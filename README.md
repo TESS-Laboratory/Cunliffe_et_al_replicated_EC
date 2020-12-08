@@ -6,11 +6,9 @@ This repository contains R code for processing, analysing and visualizing the ed
 
 ## The processed half hourly EC flux data is archived with the UK Envrionmental Information Data Centre (https://eidc.ac.uk/) and AmeriFlux (https://ameriflux.lbl.gov/)
 
-## This repo contains two scripts
+## This repo contains one script
 1) plot_datasets.r
    main script with analysis and visualization of conventional and REC fluxes
 
-2) plot_lags.r
-   analysis and visualization of lags.csv files from EdiRe to determine the correct time lags to be fed       into the proc files of EdiRe for REC preprocessing
    
    
