@@ -1,13 +1,13 @@
 
 
 
-## this script sources datasets output_ed from ediRe or given by Marcy, merges / filters /
-## despikes them, and then plots monthly time series, monthly avg days, and test 
-## for REC enclosure  
+## this script sources datasets output-ed from ediRe or AmeriFlux,
+## merges them into a single datasets
+## performs visualization and data analysis
 
 
 rm(list = ls())
-library(chron); library(oce); #library(ggplot2); library(gridExtra); 
+library(chron); library(oce)
 library(lubridate) # only for 'month()' function
 library(scales)    # for alpha in plots
 library(plotrix)   # for std.error() function
@@ -15,7 +15,7 @@ library(plotrix)   # for std.error() function
 
 path<-"E:/REC_7_Data/8_datasets/"
 rpath<-"E:/REC_7_Data/11_ReddyProc/"
-mpath<-"E:/REC_7_Data/12_Marcys_data/"
+mpath<-"E:/REC_7_Data/12_AmeriFluxs_data/"
 
 sites<-c("SEG", "SES"); recs<-1:4; towers<-paste(rep(sites, each=4), rep(recs,2), sep="_REC")
 systems<-c(towers, sites); mlabs<-c("Seg", "Ses"); soildatasets<-c("soilg", "soils")
@@ -29,11 +29,10 @@ all_fluxes<-c(fluxes, fluxes_reddy)
 pfluxes<-c("H", "Fc", "LE", "Hc", "LEc", "Fcc", "WPL_LE", "WPL_Fc", "LEcw", "Fccw")
 
 
-#last_date<-"2019_06_19_telemetry_"   # format: 'yyyy_mm_dd_'
-last_date  <-"2020_01_01_from_flash_Txcor_"
-last_date_2<-"2020_02_19_from_flash_Txcor_"
-#last_date<-"2019_10_01_from_flash_"
-#last_date<-"SEP_DEC_2019_"
+
+last_date  <-"2020_01_01_"
+last_date_2<-"2020_02_19_"
+
 last_date_reddy<-"_2019_365"          # used for files ID    ----- from point 2.2 !!! 
 last_date_use<-"01/11/2019"           # used for chron filtering
 
@@ -55,8 +54,8 @@ datasets_fa<-c(datasets_f, "gm_f", "sm_f", "ga4_f", "sa4_f", "ga3_f", "sa3_f",
                "ga23_f", "ga34_f", "ga42_f", "sa23_f", "sa34_f", "sa42_f")
 
 
-make_txt_for_reddy<-F
-run_reddy_proc<-F
+make_txt_for_reddy<-F        # prepare datasets for gapfilling
+run_reddy_proc<-F            # run gapfilling code
 
 
 
@@ -139,7 +138,7 @@ if(T){
 ### 
 ### 1.0 get REC csv datasets   =====================
 ### 
-for(i in 1:10){   # could be up to 10 for tests with Edire marcy's data
+for(i in 1:10){   # could be up to 10 for tests with Edire AmeriFlux's data
   
   
   if(i %in% c(1:8)){
@@ -147,13 +146,13 @@ for(i in 1:10){   # could be up to 10 for tests with Edire marcy's data
     dat2<-read.csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")
     fluxesc<-fluxes
   } else { 
-    dat<-read.csv(file=paste(path, "five_months_", sites[i-8], "_marcy_flux.csv", sep=""), header=TRUE, sep=",")
+    dat<-read.csv(file=paste(path, "five_months_", sites[i-8], "_AmeriFlux_flux.csv", sep=""), header=TRUE, sep=",")
     fluxesc<-pfluxes
   }
   
   
   if(i==9){  # got all raw data for SEG, not for SES
-    dat<-read.csv(file=paste(path, "all_drivingc_SEG_marcy_flux.csv", sep=""), header=TRUE, sep=",")
+    dat<-read.csv(file=paste(path, "all_drivingc_SEG_AmeriFlux_flux.csv", sep=""), header=TRUE, sep=",")
     fluxesc<-pfluxes
   }
   
@@ -275,83 +274,13 @@ for(i in 1:10){   # could be up to 10 for tests with Edire marcy's data
   }
   
   
-}   # 9 & 10 are Marcy's Data (uncorrected) with EdiRe processing
+}   # 9 & 10 are AmeriFlux's Data (uncorrected) with EdiRe processing
 
 
 
 
 #### 
-#### 1.1 check gaps in telemetry ==================
-#### 
-if(F){
-  # check if there are timegaps in single towers, their length 
-  # and changes before/after maintenece of 2019-03-02 (re-wiring of logger's green blocks)
-  
-  gmat<-matrix(NA, ncol=8, nrow=8); rownames(gmat)<-towers
-  colnames(gmat)<-c("Days BM", "Days AM", "Gaps BM", "Gaps AM", "Days/gaps BM", "Days/gaps AM",
-                    "md (h) BM", "md (h) AM")
-  
-  par(mfrow=c(2,4))
-  for(i in 1:8){
-    dti<-get(paste("dt_", datasets[i], sep=""))
-    
-    dti_bm<-dti[dti < "03/03/19"];  bmd<-as.integer(dti_bm[length(dti_bm)]-dti_bm[1]) # n of days
-    dti_am<-dti[dti >= "03/03/19"]; amd<-as.integer(dti_am[length(dti_am)]-dti_am[1])
-    
-    tdiff <- c(NA, dti[-1] - dti[-length(dti)])
-    dti[  tdiff>0.021  ]  # 0.02083333 = 30 min
-    
-    length(dti[  tdiff>0.021  ])    # number of gaps
-    
-    tdiff_bm<-c(NA, dti_bm[-1] - dti_bm[-length(dti_bm)]); nog_bm<-length(dti_bm[tdiff_bm>0.021])
-    tdiff_am<-c(NA, dti_am[-1] - dti_am[-length(dti_am)]); nog_am<-length(dti_am[tdiff_am>0.021])
-    
-    at_bm<-round(bmd/nog_bm,2)    # avg time between gaps
-    at_am<-round(amd/nog_am,2)
-    
-    
-    ## add avg duration of gaps before / after
-    mdd_bm<-median(tdiff_bm[tdiff_bm>0.021]/0.04166666, na.rm=T)
-    mdd_am<-median(tdiff_am[tdiff_am>0.021]/0.04166666, na.rm=T)
-    
-    gmat[i,]<-c(bmd, amd, nog_bm, nog_am, at_bm, at_am, mdd_bm, mdd_am)
-    
-    # data availability
-    data_av<-(length(dti)-sum(tdiff[tdiff>0.021]/0.0208333, na.rm=T))/length(dti)*100
-    
-    # missing hours on a full year (24 * 365 = 8760)
-    mhs<-(8760-sum(tdiff[tdiff>0.021]/0.04166666, na.rm=T))/8760*100
-    
-    print(towers[i])
-    #print(paste("End of data gaps:"))
-    #print(dti[  tdiff>0.021  ])
-    #print(paste("Data gaps in hours:"))
-    #print(tdiff[tdiff>0.021]/0.04166666)  # time gaps in hours 
-    print(paste("Data availability (%):", round(data_av, 2)))
-    #hist(chron::hours(dti[tdiff>0.021]), main=paste("Time of gaps",datasets[i]), xlab="Hour of day") 
-    #hist(tdiff[tdiff>0.021]/0.04166666, main=paste("Dur. of gaps", datasets[i]), xlab="Hours") 
-  }
-  
-  # using last_date<-"2019_05_06_telemetry_":
-  #          Days BM Days AM Gaps BM Gaps AM Days/gaps BM Days/Gaps AM md (h) BM md (h) AM
-  # SEG_REC1     132      64      53      34         2.49         1.88       1.0  2.000000
-  # SEG_REC2     132      64      52      31         2.54         2.06       1.0  1.750000
-  # SEG_REC3     132      62      52      30         2.54         2.07       1.0  1.500000
-  # SEG_REC4     132      63     160      60         0.82         1.05       1.0  1.500000
-  # SES_REC1     132      63     166      60         0.80         1.05       2.5  3.000000
-  # SES_REC2     132      63     157      59         0.84         1.07       2.5  3.250001
-  # SES_REC3     132      63     157      68         0.84         0.93       2.5  3.500001
-  # SES_REC4     132      63     155      53         0.85         1.19       2.5  3.000000
-  
-  # note that there were numerous issues with the SEV server after maintenance;
-  # for this reason, the higher median duration of gaps AM is not too significant
-} 
-
-
-
-
-#### 
-#### 2.0 get Marcy's csv datasets ==========
+#### 2.0 get AmeriFlux's csv datasets ==========
 #### 
 for(im in 1:2){
     
@@ -366,20 +295,8 @@ for(im in 1:2){
     datm<-rbind(d18, d19)
     
     
-    # Get corrected files for SEG
-    #if(im==1){
-    #  
-    #  sel<-datm[,"TIMESTAMP_START"]<201812111200
-    #  dato<-datm[sel,]
-    #  
-    #  datc<-read.csv(file=paste(mpath, "US-", mlabs[im], 
-    #  "_HH_201812111200_202001010000_xtr_corr.csv", sep=""), header=TRUE, sep=",")
-    #
-    #  datm<-rbind(dato, datc)
-    #}
     
-    
-    # invert Marcy's wind directions (CSAT vs Windmaster)
+    # invert AmeriFlux wind directions (CSAT vs Windmaster)
     datm[,"WD"]<-datm[,"WD"]+180; datm[ datm[,"WD"]>360 ,"WD"]<- datm[datm[,"WD"]>360  ,"WD"]-360
     
     
@@ -402,7 +319,7 @@ for(im in 1:2){
     
     
     # rm outliers/despike before ustar/gapfilling as in FLUXNET_2015 data processing protocol
-    # yes, Marcy's data still has big spikes, I checked
+    # yes, AmeriFlux's data still has big spikes, I checked
     
     # remove outliers according to Tukey's Fence: 
     # 1.5 times the inter-quartile difference (3 times iqd, it is "far out") 
@@ -436,12 +353,10 @@ for(im in 1:2){
 
 
 ####
-#### 2.0.1 get soil data from marcy ============
+#### 2.0.1 get soil data from AmeriFlux ============
 ####
 for(is in 1:2){
   
-  #g18<-read.table(file=paste(mpath, "soil_data/Previous_received_20200204/", substring(sites[is], 3), "Land_2018_soilmet.txt",sep=""), header=TRUE, sep=",")
-  #g19<-read.table(file=paste(mpath, "soil_data/Previous_received_20200204/", substring(sites[is], 3), "Land_2019_soilmet.txt",sep=""), header=TRUE, sep=",")
   g18<-read.table(file=paste(mpath, "soil_data/Previous_received_20201125/", substring(sites[is], 3), "Land_2018_soilmet_qc.txt",sep=""), header=TRUE, sep=",")
   g19<-read.table(file=paste(mpath, "soil_data/Previous_received_20201125/", substring(sites[is], 3), "Land_2019_soilmet_qc.txt",sep=""), header=TRUE, sep=",")
   
@@ -465,28 +380,9 @@ for(is in 1:2){
   
   
   colnames(gdat)<-paste(colnames(gdat), soildatasets[is], sep="_")
-  #gdat$dt<-gdt
+  
   gdat$dt<-thetimes0
-  
-  
-  
-  
-  # avg different layers, then despike and gapfill (use gm and soilg, NOT datdd)
-  
-  # merge soilg and gm, sx or dx, NOT "all"
-  
-  
-  #if(is==2){  # SES Soil Water Content needs to be despiked and gapfilled 
-  
-  #wcols<-colnames(gdat)[grepl("SWC_", colnames(gdat))]
-  #gdat[, wcols]<-despike(gdat[, wcols])    # despike from oce package
-  
-  #}
-  
-  
-  
-  
-  
+
   
   assign(soildatasets[is], gdat)
   
@@ -502,7 +398,7 @@ for(is in 1:2){
 #### 
 if(make_txt_for_reddy){
   
-  ## loop for merging REC datasets with marcy's data
+  ## loop for merging REC datasets with AmeriFlux's data
   mdata_vec<-rep(mdatasets, each=4)
   for(i in 1:8){
     
@@ -534,7 +430,7 @@ if(make_txt_for_reddy){
     rH<-dti[,paste("RH_F", mdata_vec[i], sep="_")]    # these are filled with Reddy altrady (see 3.0)
     
     
-    # from marcy's data
+    # from AmeriFlux's data
     Tair<-dti[,paste("TA_F", mdata_vec[i], sep="_") ] 
     Rg<-dti[,paste("SW_IN", mdata_vec[i], sep="_")]     # Rg = global radiation = total short wave rediation from the sun
     VPD<-dti[,paste("VPD_F", mdata_vec[i], sep="_")]    # VPD = vapor pressure deficit  
@@ -570,7 +466,7 @@ if(make_txt_for_reddy){
   }     # 1:8
   
   
-  ## rearrange marcy's data to get Reddy's input file
+  ## rearrange AmeriFlux's data to get Reddy's input file
   for (im in 1:2){
     
     dm_tr<-get(mdatasets[im])
@@ -588,7 +484,7 @@ if(make_txt_for_reddy){
     rH<-dm_tr[, paste("RH_F", mdatasets[im], sep="_")]             
     
     
-    # from marcy's data
+    # from AmeriFlux's data
     Tair<-dm_tr[,paste("TA_F",  mdatasets[im], sep="_")]   # filled with reddy (see 3.0)
     Rg  <-dm_tr[,paste("SW_IN", mdatasets[im], sep="_")]   # Rg = global radiation = total short wave rediation from the sun
     VPD <-dm_tr[,paste("VPD_F", mdatasets[im], sep="_")]   # VPD = vapor pressure deficit  
@@ -623,7 +519,7 @@ if(make_txt_for_reddy){
   }  
 
   
-  ## make Reddy's input file for avg_REC (4, 3 and 2x3 RECs)
+  ## make Reddy's input file for mean fluxes from multiple towers (4, 3 and 2x3 RECs)
   for(ia in 1:10){   # 1:10
     
     # there are 2 ways of doing the average of reddy_fluxes!
@@ -673,10 +569,10 @@ if(make_txt_for_reddy){
     
     Ustar<-mat[,"friction_velocity"]
     #Ustar<-dat5[,paste("USTAR", mdatasets[ia], sep="_")]  # used until 30/08/2019 
-    rH<-dat5[,paste("RH_F", mdatasets[iam], sep="_")]    # use marcy's because there is a lot of attenuation
+    rH<-dat5[,paste("RH_F", mdatasets[iam], sep="_")]    # use AmeriFlux's because there is a lot of attenuation
                                                         # in the REC. LE has freq-response-corr; RH does not
     
-    # from marcy's data
+    # from AmeriFlux's data
     Tair<-dat5[,paste("TA_F", mdatasets[iam], sep="_") ]   # filled with reddy (see 3.0)
     Rg<-dat5[,paste("SW_IN", mdatasets[iam], sep="_")]     # Rg = global radiation = total short wave rediation from the sun
     VPD<-dat5[,paste("VPD_F", mdatasets[iam], sep="_")]    # VPD = vapor pressure deficit  
@@ -875,7 +771,6 @@ if(run_reddy_proc){
 for(ir in c(1:20)){
   
   file_nm<-paste(rpath, asystems[ir], last_date_reddy, "_filled", xch, ".txt", sep="")
-  #file_nm<-paste(rpath, asystems[ir], "_2019_273", "_filled", xch, ".txt", sep="")
   header <- read.table(file_nm, nrows = 1, header = FALSE, sep ='\t', stringsAsFactors = FALSE)
   datr    <- read.table(file_nm, skip = 2, header = FALSE, sep ='\t')
   colnames( datr ) <- unlist(header)
@@ -909,157 +804,6 @@ for(ir in c(1:20)){
 }
 
 
-# Reddy script from Jon apply the annual u* filter (_uStar_orig), and then gap-fills (_uStar_f) 
-# u* is applied to NEE only; I think it is because H2O is lighter than air, while CO2 is heavier
-if(F){
-  
-  
-  ms<-mseas<-c("2018012")   # add more when marcy gives us more ancillary data
-                            # Ustar_uStar_Thres_g1 gives the annual value
-  
-  for(i in 1:8){
-    
-    dti_f<-get(datasets_f[i])
-    usc<-paste("Ustar", datasets[i], sep="_")
-    
-    # add month, year and hour columns
-    hh<-chron::hours(dti_f[,"dt"]); mon<-month(dti_f[,"dt"]); yyyy<-year(dti_f[,"dt"])
-    dti<-cbind(dti_f, hh, mon, yyyy)
-    
-    
-    # get uStar values
-    mt3<-towers[i];   usc<-paste("friction_velocity_", adatasets[i], sep="")
-    #if(i %in% c(9,10)){ mt3<-toupper(sites[i-8]); usc<-paste("USTAR_", adatasets[i], sep="") }
-    uss<-read.csv(file=paste(rpath, "UstarThresholds_", mt3, ".csv", sep=""), header=TRUE, sep=",")
-    
-    
-    
-    
-    if(F){
-      
-      # dti is g1_f
-      
-      plot(dti[,"NEE_g1"], type="l")
-      plot(dti[,"NEE_uStar_f_g1"], type="l")         # filled
-      plot(dti[,"NEE_uStar_orig_g1"], type="l")
-      
-      hist(dti[,"NEE_g1"]-dti[,"NEE_uStar_f_g1"])
-      range(dti[,"NEE_g1"]-dti[,"NEE_uStar_f_g1"], na.rm=T)    # -1.916298  3.438365
-      
-      hist(dti[,"NEE_uStar_orig_g1"]-dti[,"NEE_uStar_f_g1"])
-      range(dti[,"NEE_uStar_orig_g1"]-dti[,"NEE_uStar_f_g1"], na.rm=T) # 0 0
-      
-      range(dti[,"NEE_g1"]-dti[,"NEE_uStar_orig_g1"], na.rm=T)         # 0 0
-      
-      
-      sum(is.na(dti[,"NEE_g1"]))                 # 445
-      sum(is.na(dti[,"NEE_uStar_f_g1"]))         # 0          # filtered and gap-filled ?????
-      sum(is.na(dti[,"NEE_uStar_orig_g1"]))      # 1057       # just filtered with u*   ?????
-      
-      
-      plot(dti[,"Ustar_g1"], type="l", ylim=c(0,0.1))
-      abline(h=0.09378444, col="red")     # u* fall
-      abline(h=0.05164667, col="blue")    # u* winter
-      
-      
-      
-      na_dti <-dti[ is.na(dti[,"NEE_uStar_orig_g1"]),]
-      nna_dti<-dti[!is.na(dti[,"NEE_uStar_orig_g1"]),]
-      
-      
-      ## these columns use year value for the u* filter 
-      max( na_dti[,"Ustar_g1"], na.rm=T)  # 0.07711  
-      min(nna_dti[,"Ustar_g1"], na.rm=T)  # 0.00765
-      
-      
-      
-      # u* applied to NEE only?  (YES)
-      sum(is.na(dti[,"H_r_g1"]))     # 445               
-      sum(is.na(dti[,"H_f_g1"]))     # 0    
-      sum(is.na(dti[,"H_orig_g1"]))  # 445     
-      
-      sum(is.na(dti[,"LE_g1"]))       # 462               
-      sum(is.na(dti[,"LE_f_g1"]))     # 0    
-      sum(is.na(dti[,"LE_orig_g1"]))  # 462 
-      
-      
-    } # test ReddyProc u* and gap-fill 
-    
-    # derive seasonal time filter
-    
-    for(ms in mseas){  
-      
-      seas_y<-as.numeric(substring(ms, 1, 4))
-      seas_m<-as.numeric(substring(ms, 6, 7))
-      
-      w_mms<-c(seas_m-c(0,1,2))  # months of the season
-      
-      selt<-dti[,"yyyy"]==seas_y & dti[,"mon"]%in%w_mms         # time selection (seasonal)
-      selu<-dti[, usc ] <= uss[which(uss[,"season"]==ms), usc]  # u* selection (data to be discarded)
-      
-      sel<-selt & selu ### total selection
-      
-      
-      # set to NA all of the fluxes with low u* 
-      
-      
-      
-    }   ##### NOT NECESSARY !!!!
-    
-    
-    ## add YMD to each datasets, filter u*
-    ## then merge and add avg fluxes in 4.0 (and add YMD again?)
-    
-  }
-  
-  
-}
-
-
-# it does not look like Marcy's data were u*-filtered (ancillary data are gap-filled)
-if(F){
-  gm1<-gm[gm[,"dt"]< "01/04/2018", ]
-  max(gm1[is.na(gm1[,"Fc_gm"]),"USTAR_gm"], na.rm=T)    # 1.196366
-  min(gm1[!is.na(gm1[,"Fc_gm"]),"USTAR_gm"], na.rm=T)   # 0.0068839
-
-  gm2<-gm[gm[,"dt"]>="01/04/2018" & gm[,"dt"]<"01/07/2018", ]
-  max(gm2[is.na(gm2[,"Fc_gm"]),"USTAR_gm"], na.rm=T)   # 1.047384
-  min(gm2[!is.na(gm2[,"Fc_gm"]),"USTAR_gm"], na.rm=T)  # 0.01655748
-
-  gm3<-gm[gm[,"dt"]>="01/07/2018" & gm[,"dt"]<"01/10/2018", ]
-  max(gm3[is.na(gm3[,"Fc_gm"]),"USTAR_gm"], na.rm=T)    # 1.833197
-  min(gm3[!is.na(gm3[,"Fc_gm"]),"USTAR_gm"], na.rm=T)   # 0.01550167
-  
-  
-  
-  gm4<-gm[gm[,"dt"]>="01/10/2018", ]
-  max(gm4[is.na(gm4[,"Fc_gm"]),"USTAR_gm"], na.rm=T)    # 1.101494
-  min(gm4[!is.na(gm4[,"Fc_gm"]),"USTAR_gm"], na.rm=T)   # 0.009804187
-  
-  max(gm4[is.na(gm4[,"cLE_gm"]),"USTAR_gm"], na.rm=T)   # 1.101494
-  min(gm4[!is.na(gm4[,"cLE_gm"]),"USTAR_gm"], na.rm=T)  # 0.009804187
-  
-  max(gm4[is.na(gm4[,"H_gm"]),"USTAR_gm"], na.rm=T)     # 1.068232
-  min(gm4[!is.na(gm4[,"H_gm"]),"USTAR_gm"], na.rm=T)    # 0.009804187
-  
-  max(gm1[is.na(gm1[,"P_gm"]),"USTAR_gm"], na.rm=T)     # NA
-  min(gm1[!is.na(gm1[,"P_gm"]),"USTAR_gm"], na.rm=T)    # 0.0068839
-  
-  max(gm1[is.na(gm1[,"TA_gm"]),"USTAR_gm"], na.rm=T)    # NA
-  min(gm1[!is.na(gm1[,"TA_gm"]),"USTAR_gm"], na.rm=T)   # 0.0068839
-  
-  max(gm1[is.na(gm1[,"PA_gm"]),"USTAR_gm"], na.rm=T)    # NA
-  min(gm1[!is.na(gm1[,"PA_gm"]),"USTAR_gm"], na.rm=T)   # 0.0068839
-  
-  max(gm1[is.na(gm1[,"VPD_gm"]),"USTAR_gm"], na.rm=T)    # NA
-  min(gm1[!is.na(gm1[,"VPD_gm"]),"USTAR_gm"], na.rm=T)   # 0.0068839
-}
-
-
-
-
-
-
 
 
 
@@ -1077,14 +821,6 @@ if(T){
                     ga23_f, ga34_f, ga42_f, sa23_f, sa34_f, sa42_f,  
                     gp, sp, soilg, soils))      
 
-  
-  # merge all unfilled data - old
-  # data<-Reduce(function(x,y) merge(x=x, y=y, by="dt", all=T), 
-  #   list(g1,g2,g3,g4,s1,s2,s3,s4,gm,sm))
-  
-  
-  
-  
   
   # convert everything in numeric (sometimes there are issues from the .csv files)
   dcols0<-paste(rep(fluxes,  length(datasets)),  rep(datasets,  each=length(fluxes)),  sep="_")
@@ -1154,11 +890,11 @@ if(T){
   # define fluxes columns
   dcols<-paste(rep(all_fluxes, length(adatasets[adatasets != c("gm", "sm") ])) , 
                rep(adatasets[adatasets != c("gm", "sm") ], each=length(all_fluxes)), sep="_")
-  # add Marcy's
+  # add AmeriFlux's
   dcols<-c(dcols, "H_gm", "cLE_gm", "Fc_gm", "H_sm", "cLE_sm", "Fc_sm",
          paste(rep(fluxes_reddy, 2), rep(c("gm", "sm"), each=length(fluxes_reddy)), sep="_" )) 
   
-  # add Marcy's with REC pipeline
+  # add AmeriFlux's with REC pipeline
   dcols<-c(dcols, dcolsp)
   
   
@@ -1168,12 +904,6 @@ if(T){
   
   seas<-rep(1, nrow(data));      seas[mon %in% c(5, 6, 7)]<-2
   seas[mon %in% c(8, 9, 10)]<-3; seas[mon %in% c(11,12,1)]<-4
-  
-  
-  # add growing season columns (see 4.1 for dates) - before Trip 7
-  #g_seas_gm<-g_seas_sm<-rep(T, nrow(data))
-  #g_seas_gm[data[,"dt"]<"30/03/2019" | data[,"dt"]>"11/06/2019"]<-F
-  #g_seas_sm[data[,"dt"]<"23/03/2019" | data[,"dt"]>"05/07/2019"]<-F
   
   
   # add growing season columns (see 4.1 for dates)
@@ -1213,7 +943,6 @@ if(T){
 if(T){
   
   ### uncertainty following a Laplace distribution rather than guassian distribution
-  
   
   
   dat48<-datdd[49:nrow(datdd),]
@@ -1276,7 +1005,7 @@ if(F){
   
   #### add season filter according to Petrie (2015)
   #### 10 gg consecutive (first/last); threshold = 0.25 gC d-1 
-  #### use marcy's tower as reference   
+  #### use AmeriFlux's tower as reference   
   
   thres<-0.25    # 0.25
   wlen<-10       # 11
@@ -1388,11 +1117,6 @@ if(F){
   
   
   
-  
-  ### length of growing season in days (before Trip 7)
-  #gdg<-as.chron("2019-06-11")-as.chron("2019-03-30")    # 73
-  #gds<-as.chron("2019-07-05")-as.chron("2019-03-23")    # 104
-  
   ### length of growing season in days
   gdg<-(as.chron("2019-06-11")-as.chron("2019-03-30"))+(as.chron("2019-10-08")-as.chron("2019-09-13")) # 98
   gds<-(as.chron("2019-07-05")-as.chron("2019-03-23"))+(as.chron("2019-10-10")-as.chron("2019-07-29")) # 177
@@ -1400,7 +1124,7 @@ if(F){
   
   
   
-  ### try make a plot GPP vs DOY and compare with Petrie et al, fig 4
+  ### try make a plot GPP vs DOY and compare with Petrie et al (2015), fig 4
   ptest<-dggp0
   ptest$doy<-yday(dggp0[,1])
   ptest_o<-ptest[order(ptest[,"doy"]),]
@@ -1458,7 +1182,6 @@ if(T){
   
   ###### total AVG day
   avd_mn<-aggregate(data[,dcols],by=list(chron::hours(data[,"dt"])), mean, na.rm=T)
-  #avd_sd<-aggregate(data[,dcols],by=list(chron::hours(data[,"dt"])), std.error, na.rm=T)
   avd_sd<-aggregate(data[,dcols],by=list(chron::hours(data[,"dt"])), laplace_err)
   colnames(avd_mn)<-c("HOD", paste(colnames(avd_mn[-1]), "mn",  sep="_"))
   colnames(avd_sd)<-c("HOD", paste(colnames(avd_sd[-1]), "sde", sep="_"))
@@ -1468,7 +1191,6 @@ if(T){
   
   ###### dataset for seasonal avg days
   savd_mn<-aggregate(datdd[,dcols],by=list(datdd[,"yyyy"], datdd[,"seas"], chron::hours(datdd[,"dt"])), mean, na.rm=T)
-  #savd_sd<-aggregate(datdd[,dcols],by=list(datdd[,"yyyy"], datdd[,"seas"], chron::hours(datdd[,"dt"])), std.error, na.rm=T)
   savd_sd<-aggregate(datdd[,dcols],by=list(datdd[,"yyyy"], datdd[,"seas"], chron::hours(datdd[,"dt"])), laplace_err)
   colnames(savd_mn)<-c("yyyy", "seas", "HOD", paste(colnames(savd_mn)[-c(1:3)], "mn",  sep="_"))
   colnames(savd_sd)<-c("yyyy", "seas", "HOD", paste(colnames(savd_sd)[-c(1:3)], "sde", sep="_"))
@@ -1478,7 +1200,6 @@ if(T){
   
   ###### dataset for monthly avg days
   tavd_mn<-aggregate(datdd[,dcols],by=list(datdd[,"yyyy"], datdd[,"mon"], chron::hours(datdd[,"dt"])), mean, na.rm=T)
-  #tavd_sd<-aggregate(datdd[,dcols],by=list(datdd[,"yyyy"], datdd[,"mon"], chron::hours(datdd[,"dt"])), std.error, na.rm=T)
   tavd_sd<-aggregate(datdd[,dcols],by=list(datdd[,"yyyy"], datdd[,"mon"], chron::hours(datdd[,"dt"])), laplace_err)
   colnames(tavd_mn)<-c("yyyy", "mon", "HOD", paste(colnames(tavd_mn)[-c(1:3)], "mn",  sep="_"))
   colnames(tavd_sd)<-c("yyyy", "mon", "HOD", paste(colnames(tavd_sd)[-c(1:3)], "sde", sep="_"))
@@ -1498,12 +1219,6 @@ if(T){
   ylim_F<-range(tavd_m[,paste(fcol, "mn", sep="_")]+tavd_m[,paste(fcol, "sde", sep="_")],
                 tavd_m[,paste(fcol, "mn", sep="_")]-tavd_m[,paste(fcol, "sde", sep="_")], na.rm=T)
   
-  #ylim_H<-range(tavd_m[,paste("Hc", adatasets[1:10], "mn", sep="_")]+tavd_m[,paste("Hc", adatasets[1:10], "sde", sep="_")],
-  #              tavd_m[,paste("Hc", adatasets[1:10], "mn", sep="_")]-tavd_m[,paste("Hc", adatasets[1:10], "sde", sep="_")], na.rm=T)
-  #ylim_LE<-range(tavd_m[,paste("cLEc", adatasets[1:10], "mn", sep="_")]+tavd_m[,paste("cLEc", adatasets[1:10], "sde", sep="_")],
-  #               tavd_m[,paste("cLEc", adatasets[1:10], "mn", sep="_")]-tavd_m[,paste("cLEc", adatasets[1:10], "sde", sep="_")], na.rm=T)
-  #ylim_F<-range(tavd_m[,paste("Fcc", adatasets[1:10], "mn", sep="_")]+tavd_m[,paste("Fcc", adatasets[1:10], "sde", sep="_")],
-  #              tavd_m[,paste("Fcc", adatasets[1:10], "mn", sep="_")]-tavd_m[,paste("Fcc", adatasets[1:10], "sde", sep="_")], na.rm=T)
   ylims<-list(ylim_H, ylim_LE, ylim_F)
   
   
@@ -1523,8 +1238,7 @@ if(T){
   wea_par<-c("TA", "SW_IN", "NETRAD")
   wea_cols<-paste(rep(wea_par, length(mdatasets)), rep(mdatasets, each=length(wea_par)), sep="_")
   wea_mn<-aggregate(datdd[,wea_cols],by=list(datdd[,"yyyy"], datdd[,"mon"], chron::hours(datdd[,"dt"])), mean, na.rm=T)
-  #colnames(wea_mn)<-c("yyyy", "mon", "HOD", paste(colnames(wea_mn)[-c(1:3)], "mn",  sep="_"))
-  
+
   
   
   p_mn<-aggregate(datdd[,c("P_gm", "P_sm")], 
@@ -1538,7 +1252,7 @@ if(T){
   colnames(pm)[1:2]<-c("yyyy", "mon")
   
 }
-#
+
 
 
 
@@ -1566,12 +1280,12 @@ if(F){
   #library(RColorBrewer)   # max n:9; need combine with colorRampPalette
   
   
-  ### marcy's footprint are currently done with some data from REC1
+  ### AmeriFlux's footprint are currently done with some data from REC1
   
   datfoot0<-datdd
   lb<-""
   time_f<-""    # can be "day_time", "night_time", ""
-  marcy_f<-T
+  AmeriFlux_f<-T
   xl<-440      # default
   
   if(time_f=="day_time")  {lb<-"_day";   xl<-250}
@@ -1581,8 +1295,8 @@ if(F){
   wcols<-paste(rep( c("MO_stability", "sigma_V", "friction_velocity", "Wind_Dir"), length(datasets)),
                rep(datasets, each=4), sep="_") 
   
-  # last Marcy's corrected fluxes do not have the extra columns
-  if(marcy_f)wcols<-c(wcols, paste( rep( c("zoL", "V_SIGMA", "USTAR", "WD", "SW_IN" ), 2), 
+  # last AmeriFlux's corrected fluxes do not have the extra columns
+  if(AmeriFlux_f)wcols<-c(wcols, paste( rep( c("zoL", "V_SIGMA", "USTAR", "WD", "SW_IN" ), 2), 
                                     rep(mdatasets, each=5), sep="_"))
   
   
@@ -1955,7 +1669,7 @@ if(F){
     if(F){
       ppath<-"E:/REC_7_Data/10_Plots/footprints/"
       filenm<-paste(ppath, mt3, "_", last_date, "footprint", 
-                    ifelse(marcy_f, "_mdata",""), lb, "_all.png", sep="")
+                    ifelse(AmeriFlux_f, "_mdata",""), lb, "_all.png", sep="")
       
       png(filenm, width=600, height=600)
       
@@ -2120,7 +1834,7 @@ if(F){
           if(dt %in% c(9,10)){mt3<-sites[dt-8]}
           
           ppath<-paste("E:/REC_7_Data/10_Plots/footprints/monthly_avg_days/", mt3, "/", sep="")
-          filenm<-paste(ppath, mt3, "_", last_date, "footprint", ifelse(marcy_f, "_mdata",""), 
+          filenm<-paste(ppath, mt3, "_", last_date, "footprint", ifelse(AmeriFlux_f, "_mdata",""), 
                         "_", mon_ys[i,1], "_", mon_ys[i,2], "_", hi, ".png", sep="")
           
           png(filenm, width=600, height=600)
@@ -2499,10 +2213,7 @@ if(F){
   ###### 6.3 hourly footprint for clusters / probability sum for clusters (/5) and towers ######
   # ========================================================================================== #
   
-  
-  #save(pmat, file = paste("E:/REC_7_Data/9_R/Rdata/", "pmat_", 
-  #                        mon_ys[k,"yyyy"], "_", mon_ys[k,"mon"], ".Rdata", sep=""))
-  
+
   
   mon_ys<-unique(datfoot0[,c("yyyy", "mon")])
   datfoot_t<-datfoot0
@@ -2512,7 +2223,7 @@ if(F){
    
   
   
-  for(k in 12){  # 1:nrow(mon_ys)
+  for(k in 1:nrow(mon_ys)){  # loops over different months
     
     datfoot<-datfoot_t[  datfoot_t[,"yyyy"]==mon_ys[k,"yyyy"] & datfoot_t[,"mon"]==mon_ys[k,"mon"] , ]
     
@@ -2523,7 +2234,7 @@ if(F){
     pmat_80<-pmat
     
     
-    for(i in 1:nrow(datfoot)){     # 1:nrow(datfoot)
+    for(i in 1:nrow(datfoot)){     # loops over different half-hourly data
       
       #i<-4   # first that does not abort
       
@@ -2559,7 +2270,7 @@ if(F){
         sel80c<-matrix(F, ncol=2*xl+1, nrow=2*xl+1)
         
         
-        for(dt in dts){
+        for(dt in dts){   # loops over different towers
           
           print(paste(towers[dt]))
           mt3<-towers[dt]; if(dt %in% c(9,10)){mt3<-sites[dt-8]}
@@ -2662,35 +2373,6 @@ if(F){
           
           
           
-          ###############################################################
-          if(F){
-            library(exactextractr)
-            library(sf)
-            
-            crdm<-matrix(c(xs, ys), ncol=2)
-            # add NAD83 coord to the coordinates / NAD_1983_UTM_Zone_13N 
-            #	SEG   X: 343643, Y: 3803412
-            #	SES   X: 339497, Y: 3800677
-            
-            
-            crdd<-data.frame("xs"=xs, "ys"=ys)
-            
-            # this works, but MUST be a polygon
-            mp<-st_multipoint(x = crdm, dim =  "XY")  # this is NOT in NAD83
-            
-            # this is a polygon
-            po<-st_polygon(x = list(crdm), dim =  "XY") # this is NOT in NAD83
-            
-            
-            
-            # segr is fine (RasterLayer)
-            # crd must be an sf object with polygonal geometries
-            prob <- exact_extract(segr, po, 'mean') 
-            
-          }  # exact extract testing
-          ###############################################################
-          
-          
           
           # for when the lines are produced, but then are translated outside of the cluster footprint
           rx[rx<(-xl)]<-(-xl); rx[rx>xl]<-xl
@@ -2723,7 +2405,7 @@ if(F){
           
            
           
-        } # end of dts loop
+        } # end of dts loop over towers
         
         
         if(abort_plot){print("missing footprint"); abort_plot<-F; next}
@@ -2753,14 +2435,6 @@ if(F){
           if(!file.exists(filenm)){
             png(filenm, width=900, height=900)    # was 600
             par(mar=c(5,5,4,4), oma=c(1,1,1,2) )
-            
-            
-            #quilt.plot(xp, yp, fp, nx=400,ny=400, xlim=c(-199,200),ylim=c(-199,200)) # was c(-499, 500)
-            #zmax<-0.001; nlevs=1000
-            #image.plot(xp3, yp3, fp3, zlim=c(0,zmax), 
-            #           col=magma(nlevs), breaks=(0:nlevs)^5/(nlevs+1)^5*zmax)
-            
-            #image.plot(xp3, yp3, fp3, xlab="", ylab="")
             
             image.plot(FFP$y_2d, FFP$x_2d, totfootn, xlab="", ylab="", zlim=c(-0.00001, 0.0005),
                        cex.axis=1.5) #, legend.args=list(text="", cex.legend=1.5))   # FFP_gm
@@ -2938,7 +2612,7 @@ plot_avg_day<-function(avd=avd, mon=NULL, year=NULL, ylims=NULL, test_2=F){
 }
 
 
-plot_avg_day_marcy<-function(avd=avd, mon=NULL, year=NULL, ylims=NULL, 
+plot_avg_day_AmeriFlux<-function(avd=avd, mon=NULL, year=NULL, ylims=NULL, 
         add_P=F, pmd=pmd, pavd=pavd, irga_s=F, no_seg_nee=F, avg_rec3=F){
   
   #browser()
@@ -3007,10 +2681,10 @@ plot_avg_day_marcy<-function(avd=avd, mon=NULL, year=NULL, ylims=NULL,
   
   ppath<-"E:/REC_7_Data/10_Plots/2_avg_mon_video/"
   ap<-""; if(add_P)ap<-"add_P_"
-  if(!irga_s)filenm<-paste(ppath, holl, xct, ap, "marcy_avg_days_", year, "_", substring(1000+mon, 3,4), "corr_EC0_test.png", sep="")
-  if(irga_s)filenm<-paste(ppath, holl, xct, ap, "marcy_avg_days_", year, "_corr.png", sep="") # year=e.g Switch1_minus_60
+  if(!irga_s)filenm<-paste(ppath, holl, xct, ap, "AmeriFlux_avg_days_", year, "_", substring(1000+mon, 3,4), "corr_EC0_test.png", sep="")
+  if(irga_s)filenm<-paste(ppath, holl, xct, ap, "AmeriFlux_avg_days_", year, "_corr.png", sep="") # year=e.g Switch1_minus_60
   if((is.null(mon)&is.null(year))){ filenm<-paste("E:/REC_7_Data/10_Plots/", holl, xct, 
-                                                  "marcy_avg_days_total_corr_EC0.png", sep="") }
+                                                  "AmeriFlux_avg_days_total_corr_EC0.png", sep="") }
   
   
   png(filenm, width=600, height=500)
@@ -3077,16 +2751,14 @@ plot_avg_day_marcy<-function(avd=avd, mon=NULL, year=NULL, ylims=NULL,
 
 
 plot_months_3_1<-function(dat=dat, mon=mm, year=yy, telemetry=F, RH="cell", corrected=T, 
-        marcy=F, marcy_edire=F, avg_rec4=T, avg_rec3=F, no_rec234=T, no_rec1=F, no_seg_nee=F,
+        AmeriFlux=F, AmeriFlux_edire=F, avg_rec4=T, avg_rec3=F, no_rec234=T, no_rec1=F, no_seg_nee=F,
         add_wdir=F, add_ts=F, add_w=F){
   
   
-  #telemetry<-F; RH<-"cell"; corrected<-T; marcy<-F; avg_rec4<-T; avg_rec3<-T; only_rec1<-T
+  #telemetry<-F; RH<-"cell"; corrected<-T; AmeriFlux<-F; avg_rec4<-T; avg_rec3<-T; only_rec1<-T
   
   
   cols<-c("purple", "green",  "darkgreen", "brown",  "black",    "orange", "cyan",          "blue",    "red")
-  #labg<-c("SEG EC1","SEG EC2","SEG EC3",   "SEG EC4","SEG mn 4", "US-SEG", "Precipitation", "SEG mn3", "US-SEG EdiRe")
-  #labs<-c("SES EC1","SES EC2","SES EC3",   "SES EC4","SES mn 4", "US-SES", "Precipitation", "SES mn3", "US-SES EdiRe")
   labg<-labs<-c("EC1","EC2","EC3",   "EC4","EC1234", "EC0", "Precip", "EC234", "EC0 EdiRe")
   
   sel<-c(T, T, T, T, F, F, F, F, F)
@@ -3152,10 +2824,10 @@ plot_months_3_1<-function(dat=dat, mon=mm, year=yy, telemetry=F, RH="cell", corr
   
   
   
-  if(marcy){recs<-c(recs,"m");     sel[c(6,7)]<-T}
+  if(AmeriFlux){recs<-c(recs,"m");     sel[c(6,7)]<-T}
   systems<-paste(rep(c("g", "s"), each=length(recs)), rep(recs, 2), sep="")
   cols_to_plot<-paste(rep(fluxes, each=length(systems)), rep(systems, 3), sep="_")
-  if(marcy)cols_to_plot[grepl("m", cols_to_plot)]<-c("H_gm", "H_sm", "cLE_gm", "cLE_sm", "Fc_gm", "Fc_sm")
+  if(AmeriFlux)cols_to_plot[grepl("m", cols_to_plot)]<-c("H_gm", "H_sm", "cLE_gm", "cLE_sm", "Fc_gm", "Fc_sm")
   
   
   if(no_rec234){
@@ -3175,7 +2847,7 @@ plot_months_3_1<-function(dat=dat, mon=mm, year=yy, telemetry=F, RH="cell", corr
   
   
   
-  if(marcy_edire){
+  if(AmeriFlux_edire){
     cols_to_plot<-c("Hc_g1", "H_gm", "Hc_gp", "cLEc_g1", "cLE_gm", "LEcw_gp", "Fcc_g1", "Fc_gm", "Fccw_gp",
                     "Hc_s1", "H_sm", "Hc_sp", "cLEc_s1", "cLE_sm", "LEcw_sp", "Fcc_s1", "Fc_sm", "Fccw_sp")
     sel<-sel<-c(T, F, F, F, F, T, F, F, T)
@@ -3396,10 +3068,6 @@ plot_REC1_vs_conv1<-function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_seg_nee=F)
     mfx<-c("H_f_gm", "LE_f_gm", "NEE_uStar_f_gm", "H_f_sm", "LE_f_sm", "NEE_uStar_f_sm")
   }
   
-  
-  ##### theil-sen estimator take faaaar too long to calculate
-  
-  
     
   # Total least squares
   ints<-slopes<-cors<-rep(NA, 6)
@@ -3440,7 +3108,6 @@ plot_REC1_vs_conv1<-function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_seg_nee=F)
   
   
   pl_name<-paste("E:/REC_7_Data/10_Plots/6_REC1_vs_Conv/corr_REC1_vs_Conv_", xct, year, "_", mon, attr, "_00.pdf", sep="")
-  #png(pl_name, width=900, height=1350)
   pdf(pl_name, width=100, height=150)
   par(mfrow=c(3,2), mar=c(8,9,5,1) , oma=c(0,0,10,0), mgp=c(5.5 ,2, 0))
   
@@ -3546,7 +3213,7 @@ plot_REC1_vs_conv1_ggplot<-function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_seg
   library(ggplot2)
   library(ggpubr)      # needed for ggarrange
   
-  # https://www.r-graph-gallery.com/2d-density-plot-with-ggplot2.html
+  # https://www.r-graph-gallery.com/2d-density-plot-with-ggplot2.html - for reference
   
   # 'mode' parameter can be: 
   # 1) raw, 
@@ -3582,16 +3249,7 @@ plot_REC1_vs_conv1_ggplot<-function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_seg
 
     
   
-  
-  
-  
-  
-  
-  
-  ##### theil-sen estimator take faaaar too long to calculate
-  
-  
-  
+
   # Total least squares
   ints<-slopes<-cors<-rep(NA, 6)
   for(i in 1:6){
@@ -3624,9 +3282,6 @@ plot_REC1_vs_conv1_ggplot<-function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_seg
   
   pl_name<-paste("E:/REC_7_Data/10_Plots/6_REC1_vs_Conv/corr_REC1_vs_Conv_", 
                  xct, year, "_", mon, attr, "_ggplot", sl, "_00_test.png", sep="")
-  #png(pl_name, width=900, height=1350)
-  #par(mfrow=c(3,2), mar=c(8,9,5,1) , oma=c(0,0,10,0), mgp=c(5.5 ,2, 0))
-  
   
   # H / US-SEG
   
@@ -3759,11 +3414,7 @@ plot_REC1_vs_conv1_ggplot<-function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_seg
   
   ### rearrange
   pall<-ggarrange(gh, sh, gl, sl, gn, sn, 
-                  #labels = c("A", "B", "C"),
                   ncol = 2, nrow = 3)
-  
-  
-  #pall
   
   ggsave(
     pall,
@@ -3772,15 +3423,6 @@ plot_REC1_vs_conv1_ggplot<-function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_seg
     height = 30,
     units = "cm"
   )
-  
-  #png(pl_name, width = 10, height = 15, unit="cm")
-  #pdf(pl_name, width = 100, height = 150)
-  #print(pall)
-  #dev.off()
-  
-  
-  
-  
   
   
 }  # end function _ggplot
@@ -3800,7 +3442,7 @@ plot_NEE_months_10x3<-function(dat=dat_ym, mon=mm, year=yy){
   pids<-c("_m_1", "_2_3_4")
   
   cols<-c("purple", "green",  "darkgreen", "brown",   "orange", "cyan"    )
-  labs<-c("EC1",    "EC2",    "EC3",       "EC4",     "Marcy",  "Precipit")
+  labs<-c("EC1",    "EC2",    "EC3",       "EC4",     "AmeriFlux",  "Precipit")
   
   dts<-c("g1",  "g2", "g3", "g4", "s1", "s2", "s3", "s4", "gm", "sm")
   plabs<-c("a)", "b)", "c)")
@@ -3818,7 +3460,7 @@ plot_NEE_months_10x3<-function(dat=dat_ym, mon=mm, year=yy){
     
     
     
-    for(ip in 1:2){   # plot  Marcy and REC1 or REC 2_3_4 
+    for(ip in 1:2){   # plot  AmeriFlux and REC1 or REC 2_3_4 
       
       ks<-c(1, 5); if(ip==2)ks<-c(2, 3, 4)
       
@@ -3901,7 +3543,6 @@ dat_ym<-aggregate(datdd[,dcols],by=list(dates(datdd[,"dt"])), sum, na.rm=T)
 
 # plot REC1 vs US-SEX (all)
 mon<-mm<-NULL; year<-yy<-NULL; dat_ym<-dat<-datdd
-#plot_REC1_vs_conv1(mode="reddy", dat_ym=dat_ym, mon=mm, year=yy, no_seg_nee = F)
 plot_REC1_vs_conv1_ggplot(mode="reddy", dat_ym=dat_ym, mon=mm, year=yy, no_seg_nee = F)
 
 
@@ -3914,7 +3555,6 @@ fg<-c("H_f_g1", "LE_f_g1", "NEE_uStar_f_g1", "H_f_gm", "LE_f_gm", "NEE_uStar_f_g
 fs<-c("H_f_s1", "LE_f_s1", "NEE_uStar_f_s1", "H_f_sm", "LE_f_sm", "NEE_uStar_f_sm", "H_f_sa4", "LE_f_sa4", "NEE_uStar_f_sa4")
 dat_ym[ dat_ym[,"g_seas_gm"]==F,  fg ]<-NA
 dat_ym[ dat_ym[,"g_seas_sm"]==F,  fs ]<-NA
-#plot_REC1_vs_conv1(mode="reddy", dat_ym=dat_ym, mon=mm, year=yy, no_seg_nee = F)
 plot_REC1_vs_conv1_ggplot(mode="reddy", dat_ym=dat_ym, mon=mm, year=yy, no_seg_nee = F, seas=seas_i)
 
 
@@ -3928,13 +3568,12 @@ fg<-c("H_f_g1", "LE_f_g1", "NEE_uStar_f_g1", "H_f_gm", "LE_f_gm", "NEE_uStar_f_g
 fs<-c("H_f_s1", "LE_f_s1", "NEE_uStar_f_s1", "H_f_sm", "LE_f_sm", "NEE_uStar_f_sm", "H_f_sa4", "LE_f_sa4", "NEE_uStar_f_sa4")
 dat_ym[ dat_ym[,"g_seas_gm"]==T,  fg ]<-NA
 dat_ym[ dat_ym[,"g_seas_sm"]==T,  fs ]<-NA
-#plot_REC1_vs_conv1(mode="reddy", dat_ym=dat_ym, mon=mm, year=yy, no_seg_nee = F)
 plot_REC1_vs_conv1_ggplot(mode="reddy", dat_ym=dat_ym, mon=mm, year=yy, no_seg_nee = F, seas=seas_i)
 
 
 
 
-# plot avg_day marcy
+# plot avg_day AmeriFlux
 
 fg<-c("Hc_g1",   "Hc_ga4",   "H_gm", "cLEc_g1", "cLEc_ga4", "cLE_gm", "Fcc_g1",  "Fcc_ga4",  "Fc_gm")
 fs<-c("Hc_s1",   "Hc_sa4",   "H_sm", "cLEc_s1", "cLEc_sa4", "cLE_sm", "Fcc_s1",  "Fcc_sa4",  "Fc_sm")
@@ -3947,7 +3586,7 @@ colnames(avd_mn)<-c("HOD", paste(colnames(avd_mn[-1]), "mn", sep="_"))
 colnames(avd_sd)<-c("HOD", paste(colnames(avd_sd[-1]), "sde", sep="_"))
 avd_m<-merge(avd_mn, avd_sd, by="HOD")
 
-plot_avg_day_marcy(avd=avd_m, mon=mm, year=yy, ylims=ylims, add_P=F, pmd=pm, pavd=p_mn)
+plot_avg_day_AmeriFlux(avd=avd_m, mon=mm, year=yy, ylims=ylims, add_P=F, pmd=pm, pavd=p_mn)
 
 
 
@@ -3961,15 +3600,15 @@ plot_NEE_months_10x3(dat=dat_ym, mon=mm, year=yy)
 # plotting functions --------- operational area
 
 if(F){
-  ##### monthly plots
+  ##### monthly plots - commnet (out) plots that you (do not) want to plot
   
   for(yy in unique(datdd[,"yyyy"])){
     for(mm in sort(unique(datdd[,"mon"]))){
       print(paste(yy, mm))
       dat_ym<-datdd[datdd[,"yyyy"]==yy & datdd[,"mon"]==mm,]
       if(nrow(dat_ym)>1){
-        #plot_months_3_1(dat=dat_ym, mon=mm, year=yy, RH="cell", corrected=T, marcy=T, 
-         #               marcy_edire=F, avg_rec4=T, avg_rec3=F, no_rec234=T, no_rec1=F, 
+        #plot_months_3_1(dat=dat_ym, mon=mm, year=yy, RH="cell", corrected=T, AmeriFlux=T, 
+         #               AmeriFlux_edire=F, avg_rec4=T, avg_rec3=F, no_rec234=T, no_rec1=F, 
           #              no_seg_nee=F, add_wdir=F, add_ts=F, add_w=F)
         #plot_REC1_vs_conv1(mode="reddy", dat_ym=dat_ym, mon=mm, year=yy)
         ###   
@@ -3986,11 +3625,9 @@ if(F){
           avd_m<-merge(avd_mn, avd_sd, by="HOD")
           
           #plot_avg_day(avd=avd_m, mon=mm, year=yy, ylims=ylims, test_2=T)
-          plot_avg_day_marcy(avd=avd_m, mon=mm, year=yy, ylims=ylims, add_P=F, 
+          plot_avg_day_AmeriFlux(avd=avd_m, mon=mm, year=yy, ylims=ylims, add_P=F, 
                              pmd=pm, pavd=p_mn, irga_s=F, no_seg_nee = F)
         }
-        #print(range(dat_ym[,"P_gm"]))
-        #print(range(dat_ym[,"P_sm"]))
       }
     }
   }
@@ -4095,45 +3732,6 @@ if(T){
 #
 if(T){
   
-  
-  # derive ends and begs for the "monthly" plots
-  #sdates<-c("11/12/2018", "17/07/2019")
-  
-  begd<-c("11/10/2018", "11/11/2018", "12/12/2018", "12/01/2019", "17/05/2019", "17/06/2019", "18/07/2019", "18/08/2019")
-  endd<-c("11/11/2018", "11/12/2018", "12/01/2019", "12/02/2019", "17/06/2019", "17/07/2019", "18/08/2019", "18/09/2019")
-  idd<-c("1_switch1_m60", "2_switch1_m30", "3_switch1_p30", "4_switch1_p60", 
-         "5_switch2_m60", "6_switch2_m30", "7_switch2_p30", "8_switch2_p60")
-  
-  
-  
-  
-  for(i in 1:8){
-    
-    dat_ym<-datdd[ datdd[,"dt"]>=begd[i] & datdd[,"dt"]<endd[i], ]
-    
-    avd_mn<-aggregate(dat_ym[,dcols],by=list(chron::hours(dat_ym[,"dt"])), mean, na.rm=T)
-    avd_sd<-aggregate(dat_ym[,dcols],by=list(chron::hours(dat_ym[,"dt"])), laplace_err)
-    colnames(avd_mn)<-c("HOD", paste(colnames(avd_mn[-1]), "mn", sep="_"))
-    colnames(avd_sd)<-c("HOD", paste(colnames(avd_sd[-1]), "sde", sep="_"))
-    avd_m<-merge(avd_mn, avd_sd, by="HOD")
-    
-    # need to remove all night hours
-    
-    # add button for irga_s
-    
-    
-    plot_avg_day_marcy(avd=avd_m, mon=paste("from", begd[i]), year=idd[i], 
-                       ylims=ylims, add_P=F, pmd=pm, pavd=p_mn, irga_s=T)
-  }
-  
-  
-  
-  
-  
-}  # average day of 30 days before/after IRGA switch
-#
-if(T){
-  
   # better to do this for avg_day hours, not the complete time series (tavd_mn) - it also does not go
   
   
@@ -4206,7 +3804,7 @@ if(T){
   
   
   
-}  # spread of individual towers (range/mean - not good)
+}  # spread of individual towers
 #
 if(T){
   
@@ -4570,8 +4168,8 @@ if(T){
   dat <-read.csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")
   
   files<-c("GLand_2018_soilmet.txt", "GLand_2019_soilmet.txt", "SLand_2018_soilmet.txt", "SLand_2019_soilmet.txt")
-  patho<- "E:/REC_7_Data/12_Marcys_data/soil_data/Previous_received_20200204/"
-  pathn<- "E:/REC_7_Data/12_Marcys_data/soil_data/Previous_received_20201123/"
+  patho<- "E:/REC_7_Data/12_AmeriFluxs_data/soil_data/Previous_received_20200204/"
+  pathn<- "E:/REC_7_Data/12_AmeriFluxs_data/soil_data/Previous_received_20201123/"
   
   for(i in 1:4){
     
@@ -4588,7 +4186,7 @@ if(T){
   # old and new datasets are completely the same!
   
   
-}  # Test new vs old soil data from Marcy
+}  # Test new vs old soil data from AmeriFlux
 #
 if(T){
   
@@ -4631,7 +4229,7 @@ if(T){
   ### Energy Balance with Tomer's small datasets
   ###
   
-  tpath<-"E:/REC_7_Data/12_Marcys_data/soil_data/Previous_received_20201125/"
+  tpath<-"E:/REC_7_Data/12_AmeriFluxs_data/soil_data/Previous_received_20201125/"
   gt<-read.table(file=paste(tpath, "Seg_eb_table.csv", sep=""), header=TRUE, sep=",")
   st<-read.table(file=paste(tpath, "Ses_eb_table.csv", sep=""), header=TRUE, sep=",")
   
@@ -4700,7 +4298,7 @@ if(T){
   
   
   
-}  # Test energy balance with files from Tomer
+}  # Test energy balance with files from AmeriFlux
 
 
 
@@ -4709,6 +4307,8 @@ if(T){
 ## S3 Extra plots ================================
 
 if(T){
+  
+  # MAT and TAP
   
   sum(gm[,"P_F_gm"], na.rm=T)    # 516.874
   sum(sm[,"P_F_sm"], na.rm=T)    # 457.656
@@ -4726,7 +4326,9 @@ if(T){
 #
 if(T){
   
-  for(k in 1:12){
+  # daily land cover probabilities
+  
+  for(k in 1:12){   # loops over months
     #k<-12
     mon_ys<-unique(datfoot0[,c("yyyy", "mon")])
     load(file = paste("E:/REC_7_Data/9_R/Rdata/", "pmat_80_", 
@@ -4735,7 +4337,7 @@ if(T){
     
     
     
-    for(di in unique(pmat_80[,"dd"])){
+    for(di in unique(pmat_80[,"dd"])){      # loops over days
       
       tlab1<-paste(mon_ys[k,"yyyy"], mon_ys[k,"mon"], di, sep="_")
       pmatd<-pmat_80[ pmat_80[,"dd"]==di, ]
@@ -4746,7 +4348,7 @@ if(T){
       
       
       
-      for(cluster in sites){
+      for(cluster in sites){     # loops over different sites
         
         tws<-c("SEG", "gm", "g1", "g2", "g3", "g4"); 
         leg<-c("SEG cluster", "US-SEG", "SEG1", "SEG2", "SEG3", "SEG4"); 
@@ -4796,6 +4398,9 @@ if(T){
 }  # daily land cover probabilities
 #
 if(T){
+  
+  # growing / senescent periods fluxes matrix / barchart
+  
   reddy<-T
   hollinger<-T  # if reddy & hollinger
   ECs2<-T       # use mean of 2 towers
@@ -4848,8 +4453,6 @@ if(T){
   if(hollinger){
     seg_se<-aggregate( abs( datdd[,paste("res", cols_seg, sep="_")]), by=list(datdd[,"g_seas_gm"]), laplace_err)   
     ses_se<-aggregate( abs( datdd[,paste("res", cols_ses, sep="_")]), by=list(datdd[,"g_seas_sm"]), laplace_err)
-    #seg_se<-aggregate(datdd[,cols_seg],by=list(datdd[,"g_seas_gm"]), laplace_err)   
-    #ses_se<-aggregate(datdd[,cols_ses],by=list(datdd[,"g_seas_sm"]), laplace_err)
     lb<-"_hollinger"
   } else {
     seg_se<-seg_se0
@@ -4864,9 +4467,6 @@ if(T){
     seg_af<-aggregate(datdd[,cols_seg],by=list(datdd[,"Group.1"]), mean, na.rm=T)   
     ses_af<-aggregate(datdd[,cols_ses],by=list(datdd[,"Group.1"]), mean, na.rm=T)
     
-    #seg_se<-aggregate(datdd[,cols_seg],by=list(datdd[,"Group.1"]), laplace_err)   
-    #ses_se<-aggregate(datdd[,cols_ses],by=list(datdd[,"Group.1"]), laplace_err)
-    
     seg_se<-aggregate(  datdd[,paste("res", cols_seg, sep="_")], by=list(datdd[,"Group.1"]), laplace_err)   
     ses_se<-aggregate(  datdd[,paste("res", cols_ses, sep="_")], by=list(datdd[,"Group.1"]), laplace_err)
      
@@ -4879,7 +4479,7 @@ if(T){
   bard<-merge(seg_af, ses_af, by="Group.1"); bard<-as.matrix(bard[,2:ncol(bard)])
   bare<-merge(seg_se, ses_se, by="Group.1"); bare<-as.matrix(bare[,2:ncol(bare)])
   
-  # reorder to Means, Marcy, RECs
+  # reorder to Means, AmeriFlux, RECs
   bard<-bard[,    ll*rep(0:5, each=ll) + rep(c(6:ll, 5, 1:4), 6)   ]
   bare<-bare[,    ll*rep(0:5, each=ll) + rep(c(6:ll, 5, 1:4), 6)   ]
   
@@ -4904,10 +4504,6 @@ if(T){
   ylimle <- c(0, max( bard[, colle]  + bare[,colle], na.rm=T)  * 1.15)
   ylimnee<- c(min( bard[, colnee] - bare[,colnee], na.rm=T) * 1.05, 
               max( bard[, colnee] + bare[,colnee], na.rm=T) * 1.6)  # was 1.15
-  
-  #if(!ECs2)xlabs<-c("EC1", "EC2", "EC3", "EC4", "EC", "mn 4", "mn 3")
-  #if(ECs2) xlabs<-c("EC1", "EC2", "EC3", "EC4", "EC", "mn 4", "mn 3", "mn 2-23", "mn 2-34", "mn 2-42")
-  
   
   
   x1<-6.5; x2<-9.5; x3<-27.5; x4<-30.5
@@ -4990,152 +4586,12 @@ if(T){
 #
 if(T){
   
-  ## LE = lambda * (ET [mm]) / time (sec)
-  
-  lambda <- 2.501E6   # J Kg-1
-  
-  
-  
-  ## evaluate LE for all 5 towers against marcy's Precipitation
-  
-  sel<-datdd[,"dt"]>="01/11/18"
-  
-  dat_et<-datdd[sel, c(paste("cLEc", datasets, sep="_"), "cLE_gm", "cLE_sm")]
-  colnames(dat_et)<-paste("ET", adatasets[1:10], sep="_")
-  dat_et<-dat_et / lambda * 1800     # ET [mm 30 min-1]
-  dat_et[is.na(dat_et)]<-0
-  dat_etc<-dat_et
-  #dmat<-dmat[dmat[,"dt"]>="01/11/18",]
-  for(i in 1:ncol(dat_et))dat_etc[,i]<-cumsum(dat_et[,i])
-  
-  
-  ## LE = lambda * (ET [mm]) / time (sec)
-  ## ET = LE * time / ET
-  
-  ## ET [mm]  =   
-  ## ET [kg m-2]   =   
-  ## LE [W m-2] * time [s] / lambda [J Kg-1]  =
-  ## LE [J s-1 m-2] * time [s] / lambda [J kg-1]   =
-  ## LE [J s-1 m-2] * time [s] * lambda [J-1 kg]   ~  [kg m-2]
-  
-  
-  pdat<-matrix(NA, ncol=10, nrow=nrow(datdd[sel,]))
-  pdat[,c(1:4,9)] <-datdd[sel, "P_hh_gm"]
-  pdat[,c(5:8,10)]<-datdd[sel, "P_hh_sm"]
-  pdat[is.na(pdat)]<-0
-  
-  pdatt<-pdat-dat_et; colnames(pdatt)<-colnames(dat_et)
-  for(i in 1:ncol(pdatt))pdatt[,i]<-cumsum(pdatt[,i])      # range: -58.8; - 0.7
-  
-  
-  ylim_etp<-range(pdatt)*c(1.3,1.5)
-  ylim_et<-range(dat_etc)*c(1,1.5)
-  ylim_p<-range(datdd[sel, c("P_hh_gm", "P_hh_sm")], na.rm=T)*c(1, 2)
-  
-  cols<-c( rep( c("purple", "green", "darkgreen", "brown"), 2), "orange", "orange")
-  
-  tp1<-c(1:4,9)
-  tp2<-c(5:8,10)
-  
-  plot_nm<-paste(last_date, "ET_soil_water_prec_cumsum_h_F", xch, ".png", sep="")
-  
-  
-  gpath<-"E:/REC_7_Data/10_Plots/cumsum/"
-  png(paste(gpath, plot_nm, sep=""), width=1200, height=1200)
-  
-  #par(mfrow=c(2,2), mar = c(3, 3, 3, 2), oma = c(3, 3, 5, 1), mgp=c(2, 0.5, 0))
-  par(mfrow=c(2,2), mar = c(5, 7, 5, 4), mgp=c(3, 0.5, 0), tck=0.01)
-  
-  
-  
-  if(F){
-    # Plot 1
-    plot(datdd[,"dt"], datdd[,"P_hh_gm"], type="n", ylim=ylim_et, axes=F, xlab="", ylab="")
-    for(i in tp1)lines(datdd[,"dt"], dat_etc[,i], col=cols[i])
-    
-    axis(2, cex.axis=2); box(); 
-    mtext(paste("Cumulative ET (mm)",sep=""), side=2, line=3, cex=2)   # was (kg m-2)
-    mtext("ET Grassland", side=3, line=1, cex=3)
-    mtext ("a)", side=3, adj=0, line=1, cex=3)
-    
-    #legend("top", c(adatasets[tp1], "Prec"), ncol=2, col=c(cols[tp1], "cyan"), pch=16, cex=2)
-    legend("bottomleft", c("REC1", "REC2", "REC3", "REC4", "Conv", "Precip"), ncol=2, 
-           col=c(cols[tp1], "cyan"), pch=16, cex=2)
-    axis.Date(1, at=seq(min(datdd[,"dt"]), max(datdd[,"dt"]), by="months"), cex.axis=2, las=2); 
-    par(new=T)
-    plot(datdd[,"dt"], datdd[,"P_hh_gm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
-    axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
-    
-    
-    # Plot 2
-    plot(datdd[,"dt"], datdd[,"P_hh_gm"], type="n", ylim=ylim_et, axes=F, xlab="", ylab="")
-    for(i in tp2)lines(datdd[,"dt"], dat_etc[,i], col=cols[i])
-    
-    axis(2, cex.axis=2); box(); 
-    mtext(paste("Cumulative ET (mm)",sep=""), side=2, line=3, cex=2)
-    mtext("ET Shrubland", side=3, line=1, cex=3)
-    mtext ("b)", side=3, adj=0, line=1, cex=3)
-    
-    #legend("top", c(adatasets[tp2], "Prec"), ncol=2, col=c(cols[tp1], "cyan"), pch=16, cex=2)
-    axis.Date(1, at=seq(min(datdd[,"dt"]), max(datdd[,"dt"]), by="months"), cex.axis=2, las=2); 
-    par(new=T)
-    plot(datdd[,"dt"], datdd[,"P_hh_sm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
-    axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
-  }   # plot 1 and 2 (evapotranspiration)
-  
-  
-  
-  # Plot 3 ~ soil water content
-  plot(datdd[sel, "dt"], datdd[sel, "P_hh_gm"], type="n", ylim=ylim_etp, axes=F, xlab="", ylab="")
-  for(i in tp1)lines(datdd[sel, "dt"], pdatt[,i], col=cols[i])
-  abline(h=0, col="grey")
-  
-  axis(2, cex.axis=2); box(); 
-  mtext(paste("Cumulative P-ET (mm)",sep=""), side=2, line=3, cex=2)
-  mtext("P-ET Grassland", side=3, line=1, cex=3)
-  mtext ("a)", side=3, adj=0, line=1, cex=3)
-  
-  legend("bottomleft", c("SEG EC1", "SEG EC2", "SEG EC3", "SEG EC4", "US-SEG", "Precip"), ncol=2, 
-         col=c(cols[tp1], "cyan"), pch=16, cex=2)
-  
-  axis.Date(1, at=seq(min(datdd[, "dt"]), max(datdd[, "dt"]), by="months"), cex.axis=2, las=2); 
-  par(new=T)
-  plot(datdd[sel ,"dt"], datdd[sel ,"P_hh_gm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
-  axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
-  
-  
-  
-  
-  # Plot 4 ~ soil water content
-  plot(datdd[sel, "dt"], datdd[sel ,"P_hh_gm"], type="n", ylim=ylim_etp, axes=F, xlab="", ylab="")
-  for(i in tp2)lines(datdd[sel ,"dt"], pdatt[,i], col=cols[i])
-  abline(h=0, col="grey")
-  
-  axis(2, cex.axis=2); box(); 
-  mtext(paste("Cumulative P-ET (mm)",sep=""), side=2, line=3, cex=2)
-  mtext("P-ET Shrubland", side=3, line=1, cex=3)
-  mtext ("b)", side=3, adj=0, line=1, cex=3)
-  
-  legend("bottomleft", c("SES EC1", "SES EC2", "SES EC3", "SES EC4", "US-SES", "Precip"), ncol=2, 
-         col=c(cols[tp1], "cyan"), pch=16, cex=2)
-  
-  axis.Date(1, at=seq(min(datdd[, "dt"]), max(datdd[, "dt"]), by="months"), cex.axis=2, las=2); 
-  par(new=T)
-  plot(datdd[sel ,"dt"], datdd[sel ,"P_hh_sm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
-  axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
-  
-  
-  
-  dev.off()
-  
-}  # P-ET
-#
-if(T){### cumulative sum of LE and NEE
+  ### cumulative sum of LE and NEE
   
   cols<-rep(c("purple", "green", "darkgreen", "brown"), 2)
-  add_marcy<-T
-  add_marcy_edire<-F
-  add_marcy_edire_no_WPL<-F
+  add_AmeriFlux<-T
+  add_AmeriFlux_edire<-F
+  add_AmeriFlux_edire_no_WPL<-F
   add_prec<-T
   use_reddy<-T
   no_seg_nee<-F
@@ -5153,17 +4609,15 @@ if(T){### cumulative sum of LE and NEE
   nees<-paste("Fcc", datasets, sep="_")
   
   legend_g<-c("EC1", "EC2", "EC3", "EC4")
-  #legend_s<-c("SES EC1", "SES EC2", "SES EC3", "SES EC4")
   # u* filtered (NEE only) and gapfilled
   
   
   
-  if(add_marcy){
+  if(add_AmeriFlux){
     cols<-c(cols, "orange", "orange")
     les<-c(les, "cLE_gm", "cLE_sm")
     nees<-c(nees, "Fc_gm", "Fc_sm")
     legend_g<-c(legend_g, "EC0")
-    #legend_s<-c(legend_s, "US-SES")
     plot_nm<-paste(plot_nm, "_plusm", sep=""); tp1<-c(tp1, 9); tp2<-c(tp2, 10)
   }
   
@@ -5175,7 +4629,7 @@ if(T){### cumulative sum of LE and NEE
     attr<-"_reddy"
   }
   
-  if(add_marcy_edire){
+  if(add_AmeriFlux_edire){
     cols<-c(cols, "red", "red")
     les<-c(les, "LEcw_gp", "LEcw_sp")
     nees<-c(nees, "Fccw_gp", "Fccw_sp")
@@ -5186,7 +4640,7 @@ if(T){### cumulative sum of LE and NEE
   }
   
   
-  if(add_marcy_edire_no_WPL){
+  if(add_AmeriFlux_edire_no_WPL){
     cols<-c(cols, "blue4", "blue4")
     les<-c(les, "LEc_gp", "LEc_sp")
     nees<-c(nees, "Fcc_gp", "Fcc_sp")
@@ -5238,7 +4692,7 @@ if(T){### cumulative sum of LE and NEE
   ## convert umol m-2 s-1 to gC m-2 30min-1
   ccm<-grep("Fc", colnames(dmat))
   if(use_reddy){ccm<-grep("NEE", colnames(dmat))}
-  if(add_marcy_edire)ccm<-c(ccm, grep("Fc", colnames(dmat)))
+  if(add_AmeriFlux_edire)ccm<-c(ccm, grep("Fc", colnames(dmat)))
   
   dmat[,ccm]<-dmat[ccm]*  (12 / 10^6) * 1800     # 12 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
   
@@ -5262,7 +4716,7 @@ if(T){### cumulative sum of LE and NEE
   ylim_c<-range(dmat[,ccm], na.rm=T)*c(1, 1.5)
   if(ylim_c[1]<0)ylim_c<-ylim_c*c(1.05, 1)
   #ylim_c[1]<-(-40)
-  if(add_marcy_edire_no_WPL)ylim_c[1]<-(-1100)
+  if(add_AmeriFlux_edire_no_WPL)ylim_c[1]<-(-1100)
   ylim_l<-range(dmat[,lcm], na.rm=T)*c(1, 1.5)
   ylim_p<-range(datdd[,c("P_hh_gm", "P_hh_sm")], na.rm=T)*c(1, 2.2)
   
@@ -5441,11 +4895,7 @@ if(T){
     
   
   # Plot 1
-  #lm0 <-summary(lm(ygm~xg))
-  #m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
-  #y0<-round(lm0$coefficients[1,1], 0)
-  #r2<-round(lm0$r.squared, 2)
-  
+
   aa<-cbind(xg, ygm); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
   m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
   r <- round( cor(bb, method="pearson")[1,2], 2)
@@ -5463,11 +4913,7 @@ if(T){
   
   
   # Plot 2
-  #lm0 <-summary(lm(ysm~xs))
-  #m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
-  #y0<-round(lm0$coefficients[1,1], 0)
-  #r2<-round(lm0$r.squared, 2)
-  
+
   aa<-cbind(xs, ysm); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
   m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
   r <- round( cor(bb, method="pearson")[1,2], 2)
@@ -5483,11 +4929,7 @@ if(T){
   
   
   # Plot 3
-  #lm0 <-summary(lm(yg1~xg))
-  #m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
-  #y0<-round(lm0$coefficients[1,1], 0)
-  #r2<-round(lm0$r.squared, 2)
-  
+
   aa<-cbind(yg1, xg); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
   m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
   r <- round( cor(bb, method="pearson")[1,2], 2)
@@ -5503,11 +4945,7 @@ if(T){
   
   
   # Plot 4
-  #lm0 <-summary(lm(ys1~xs))
-  #m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
-  #y0<-round(lm0$coefficients[1,1], 0)
-  #r2<-round(lm0$r.squared, 2)
-  
+
   aa<-cbind(xs, ys1); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
   m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
   r <- round( cor(bb, method="pearson")[1,2], 2)
@@ -5545,7 +4983,7 @@ if(T){
     (sum(ys1[ys1<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.5566649
   
   
-  #                       (Intercept)        slope            Tomer (all 2018 & 2019)
+  #                       (Intercept)        slope            AmeriFlux (all 2018 & 2019)
   #l_gm$coefficients         1.3501956   0.8816234            0.81          
   #l_sm$coefficients         22.997949    0.850126            0.87
   #l_g1$coefficients         -3.161713    0.935687 
@@ -5556,6 +4994,8 @@ if(T){
 }  # Full energy balance (EB) closure
 #
 if(T){
+  
+  # Land cover maps
 
   ppath<-"E:/REC_7_Data/10_Plots/9_footprints/"
   filenm<-paste(ppath, "land_cover_maps.png", sep="")
@@ -5594,6 +5034,8 @@ if(T){
 #
 if(T){
   
+  # land cover prob barplot
+  
   mon_ys<-unique(datdd[,c("yyyy", "mon")])
   rpath<-"E:/REC_7_Data/9_R/Rdata/"
   pmat<-NULL
@@ -5615,26 +5057,6 @@ if(T){
   
   
   cols<-c("darkgreen", "olivedrab3", "moccasin")
-  
-  
-  
-  if(F){
-    bplot<-"E:/REC_7_Data/10_Plots/footprints/"
-    filenm<-paste(bplot, "land_cover_probabilities_all_year_00.png", sep="")
-    
-    png(filenm, width=900, height=900)
-    par(mar = c(13, 8, 2, 2), mgp=c(2, 0.5, 0), tck=-0.01)
-    
-    barplot(pb, las=3, beside=T, ylim=c(0, 1), cex.names=3, cex.axis=3, col=cols,
-            #names.arg = c("US-SEG", "SEG EC1", "SEG EC2", "SEG EC3", "SEG EC4", 
-             #             "US-SES", "SES EC1", "SES EC2", "SES EC3", "SES EC4"));
-             names.arg = c("Seg EC0", "Seg EC1", "Seg EC2", "Seg EC3", "Seg EC4", 
-                           "Ses EC0", "Ses EC1", "Ses EC2", "Ses EC3", "Ses EC4"));
-    mtext("Probability", 2, line=5, cex=3); abline(h=0.8, col="grey", lty=3); box()
-    legend("topright", legend=c("Bare Ground", "Shrubs", "Herbaceous"), col=cols, pch=16, cex=2.5)
-    
-    dev.off()
-  }  # old vertical barplot
 
   
   
@@ -5651,8 +5073,6 @@ if(T){
   pbi_h<-barplot(pbi, las=1, beside=T, xlim=c(0, 1), cex.names=3, cex.axis=3, col=cols, horiz=T,
           names.arg = c("Ses EC4", "Ses EC3", "Ses EC2", "Ses EC1", "Ses EC0", 
                         "Seg EC4", "Seg EC3", "Seg EC2", "Seg EC1", "Seg EC0"));
-          #names.arg = c("SES EC4", "SES EC3", "SES EC2", "SES EC1", "US-SES", 
-          #             "SEG EC4", "SEG EC3", "SEG EC2", "SEG EC1", "US-SEG"));
   arrows(x0=pbi+pai, y0=pbi_h, x1=pbi-pai, y1=pbi_h, length=0, code=3, lwd=3)
   mtext("Probability", 1, line=5, cex=3); abline(v=0.8, col="grey", lty=3); box()
   legend("bottomright", legend=c("Bare Ground", "Herbaceous", "Shrubs"), col=rev(cols), pch=16, cex=2.5)
@@ -5663,7 +5083,9 @@ if(T){
 }  # land cover prob barplot
 #
 if(T){
-   
+  
+  # RECs agreement xy plots with major axis
+  
   vertical<-T
   
   
@@ -5703,14 +5125,7 @@ if(T){
   
   
   
-  uid<-c("(W m-2)", "(W m-2)", "(umol CO2 m-2 s-1)")
-  #uid_1<-expression("(W m"^"-2"*")")
-  #uid_2<-     expression("(W m"^"-2"*")")
-  #uid_3<-       expression("(umol CO"["2"]*" m"^"-2"*"s"^"-1"*")")
-  #uid<-c(uid_1, uid_2, uid_3)
-  
-  
-  
+  #uid<-c("(W m-2)", "(W m-2)", "(umol CO2 m-2 s-1)")
   uid<-c(  expression("H (W m"^"-2"*")"),
              expression("LE (W m"^"-2"*")"),
              expression("NEE (umol CO"["2"]*" m"^"-2"*"s"^"-1"*")")   )
@@ -5719,7 +5134,6 @@ if(T){
   
   
   # axis-sized labs
-  #slab<-rep( rep(sites, each=3), 3) # sites part for both axis
   slab<-rep( rep(mlabs, each=3), 3) # Seg and Ses
   ecx<-rep("EC1", 18)
   ecy<-rep(c("EC2", "EC3", "EC4"), 6)
@@ -5727,7 +5141,6 @@ if(T){
   ulab<-rep(uid, each=6)
   
   if(vertical){
-    #slab<-rep(sites, each=9)
     slab<-rep(mlabs, each=9)
     flab<-rep(c("H", "LE", "NEE", "H", "LE", "NEE"), each=3)
     ulab<-rep( rep(uid, each=3), 2)
@@ -5739,10 +5152,6 @@ if(T){
   # expression() and paste() do not work together      !!!!!!
   #xlab<-paste( slab, ecx, "-", flab, ulab)   # use bquote instead (see below)
   
-  
-  
-  
-  ##### theil-sen estimator take faaaar too long to calculate
   
   # Total least squares
   ints<-slopes<-cors<-rep(NA, length(mfx))
@@ -5833,6 +5242,8 @@ if(T){
 }  # RECs agreement xy plots with major axis
 #
 if(T){
+  
+  # calculate potential evapotranspiration
   
   library("SPEI")
   
@@ -5938,6 +5349,8 @@ if(T){
 #
 if(T){
   
+  # Precipitation from July to Sep 2019
+  
   pathg<-"E:/REC_7_Data/15_OneFlux/FLX_US-Seg_FLUXNET2015_FULLSET_2007-2017_beta-3/"
   erag <-read.csv(file=paste(pathg, "FLX_US-Seg_FLUXNET2015_ERAI_MM_1989-2014_beta-3.csv", sep=""), header=TRUE, sep=",")
   erag$mon<-as.integer(substring(as.character(erag[,1]), 5,6))   
@@ -5977,6 +5390,8 @@ if(T){
 }  # Precipitation from July to Sep 2019
 #
 if(T){
+  
+  # confusion matrix
   
   dpath<-"E:/REC_7_Data/10_Plots/17_land_cover_maps/"
   seg<-read.csv(paste(dpath, "Confusion_matrix_SEG.csv", sep=""), header=T)
