@@ -1,16 +1,16 @@
 # Boschetti_et_al_replicated_EC
-Code for processing and analysing eddy covariance data in Boschetti et al. 'Strong correspondence in evapotranspiration and CO2 fluxes between different EC systems enables quantification of landscape heterogeneity in drylands fluxes.'
 
-Fabio Boschetti*, Andrew M. Cunliffe*, Robert Clement, Stephen Sitch, Karen Anderson, Tomer Duman, Mikeal Schlumpf, Marcy E. Litvak, Richard E. Brazier, Timothy C. Hill.
+This repository contains R code for processing, analysing and visualizing the eddy covariance data presented in 'Strong correspondence in evapotranspiration and CO2 fluxes between different EC systems enables quantification of landscape heterogeneity in drylands fluxes.' by Fabio Boschetti*, Andrew Cunliffe*, Robert Clement, Stephen Sitch, Karen Anderson, Tomer Duman, Mikeal Schlumpf, Marcy Litvak, Richard Brazier, Timothy Hill.
 
+## The manuscript is in review (cross-reference)
 
-1) plot_cospectra.r
-   analysis and plotting of cospectral analysis files (spec.csv) output from EdiRe for cospectral analysis    of conventional and LEC towers
-   
-2) plot_datasets.r
+## The processed half hourly EC flux data is archived with the UK Envrionmental Information Data Centre (https://eidc.ac.uk/) and AmeriFlux (https://ameriflux.lbl.gov/)
+
+## This repo contains two scripts
+1) plot_datasets.r
    main script with analysis and visualization of conventional and REC fluxes
-   
-3) plot_lags.r
+
+2) plot_lags.r
    analysis and visualization of lags.csv files from EdiRe to determine the correct time lags to be fed       into the proc files of EdiRe for REC preprocessing
    
    
