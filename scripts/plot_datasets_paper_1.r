@@ -15,7 +15,7 @@ library(plotrix)   # for std.error() function
 
 path<-"E:/REC_7_Data/8_datasets/"
 rpath<-"E:/REC_7_Data/11_ReddyProc/"
-mpath<-"E:/REC_7_Data/12_AmeriFluxs_data/"
+mpath<-"E:/REC_7_Data/12_Marcys_data/"
 
 sites<-c("SEG", "SES"); recs<-1:4; towers<-paste(rep(sites, each=4), rep(recs,2), sep="_REC")
 systems<-c(towers, sites); mlabs<-c("Seg", "Ses"); soildatasets<-c("soilg", "soils")
@@ -30,8 +30,8 @@ pfluxes<-c("H", "Fc", "LE", "Hc", "LEc", "Fcc", "WPL_LE", "WPL_Fc", "LEcw", "Fcc
 
 
 
-last_date  <-"2020_01_01_"
-last_date_2<-"2020_02_19_"
+last_date  <-"2020_01_01_from_flash_Txcor_"
+last_date_2<-"2020_02_19_from_flash_Txcor_"
 
 last_date_reddy<-"_2019_365"          # used for files ID    ----- from point 2.2 !!! 
 last_date_use<-"01/11/2019"           # used for chron filtering
@@ -138,23 +138,12 @@ if(T){
 ### 
 ### 1.0 get REC csv datasets   =====================
 ### 
-for(i in 1:10){   # could be up to 10 for tests with Edire AmeriFlux's data
+for(i in 1:8){
   
   
-  if(i %in% c(1:8)){
-    dat <-read.csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")
-    dat2<-read.csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")
-    fluxesc<-fluxes
-  } else { 
-    dat<-read.csv(file=paste(path, "five_months_", sites[i-8], "_AmeriFlux_flux.csv", sep=""), header=TRUE, sep=",")
-    fluxesc<-pfluxes
-  }
-  
-  
-  if(i==9){  # got all raw data for SEG, not for SES
-    dat<-read.csv(file=paste(path, "all_drivingc_SEG_AmeriFlux_flux.csv", sep=""), header=TRUE, sep=",")
-    fluxesc<-pfluxes
-  }
+  dat <-read.csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")
+  dat2<-read.csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")
+  fluxesc<-fluxes
   
   
   # check for double dt raws
@@ -324,7 +313,7 @@ for(im in 1:2){
     # remove outliers according to Tukey's Fence: 
     # 1.5 times the inter-quartile difference (3 times iqd, it is "far out") 
     
-    if(T){
+    if(F){
     for(fx in c("H", "LE", "FC")){ # iqd*30 is 10 times what is considered "far out"
       #dc<-"Fcc_g1"
       #vec<-as.numeric(datf[,dc])
@@ -365,7 +354,7 @@ for(is in 1:2){
   mdatesg<-paste(gdat[,"day"],  gdat[,"month"], gdat[,"year"], sep="/")
   mtimesg<-paste(gdat[,"hour"], gdat[,"min"],   "00", sep=":")
   gdt0<- chron(dates=mdatesg, times=mtimesg, format=c("d/m/y","h:m:s"))
-  gdt<-gdt0-1/(24*4)   # move dt back by 15 min to match dt of the other datasets
+  gdt<-gdt0+1/(24*4)   # move dt forward by 15 min to match dt of the other datasets
   
   
   
@@ -819,14 +808,12 @@ if(T){
                     gm, gm_f, sm, sm_f, 
                     ga4_f, sa4_f, ga3_f, sa3_f,
                     ga23_f, ga34_f, ga42_f, sa23_f, sa34_f, sa42_f,  
-                    gp, sp, soilg, soils))      
+                    soilg, soils))      
 
   
   # convert everything in numeric (sometimes there are issues from the .csv files)
-  dcols0<-paste(rep(fluxes,  length(datasets)),  rep(datasets,  each=length(fluxes)),  sep="_")
-  dcolsp<-paste(rep(pfluxes, length(pdatasets)), rep(pdatasets, each=length(pfluxes)), sep="_")
-  dcols<-c(dcols0, dcolsp)
-  
+  dcols<-paste(rep(fluxes,  length(datasets)),  rep(datasets,  each=length(fluxes)),  sep="_")
+
   
   for(dc in dcols){
     if(is.factor(data[,dc])){data[,dc]<-as.numeric(as.character(data[,dc]))}
@@ -893,9 +880,6 @@ if(T){
   # add AmeriFlux's
   dcols<-c(dcols, "H_gm", "cLE_gm", "Fc_gm", "H_sm", "cLE_sm", "Fc_sm",
          paste(rep(fluxes_reddy, 2), rep(c("gm", "sm"), each=length(fluxes_reddy)), sep="_" )) 
-  
-  # add AmeriFlux's with REC pipeline
-  dcols<-c(dcols, dcolsp)
   
   
   # add month, year and hour columns
@@ -4229,7 +4213,7 @@ if(T){
   ### Energy Balance with Tomer's small datasets
   ###
   
-  tpath<-"E:/REC_7_Data/12_AmeriFluxs_data/soil_data/Previous_received_20201125/"
+  tpath<-"E:/REC_7_Data/12_Marcys_data/soil_data/Previous_received_20201125/"
   gt<-read.table(file=paste(tpath, "Seg_eb_table.csv", sep=""), header=TRUE, sep=",")
   st<-read.table(file=paste(tpath, "Ses_eb_table.csv", sep=""), header=TRUE, sep=",")
   
@@ -4256,46 +4240,20 @@ if(T){
                list(gd, sd, gdf, sdf))
   
   
-  # H, LE, Rn are all good
+  # all good
   
-  range(gt[,"H"] -datt[,"H_gm"],   na.rm=T)       # -5e-10  5e-10
-  range(gt[,"LE"]-datt[,"cLE_gm"], na.rm=T)       # -5e-10  5e-10
-  range(gt[,"Rn"]-datt[,"NETRAD_gm"], na.rm=T)    # 0 0
+  range(gt[,"H"] -datt[,"H_gm"],   na.rm=T)             # -5e-10  5e-10
+  range(gt[,"LE"]-datt[,"cLE_gm"], na.rm=T)             # -5e-10  5e-10
+  range(gt[,"Rn"]-datt[,"NETRAD_gm"], na.rm=T)          # 0 0
+  range(gt[,"Gs"]-datt[,"SHF_ALL_AVG_soilg"], na.rm=T)  # 0 0 
   
-  range(st[,"H"] -datt[,"H_sm"],   na.rm=T)       # -4e-10  4e-10
-  range(st[,"LE"]-datt[,"cLE_sm"], na.rm=T)       # -5e-10  5e-10
-  range(st[,"Rn"]-datt[,"NETRAD_sm"], na.rm=T)    # 0 0
-  
-  
-  
-  # G is not the same as in "my" dataset!
-  
-  range(gt[,"Gs"]-datt[,"SHF_ALL_AVG_soilg"], na.rm=T)   # -292.9864  367.2147
-  range(gt[,"Gs"]-datt[,"SHF_G_AVG_soilg"], na.rm=T)     # -316.5721  317.1166
-  range(gt[,"Gs"]-datt[,"SHF_O_AVG_soilg"], na.rm=T)     # -269.4008  367.2147
-  
-  range(gt[,"Gs"]-datt[,"SHF_G1_AVG_soilg"], na.rm=T)    # -316.3975  327.7837
-  range(gt[,"Gs"]-datt[,"SHF_G2_AVG_soilg"], na.rm=T)    # -316.7466  329.5813
-  range(gt[,"Gs"]-datt[,"SHF_O1_AVG_soilg"], na.rm=T)    # -265.5658  303.6792
-  range(gt[,"Gs"]-datt[,"SHF_O2_AVG_soilg"], na.rm=T)    # -277.3604  443.2155
-  
-  plot(gt[,"Gs"]-datt[,"SHF_ALL_AVG_soilg"])     # so random!
-  plot(gt[,"Gs"],datt[,"SHF_ALL_AVG_soilg"])     # quite spread out
+  range(st[,"H"] -datt[,"H_sm"],   na.rm=T)              # -4e-10  4e-10
+  range(st[,"LE"]-datt[,"cLE_sm"], na.rm=T)              # -5e-10  5e-10
+  range(st[,"Rn"]-datt[,"NETRAD_sm"], na.rm=T)           # 0 0
+  range(st[,"Gs"]-datt[,"SHF_ALL_AVG_soils"], na.rm=T)   # 0 0 
   
   
-  
-  range(st[,"Gs"]-datt[,"SHF_ALL_AVG_soils"], na.rm=T)   # -153.6399  160.9787
-  range(st[,"Gs"]-datt[,"SHF_S_AVG_soils"], na.rm=T)     # -157.6690  158.5313
-  range(st[,"Gs"]-datt[,"SHF_O_AVG_soils"], na.rm=T)     # -150.3519  166.0195
-  
-  range(st[,"Gs"]-datt[,"SHF_S1_AVG_soils"], na.rm=T)    # -120.8452  163.0277
-  range(st[,"Gs"]-datt[,"SHF_S2_AVG_soils"], na.rm=T)    # -204.0263  166.5631
-  range(st[,"Gs"]-datt[,"SHF_O1_AVG_soils"], na.rm=T)    # -154.9065  168.8336
-  range(st[,"Gs"]-datt[,"SHF_O2_AVG_soils"], na.rm=T)    # -158.0961  163.2053
-  
-  plot(st[,"Gs"]-datt[,"SHF_ALL_AVG_soils"])     # so random!
-  plot(st[,"Gs"],datt[,"SHF_ALL_AVG_soils"])     # quite spread out
-  
+
   
   
 }  # Test energy balance with files from AmeriFlux
@@ -4844,28 +4802,23 @@ if(T){
   #wcols<-c("SHF_S1_AVG_soils", "SHF_S2_AVG_soils", "SHF_O1_AVG_soils", "SHF_O2_AVG_soils",
    #        "STORAGE_O2_AVG_soils", "STORAGE_S1_AVG_soils", "STORAGE_S2_AVG_soils")
   
-  netg<-datdd[,"NETRAD_gm"]
-  nets<-datdd[,"NETRAD_sm"]
+  #netg<-datdd[,"NETRAD_gm"]
+  #nets<-datdd[,"NETRAD_sm"]
   
-  shfg<-datdd[,"SHF_ALL_AVG_soilg"]
-  shfs<-datdd[,"SHF_ALL_AVG_soils"]
+  #shfg<-datdd[,"SHF_ALL_AVG_soilg"]
+  #shfs<-datdd[,"SHF_ALL_AVG_soils"]
   
-  xgs<-matrix(NA, ncol=2, nrow=nrow(datdd)); xgs[,1]<-netg; xgs[,2]<-shfg*(-1); 
-  xss<-matrix(NA, ncol=2, nrow=nrow(datdd)); xss[,1]<-nets; xss[,2]<-shfs*(-1); 
-  
-  
-  #shfg<-apply(datdd[,wcolg[1:4]], 1, mean, na.rm=T); #shfg[is.na(shfg)]<-0
-  #shfs<-apply(datdd[,wcols[1:4]], 1, mean, na.rm=T); #shfs[is.na(shfs)]<-0
-  
-  #hsg<-apply(datdd[,wcolg[5:6]], 1, mean, na.rm=T); #hsg[!is.na(hsg)]<-0
-  #hss<-apply(datdd[,wcols[5:7]], 1, mean, na.rm=T); #hss[!is.na(hss)]<-0
-  
-  #xgs<-matrix(NA, ncol=3, nrow=nrow(datdd)); xgs[,1]<-netg; xgs[,2]<-shfg*(-1); xgs[,3]<-hsg*(-1)
-  #xss<-matrix(NA, ncol=3, nrow=nrow(datdd)); xss[,1]<-nets; xss[,2]<-shfs*(-1); xss[,3]<-hss*(-1)
+  #xgs<-matrix(NA, ncol=2, nrow=nrow(datdd)); xgs[,1]<-netg; xgs[,2]<-shfg*(-1); 
+  #xss<-matrix(NA, ncol=2, nrow=nrow(datdd)); xss[,1]<-nets; xss[,2]<-shfs*(-1); 
   
   
-  xg<-apply(xgs, 1, sum, na.rm=T)
-  xs<-apply(xss, 1, sum, na.rm=T)
+
+  
+  #xg<-apply(xgs, 1, sum, na.rm=T)
+  #xs<-apply(xss, 1, sum, na.rm=T)
+  
+  xg<-datdd[,"NETRAD_gm"]-datdd[,"SHF_ALL_AVG_soilg"]
+  xs<-datdd[,"NETRAD_sm"]-datdd[,"SHF_ALL_AVG_soils"]
   ygm<-datdd[,"H_gm"] + datdd[,"cLE_gm"]
   ysm<-datdd[,"H_sm"] + datdd[,"cLE_sm"]
   yg1<-datdd[,"Hc_g1"] + datdd[,"cLEc_g1"]
@@ -4874,13 +4827,13 @@ if(T){
   lim<-range(xg, xs, ygm, ysm, yg1, ys1, na.rm=T)
   
   ylab<-expression("H + LE (W m"^"-2"*")") 
-  xlab<-expression("Rn + G (W m"^"-2"*")")
+  xlab<-expression("Rn - G (W m"^"-2"*")")
   
   
   
   plot_nm<-paste(last_date, "energy_balance_", sep="")
   gpath<-"E:/REC_7_Data/10_Plots/11_energy_balance_closure/"
-  png(paste(gpath, plot_nm, "_new_00.png", sep=""), width=1200, height=1200)
+  png(paste(gpath, plot_nm, "_test.png", sep=""), width=1200, height=1200)
   
   #par(mfrow=c(2,2), mar = c(3, 3, 3, 2), oma = c(3, 3, 5, 1), mgp=c(2, 0.5, 0))
   #if(!add_prec)par(mfrow=c(2,2), mar = c(5, 5, 5, 2), mgp=c(2, 0.5, 0), tck=0.01)
@@ -4895,18 +4848,22 @@ if(T){
     
   
   # Plot 1
-
-  aa<-cbind(xg, ygm); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
-  m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-  r <- round( cor(bb, method="pearson")[1,2], 2)
-  l_gm<-lm(ygm~xg)
+  lm0 <-summary(lm(ygm~xg))
+  m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
+  y0<-round(lm0$coefficients[1,1], 0)
+  r<-round(lm0$r.squared, 2)
+  
+  #aa<-cbind(xg, ygm); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
+  #m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  #r <- round( cor(bb, method="pearson")[1,2], 2)
+  #l_gm<-lm(ygm~xg)
   
   
   plot(xg, ygm, pch=16, xlim=lim, ylim=lim, ylab="", xlab="", main= "Seg EC0", cex.main=4, axes=F, col=alpha(1, 0.2))
   axis(1, cex.axis=3); axis(2, cex.axis=3); box(); mtext ("a)", side=3, adj=0, line=1, cex=3)
   
   mtext(xlab, side=1, line=6, cex=3); mtext(ylab, side=2, line=5, cex=3); 
-  mtext(paste("y =", y0, "+", m0, "x, r=", r), side=3, line=-3, cex=2)
+  mtext(paste("y =", y0, "+", m0, "x, r2=", r), side=3, line=-3, cex=2)
   abline(a=y0, b=m0);
   abline(a=0, b=1, col="grey") 
 
@@ -4914,48 +4871,61 @@ if(T){
   
   # Plot 2
 
-  aa<-cbind(xs, ysm); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
-  m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-  r <- round( cor(bb, method="pearson")[1,2], 2)
-  l_sm<-lm(ysm~xs)
+  lm0 <-summary(lm(ysm~xs))
+  m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
+  y0<-round(lm0$coefficients[1,1], 0)
+  r<-round(lm0$r.squared, 2)
+  
+  #aa<-cbind(xs, ysm); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
+  #m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  #r <- round( cor(bb, method="pearson")[1,2], 2)
+  #l_sm<-lm(ysm~xs)
   
   plot(xs, ysm, pch=16, xlim=lim, ylim=lim, ylab="", xlab="", main= "Ses EC0", cex.main=4, axes=F, col=alpha(1, 0.2))
   axis(1, cex.axis=3); axis(2, cex.axis=3); box(); mtext ("b)", side=3, adj=0, line=1, cex=3)
   
   mtext(xlab, side=1, line=6, cex=3); mtext(ylab, side=2, line=5, cex=3); 
-  mtext(paste("y =", y0, "+", m0, "x, r=", r), side=3, line=-3, cex=2)
+  mtext(paste("y =", y0, "+", m0, "x, r2=", r), side=3, line=-3, cex=2)
   abline(a=y0, b=m0);
   abline(a=0, b=1, col="grey") 
   
   
   # Plot 3
+  lm0 <-summary(lm(yg1~xg))
+  m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
+  y0<-round(lm0$coefficients[1,1], 0)
+  r<-round(lm0$r.squared, 2)
 
-  aa<-cbind(yg1, xg); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
-  m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-  r <- round( cor(bb, method="pearson")[1,2], 2)
-  l_g1<-lm(yg1~xg)
+  #aa<-cbind(yg1, xg); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
+  #m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  #r <- round( cor(bb, method="pearson")[1,2], 2)
+  #l_g1<-lm(yg1~xg)
   
   plot(xg, yg1, pch=16, xlim=lim, ylim=lim, ylab="", xlab="", main= "Seg EC1", cex.main=4, axes=F, col=alpha(1, 0.2))
   axis(1, cex.axis=3); axis(2, cex.axis=3); box(); mtext ("c)", side=3, adj=0, line=1, cex=3)
   
   mtext(xlab, side=1, line=6, cex=3); mtext(ylab, side=2, line=5, cex=3); 
-  mtext(paste("y =", y0, "+", m0, "x, r=", r), side=3, line=-3, cex=2)
+  mtext(paste("y =", y0, "+", m0, "x, r2=", r), side=3, line=-3, cex=2)
   abline(a=y0, b=m0);
   abline(a=0, b=1, col="grey") 
   
   
   # Plot 4
+  lm0 <-summary(lm(ys1~xs))
+  m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
+  y0<-round(lm0$coefficients[1,1], 0)
+  r<-round(lm0$r.squared, 2)
 
-  aa<-cbind(xs, ys1); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
-  m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-  r <- round( cor(bb, method="pearson")[1,2], 2)
-  l_s1<-lm(ys1~xs)
+  #aa<-cbind(xs, ys1); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
+  #m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  #r <- round( cor(bb, method="pearson")[1,2], 2)
+  #l_s1<-lm(ys1~xs)
   
   plot(xs, ys1, pch=16, xlim=lim, ylim=lim, ylab="", xlab="", main= "Ses EC1", cex.main=4, axes=F, col=alpha(1, 0.2))
   axis(1, cex.axis=3); axis(2, cex.axis=3); box(); mtext ("d)", side=3, adj=0, line=1, cex=3)
   
   mtext(xlab, side=1, line=6, cex=3); mtext(ylab, side=2, line=5, cex=3); 
-  mtext(paste("y =", y0, "+", m0, "x, r=", r), side=3, line=-3, cex=2)
+  mtext(paste("y =", y0, "+", m0, "x, r2=", r), side=3, line=-3, cex=2)
   abline(a=y0, b=m0);
   abline(a=0, b=1, col="grey") 
   
@@ -4983,12 +4953,10 @@ if(T){
     (sum(ys1[ys1<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.5566649
   
   
-  #                       (Intercept)        slope            AmeriFlux (all 2018 & 2019)
-  #l_gm$coefficients         1.3501956   0.8816234            0.81          
-  #l_sm$coefficients         22.997949    0.850126            0.87
-  #l_g1$coefficients         -3.161713    0.935687 
-  #l_s1$coefficients        19.1312371   0.6683983 
-  
+  #                       (Intercept)        slope       AmeriFlux 
+  #l_gm$coefficients          7.4636225   0.8293651           0.81          
+  #l_sm$coefficients          7.3525987   0.8807114           0.88
+
   
   
 }  # Full energy balance (EB) closure
