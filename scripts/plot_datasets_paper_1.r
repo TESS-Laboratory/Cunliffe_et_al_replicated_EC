@@ -4943,14 +4943,14 @@ if(T){
   # Energy Balance Ratio
   
   gm_ebr<-(sum(ygm[ygm>0], na.rm=T) + sum(xg[xg<0], na.rm=T)) / 
-    (sum(ygm[ygm<0], na.rm=T) + sum(xg[xg>0], na.rm=T))    # 0.788105
+    (sum(ygm[ygm<0], na.rm=T) + sum(xg[xg>0], na.rm=T))    # 0.7820445
   sm_ebr<-(sum(ysm[ysm>0], na.rm=T) + sum(xs[xs<0], na.rm=T)) / 
-    (sum(ysm[ysm<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.472368
+    (sum(ysm[ysm<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.8446459
   
   g1_ebr<-(sum(yg1[yg1>0], na.rm=T) + sum(xg[xg<0], na.rm=T)) / 
-    (sum(yg1[yg1<0], na.rm=T) + sum(xg[xg>0], na.rm=T))    # 0.9689946
+    (sum(yg1[yg1<0], na.rm=T) + sum(xg[xg>0], na.rm=T))    # 0.9496163
   s1_ebr<-(sum(ys1[ys1>0], na.rm=T) + sum(xs[xs<0], na.rm=T)) / 
-    (sum(ys1[ys1<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.5566649
+    (sum(ys1[ys1<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.9525768
   
   
   #                       (Intercept)        slope       AmeriFlux 
