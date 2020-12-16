@@ -5211,6 +5211,135 @@ if(T){
 #
 if(T){
   
+  # RECs agreement xy plots with major axis - two plots
+  
+  dat_ym<-datdd
+  
+  
+  # y-axis: always EC1
+  rfx<-c("H_f_g1",          "H_f_g1",         "H_f_g1",         
+         "LE_f_g1",         "LE_f_g1",        "LE_f_g1",        
+         "NEE_uStar_f_g1",  "NEE_uStar_f_g1", "NEE_uStar_f_g1", 
+         "H_f_s1",         "H_f_s1",         "H_f_s1",
+         "LE_f_s1",        "LE_f_s1",        "LE_f_s1",
+         "NEE_uStar_f_s1", "NEE_uStar_f_s1", "NEE_uStar_f_s1")
+  # x-axis: EC2, EC3, EC4
+  mfx<-c("H_f_g2",          "H_f_g3",         "H_f_g4",         
+         "LE_f_g2",         "LE_f_g3",        "LE_f_g4",        
+         "NEE_uStar_f_g2",  "NEE_uStar_f_g3", "NEE_uStar_f_g4", 
+         "H_f_s2",         "H_f_s3",         "H_f_s4",
+         "LE_f_s2",        "LE_f_s3",        "LE_f_s4",
+         "NEE_uStar_f_s2", "NEE_uStar_f_s3", "NEE_uStar_f_s4")
+  
+  
+  pid<-c("a)", "b)", "c)", "d)", "e)", "f)", "g)", "h)", "i)")
+  
+  #uid<-c("(W m-2)", "(W m-2)", "(umol CO2 m-2 s-1)")
+  uid<-c(  expression("H (W m"^"-2"*")"),
+           expression("LE (W m"^"-2"*")"),
+           expression("NEE (umol CO"["2"]*" m"^"-2"*"s"^"-1"*")")   )
+  
+  
+  
+  
+  # axis-sized labs
+  #slab<-rep( rep(mlabs, each=3), 3) # Seg and Ses
+  ecx<-rep("EC1", 18)
+  ecy<-rep(c("EC2", "EC3", "EC4"), 6)
+  #flab<-rep(c("H", "LE", "NEE"), each=6)
+  #ulab<-rep(uid, each=6)
+  
+  
+  slab<-rep(mlabs, each=9)
+  flab<-rep(c("H", "LE", "NEE", "H", "LE", "NEE"), each=3)
+  ulab<-rep( rep(uid, each=3), 2)
+  
+  
+  xlab0<-paste( slab, ecx, "-", flab)  
+  ylab0<-paste( slab, ecy, "-", flab)
+  
+  # expression() and paste() do not work together      !!!!!!
+  #xlab<-paste( slab, ecx, "-", flab, ulab)   # use bquote instead (see below)
+  
+  
+  # Total least squares
+  ints<-slopes<-cors<-rep(NA, length(mfx))
+  
+  for(i in 1:length(mfx)){
+    
+    aa<-dat_ym[,c(mfx[i], rfx[i])]; bb<-aa[complete.cases(aa),]
+    cc<-prcomp(bb)$rotation
+    cors[i]  <- cor(bb, method="pearson")[1,2]
+    slopes[i]<- beta <- cc[2,1]/cc[1,1]
+    ints[i]  <- mean(bb[,2])-beta*mean(bb[,1])
+    
+  }
+  
+  lims_h<- range(datdd[, paste("H_f", datasets, sep="_")], na.rm=T)
+  lims_le<-range(datdd[, paste("LE_f", datasets, sep="_")], na.rm=T)
+  lims_fc<-range(datdd[, paste("NEE_uStar_f", datasets, sep="_")], na.rm=T)
+  
+  
+  
+  
+  for(st in 1:2){
+  
+  pl_name<-paste("E:/REC_7_Data/10_Plots/", sites[st], "_LEC_cluster_agreement_00.png", sep="")
+  png(pl_name, width=1350, height=1350)   
+  par(mfrow=c(3, 3), mar=c(8,10,5,1) , oma=c(0,0,10,0), mgp=c(4, 2, 0))
+  
+  
+  for(i in 1:(length(mfx)/2)){  
+    
+    par(mar=c(8,10,5,2))
+    #if(vertical & i %in% c(10:12)){par(mar=c(8,10,15,2))}
+    
+    k<-i; if(sites[st]=="SES")k<-i+length(mfx)/2
+    
+    xlab<-bquote(.(xlab0[k]) ~ "(W m"^"-2"*")")  # expression() and paste() do not work together!
+    ylab<-bquote(.(ylab0[k]) ~ "(W m"^"-2"*")")
+    
+    if(i %in% c( 1: 3)){lims<-lims_h; } 
+    if(i %in% c( 4: 6)){lims<-lims_le }
+    if(i %in% c( 7: 9)){lims<-lims_fc 
+    xlab<-bquote(.(xlab0[k]) ~ "(umol CO"["2"]*" m"^"-2"*"s"^"-1"*")")
+    ylab<-bquote(.(ylab0[k]) ~ "(umol CO"["2"]*" m"^"-2"*"s"^"-1"*")")
+    }
+    
+    
+    
+    
+    plot(dat_ym[,mfx[k]], dat_ym[,rfx[k]], ylim=lims, xlim=lims, pch=16, cex.axis=2.5, cex.main=2.5, cex.lab=2.5,
+         xlab="", ylab="", main="", col=alpha(1, 0.2) )
+    mtext(xlab, 1, line=7, cex=2)
+    mtext(ylab, 2, line=5, cex=2)
+    
+    if(k==2) mtext("Grassland", side=3, line=6, cex=4)
+    if(k==11)mtext("Shrubland", side=3, line=6, cex=4)
+    
+    #if(!vertical){
+    #  if(i==5)mtext("Shrubland", side=3, line=6, cex=4)
+    #} else {
+    #  if(i==11)mtext("Shrubland", side=3, line=6, cex=4)
+    #}
+    
+    mtext(paste("y =", round(ints[k],3), "+", round(slopes[k],3),"x"), 
+          side=3, adj=0.05, line=-3, cex=2); abline(a=ints[k], b=slopes[k]);  # total least squares
+    mtext(paste("r:", round(cors[k],2)), side=3, adj=0.05, line=-6, cex=2)    # perason coef.
+    mtext (pid[i], side=3, adj=0, line=1, cex=2.5)
+    abline(a=0, b=1)
+    
+  }  
+  
+  dev.off()
+  
+  }
+  
+  
+}  # RECs agreement xy plots with major axis - two plots
+#
+if(T){
+  
   # calculate potential evapotranspiration
   
   library("SPEI")
