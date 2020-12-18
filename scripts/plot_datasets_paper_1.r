@@ -4833,7 +4833,7 @@ if(T){
   
   plot_nm<-paste(last_date, "energy_balance_", sep="")
   gpath<-"E:/REC_7_Data/10_Plots/11_energy_balance_closure/"
-  png(paste(gpath, plot_nm, "_test.png", sep=""), width=1200, height=1200)
+  png(paste(gpath, plot_nm, "_test_TLS.png", sep=""), width=1200, height=1200)
   
   #par(mfrow=c(2,2), mar = c(3, 3, 3, 2), oma = c(3, 3, 5, 1), mgp=c(2, 0.5, 0))
   #if(!add_prec)par(mfrow=c(2,2), mar = c(5, 5, 5, 2), mgp=c(2, 0.5, 0), tck=0.01)
@@ -4848,14 +4848,14 @@ if(T){
     
   
   # Plot 1
-  lm0 <-summary(lm(ygm~xg))
-  m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
-  y0<-round(lm0$coefficients[1,1], 0)
-  r<-round(lm0$r.squared, 2)
+  #lm0 <-summary(lm(ygm~xg))
+  #m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
+  #y0<-round(lm0$coefficients[1,1], 0)
+  #r<-round(lm0$r.squared, 2)
   
-  #aa<-cbind(xg, ygm); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
-  #m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-  #r <- round( cor(bb, method="pearson")[1,2], 2)
+  aa<-cbind(xg, ygm); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
+  m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  r <- round( cor(bb, method="pearson")[1,2], 2)
   #l_gm<-lm(ygm~xg)
   
   
@@ -4871,14 +4871,14 @@ if(T){
   
   # Plot 2
 
-  lm0 <-summary(lm(ysm~xs))
-  m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
-  y0<-round(lm0$coefficients[1,1], 0)
-  r<-round(lm0$r.squared, 2)
+  #lm0 <-summary(lm(ysm~xs))
+  #m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
+  #y0<-round(lm0$coefficients[1,1], 0)
+  #r<-round(lm0$r.squared, 2)
   
-  #aa<-cbind(xs, ysm); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
-  #m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-  #r <- round( cor(bb, method="pearson")[1,2], 2)
+  aa<-cbind(xs, ysm); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
+  m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  r <- round( cor(bb, method="pearson")[1,2], 2)
   #l_sm<-lm(ysm~xs)
   
   plot(xs, ysm, pch=16, xlim=lim, ylim=lim, ylab="", xlab="", main= "Ses EC0", cex.main=4, axes=F, col=alpha(1, 0.2))
@@ -4891,14 +4891,14 @@ if(T){
   
   
   # Plot 3
-  lm0 <-summary(lm(yg1~xg))
-  m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
-  y0<-round(lm0$coefficients[1,1], 0)
-  r<-round(lm0$r.squared, 2)
+  #lm0 <-summary(lm(yg1~xg))
+  #m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
+  #y0<-round(lm0$coefficients[1,1], 0)
+  #r<-round(lm0$r.squared, 2)
 
-  #aa<-cbind(yg1, xg); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
-  #m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-  #r <- round( cor(bb, method="pearson")[1,2], 2)
+  aa<-cbind(yg1, xg); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
+  m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  r <- round( cor(bb, method="pearson")[1,2], 2)
   #l_g1<-lm(yg1~xg)
   
   plot(xg, yg1, pch=16, xlim=lim, ylim=lim, ylab="", xlab="", main= "Seg EC1", cex.main=4, axes=F, col=alpha(1, 0.2))
@@ -4911,14 +4911,14 @@ if(T){
   
   
   # Plot 4
-  lm0 <-summary(lm(ys1~xs))
-  m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
-  y0<-round(lm0$coefficients[1,1], 0)
-  r<-round(lm0$r.squared, 2)
+  #lm0 <-summary(lm(ys1~xs))
+  #m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
+  #y0<-round(lm0$coefficients[1,1], 0)
+  #r<-round(lm0$r.squared, 2)
 
-  #aa<-cbind(xs, ys1); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
-  #m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-  #r <- round( cor(bb, method="pearson")[1,2], 2)
+  aa<-cbind(xs, ys1); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
+  m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  r <- round( cor(bb, method="pearson")[1,2], 2)
   #l_s1<-lm(ys1~xs)
   
   plot(xs, ys1, pch=16, xlim=lim, ylim=lim, ylab="", xlab="", main= "Ses EC1", cex.main=4, axes=F, col=alpha(1, 0.2))
