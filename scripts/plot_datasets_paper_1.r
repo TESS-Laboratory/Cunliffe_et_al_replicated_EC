@@ -5000,6 +5000,7 @@ if(T){
   ### ggplot version
   if(T){
     
+    gpath<-"E:/REC_7_Data/10_Plots/7_cumsum/"
     p_nm<-paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot.png", sep="")
     
     mthetimes<- as.POSIXct(dmat[,"dt"], format="%d/%m/%y %H:%M:%S") 
@@ -5023,11 +5024,53 @@ if(T){
       theme(legend.title = element_blank(), legend.position = c(0.15, 0.50)) +       # legend position
       scale_color_manual(values = colors)
       
-  
-      
+    
+    p2<-ggplot(dmat, aes(x=dt_2)) +
+      labs(x = "", y = expression("Cumulative LE (MW m"^"-2"*")",sep=""), title = "b) LE Shrubland") +
+      geom_line(aes(y = LE_f_s1, color = "EC1")) + 
+      geom_line(aes(y = LE_f_s2, color = "EC2")) + 
+      geom_line(aes(y = LE_f_s3, color = "EC3")) + 
+      geom_line(aes(y = LE_f_s4, color = "EC4")) +
+      geom_line(aes(y = LE_f_sm, color = "EC0")) +
+      geom_line(aes(y = P_sm), color = "cyan") +
+      theme_bw() + ylim(ylim_l) +
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
+      theme(axis.text.x = element_text(angle = 90)) +
+      #scale_x_datetime(labels = date_format("%b")) + 
+      theme(legend.title = element_blank(), legend.position = c(0.15, 0.50)) +       # legend position
+      scale_color_manual(values = colors)
       
     
+    p3<-ggplot(dmat, aes(x=dt_2)) +
+      labs(x = "", y = expression("Cumulative NEE (gC m"^"-2"*")",sep=""), title = "c) NEE Grassland") +
+      geom_line(aes(y = NEE_uStar_f_g1, color = "EC1")) + 
+      geom_line(aes(y = NEE_uStar_f_g2, color = "EC2")) + 
+      geom_line(aes(y = NEE_uStar_f_g3, color = "EC3")) + 
+      geom_line(aes(y = NEE_uStar_f_g4, color = "EC4")) +
+      geom_line(aes(y = NEE_uStar_f_gm, color = "EC0")) +
+      geom_line(aes(y = P_gm), color = "cyan") +
+      theme_bw() + ylim(ylim_c) +
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
+      theme(axis.text.x = element_text(angle = 90)) +
+      #scale_x_datetime(labels = date_format("%b")) + 
+      theme(legend.title = element_blank(), legend.position = c(0.15, 0.30)) +       # legend position
+      scale_color_manual(values = colors)
     
+    
+    p4<-ggplot(dmat, aes(x=dt_2)) +
+      labs(x = "", y = expression("Cumulative NEE (gC m"^"-2"*")",sep=""), title = "d) NEE Grassland") +
+      geom_line(aes(y = NEE_uStar_f_s1, color = "EC1")) + 
+      geom_line(aes(y = NEE_uStar_f_s2, color = "EC2")) + 
+      geom_line(aes(y = NEE_uStar_f_s3, color = "EC3")) + 
+      geom_line(aes(y = NEE_uStar_f_s4, color = "EC4")) +
+      geom_line(aes(y = NEE_uStar_f_sm, color = "EC0")) +
+      geom_line(aes(y = P_gm), color = "cyan") +
+      theme_bw() + ylim(ylim_c) +
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
+      theme(axis.text.x = element_text(angle = 90)) +
+      #scale_x_datetime(labels = date_format("%b")) + 
+      theme(legend.title = element_blank(), legend.position = c(0.15, 0.30)) +       # legend position
+      scale_color_manual(values = colors)
     
     
     
@@ -5042,7 +5085,7 @@ if(T){
   
   
   
-}  # cumsum NEE and LE
+}  # cumsum NEE and LE    (plus ggplot version)
 #
 if(T){
 
