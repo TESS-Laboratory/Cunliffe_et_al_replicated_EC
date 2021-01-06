@@ -11,11 +11,12 @@ library(chron); library(oce)
 library(lubridate) # only for 'month()' function
 library(scales)    # for alpha in plots
 library(plotrix)   # for std.error() function
-
+library(ggplot2)
+library(ggpubr)      # needed for ggarrange
 
 path<-"E:/REC_7_Data/8_datasets/"
 rpath<-"E:/REC_7_Data/11_ReddyProc/"
-mpath<-"E:/REC_7_Data/12_AmeriFluxs_data/"
+mpath<-"E:/REC_7_Data/12_Marcys_data/"
 
 sites<-c("SEG", "SES"); recs<-1:4; towers<-paste(rep(sites, each=4), rep(recs,2), sep="_REC")
 systems<-c(towers, sites); mlabs<-c("Seg", "Ses"); soildatasets<-c("soilg", "soils")
@@ -30,8 +31,8 @@ pfluxes<-c("H", "Fc", "LE", "Hc", "LEc", "Fcc", "WPL_LE", "WPL_Fc", "LEcw", "Fcc
 
 
 
-last_date  <-"2020_01_01_"
-last_date_2<-"2020_02_19_"
+last_date  <-"2020_01_01_from_flash_Txcor_"
+last_date_2<-"2020_02_19_from_flash_Txcor_"
 
 last_date_reddy<-"_2019_365"          # used for files ID    ----- from point 2.2 !!! 
 last_date_use<-"01/11/2019"           # used for chron filtering
@@ -138,23 +139,12 @@ if(T){
 ### 
 ### 1.0 get REC csv datasets   =====================
 ### 
-for(i in 1:10){   # could be up to 10 for tests with Edire AmeriFlux's data
+for(i in 1:8){
   
   
-  if(i %in% c(1:8)){
-    dat <-read.csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")
-    dat2<-read.csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")
-    fluxesc<-fluxes
-  } else { 
-    dat<-read.csv(file=paste(path, "five_months_", sites[i-8], "_AmeriFlux_flux.csv", sep=""), header=TRUE, sep=",")
-    fluxesc<-pfluxes
-  }
-  
-  
-  if(i==9){  # got all raw data for SEG, not for SES
-    dat<-read.csv(file=paste(path, "all_drivingc_SEG_AmeriFlux_flux.csv", sep=""), header=TRUE, sep=",")
-    fluxesc<-pfluxes
-  }
+  dat <-read.csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")
+  dat2<-read.csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")
+  fluxesc<-fluxes
   
   
   # check for double dt raws
@@ -324,7 +314,7 @@ for(im in 1:2){
     # remove outliers according to Tukey's Fence: 
     # 1.5 times the inter-quartile difference (3 times iqd, it is "far out") 
     
-    if(T){
+    if(F){
     for(fx in c("H", "LE", "FC")){ # iqd*30 is 10 times what is considered "far out"
       #dc<-"Fcc_g1"
       #vec<-as.numeric(datf[,dc])
@@ -365,7 +355,7 @@ for(is in 1:2){
   mdatesg<-paste(gdat[,"day"],  gdat[,"month"], gdat[,"year"], sep="/")
   mtimesg<-paste(gdat[,"hour"], gdat[,"min"],   "00", sep=":")
   gdt0<- chron(dates=mdatesg, times=mtimesg, format=c("d/m/y","h:m:s"))
-  gdt<-gdt0-1/(24*4)   # move dt back by 15 min to match dt of the other datasets
+  gdt<-gdt0+1/(24*4)   # move dt forward by 15 min to match dt of the other datasets
   
   
   
@@ -819,14 +809,12 @@ if(T){
                     gm, gm_f, sm, sm_f, 
                     ga4_f, sa4_f, ga3_f, sa3_f,
                     ga23_f, ga34_f, ga42_f, sa23_f, sa34_f, sa42_f,  
-                    gp, sp, soilg, soils))      
+                    soilg, soils))      
 
   
   # convert everything in numeric (sometimes there are issues from the .csv files)
-  dcols0<-paste(rep(fluxes,  length(datasets)),  rep(datasets,  each=length(fluxes)),  sep="_")
-  dcolsp<-paste(rep(pfluxes, length(pdatasets)), rep(pdatasets, each=length(pfluxes)), sep="_")
-  dcols<-c(dcols0, dcolsp)
-  
+  dcols<-paste(rep(fluxes,  length(datasets)),  rep(datasets,  each=length(fluxes)),  sep="_")
+
   
   for(dc in dcols){
     if(is.factor(data[,dc])){data[,dc]<-as.numeric(as.character(data[,dc]))}
@@ -893,9 +881,6 @@ if(T){
   # add AmeriFlux's
   dcols<-c(dcols, "H_gm", "cLE_gm", "Fc_gm", "H_sm", "cLE_sm", "Fc_sm",
          paste(rep(fluxes_reddy, 2), rep(c("gm", "sm"), each=length(fluxes_reddy)), sep="_" )) 
-  
-  # add AmeriFlux's with REC pipeline
-  dcols<-c(dcols, dcolsp)
   
   
   # add month, year and hour columns
@@ -2611,7 +2596,6 @@ plot_avg_day<-function(avd=avd, mon=NULL, year=NULL, ylims=NULL, test_2=F){
   
 }
 
-
 plot_avg_day_AmeriFlux<-function(avd=avd, mon=NULL, year=NULL, ylims=NULL, 
         add_P=F, pmd=pmd, pavd=pavd, irga_s=F, no_seg_nee=F, avg_rec3=F){
   
@@ -2749,6 +2733,142 @@ plot_avg_day_AmeriFlux<-function(avd=avd, mon=NULL, year=NULL, ylims=NULL,
   
 } 
 
+plot_avg_day_AmeriFlux_HR<-function(avd=avd, mon=NULL, year=NULL, ylims=NULL, 
+        add_P=F, pmd=pmd, pavd=pavd, irga_s=F, no_seg_nee=F, avg_rec3=F){
+  
+  #browser()
+  HOD<-x1<-0:23; x2<-x1; x3<-x2; x4<-x3
+  HOD<-as.data.frame(HOD)
+  avd<-merge(avd, HOD, by="HOD", all=T)
+  
+  if(irga_s){
+    #avd<-avd[ avd[, "H_gm_mn"]>0 | avd[, "H_sm_mn"]>0 ,]
+    avd<-avd[ avd[, "HOD"]>=6 & avd[, "HOD"]<=18 ,]
+    x1<-x2<-x3<-x4<-avd[,"HOD"]
+  }
+  
+  
+  
+  f2p_H <-c("Hc_g1",   "Hc_ga4",   "Hc_ga3",  "H_gm",   "Hc_s1",   "Hc_sa4",   "Hc_sa3",   "H_sm")
+  f2p_LE<-c("cLEc_g1", "cLEc_ga4", "cLEc_ga3","cLE_gm", "cLEc_s1", "cLEc_sa4", "cLEc_sa3", "cLE_sm")
+  f2p_F <-c("Fcc_g1",  "Fcc_ga4",  "Fcc_ga3", "Fc_gm",  "Fcc_s1",  "Fcc_sa4",  "Fcc_sa3",  "Fc_sm")
+  fg<-c("f2p_H", "f2p_H", "f2p_LE", "f2p_LE", "f2p_F", "f2p_F")  
+  
+  
+  if(is.null(ylims)){
+    ylim_H<-range(avd[,paste(f2p_H, "mn", sep="_")]+avd[,paste(f2p_H, "sde", sep="_")],
+                  avd[,paste(f2p_H, "mn", sep="_")]-avd[,paste(f2p_H, "sde", sep="_")], na.rm=T)
+    ylim_LE<-range(avd[,paste(f2p_LE, "mn", sep="_")]+avd[,paste(f2p_LE, "sde", sep="_")],
+                   avd[,paste(f2p_LE, "mn", sep="_")]-avd[,paste(f2p_LE, "sde", sep="_")], na.rm=T)
+    ylim_F<-range(avd[,paste(f2p_F, "mn", sep="_")]+avd[,paste(f2p_F, "sde", sep="_")],
+                  avd[,paste(f2p_F, "mn", sep="_")]-avd[,paste(f2p_F, "sde", sep="_")], na.rm=T)
+    
+  } else {
+    ylim_H<-ylims[[1]]  *c(1, 1.03)
+    ylim_LE<-ylims[[2]] *c(1, 1.03)
+    ylim_F<-ylims[[3]]  *c(1, 1.03)
+  } 
+  
+  
+  
+  
+  
+  holl<-"corr_holl_"; if(irga_s)holl<-paste("corr_irga_s_", holl, sep="")
+  titles<-c("Grassland (US-Seg)", "Shrubland (US-Ses)", "", "", "", "")
+  if(irga_s){titles[1:2]<-paste(titles[1:2], " / ", year)} # year here is e.g. switch_m1_m60
+  if(!(is.null(mon) & is.null(year)) & !irga_s){
+    titles[1:2]<-paste(titles[1:2], " / ", month.abb[mon], "-", year)
+  }
+  
+  #ylabs<-c("H (W m-2)", "", "LE (W m-2)", "", "NEE (umolC m-2 s-1)", "")
+  ylabs<-c(  expression("H (W m"^"-2"*")"), "", 
+             expression("LE (W m"^"-2"*")"), "",
+             expression("NEE (umol CO"["2"]*" m"^"-2"*"s"^"-1"*")"), ""           )
+  ylims_nm<-rep(c("ylim_H", "ylim_LE", "ylim_F"), each=2)
+  
+  fluxes<-rep(c("Hc_", "cLEc_", "Fcc_"), each=2)
+  ids<-rep(c("g1", "ga4", "ga3", "gm", "s1", "sa4", "sa3", "sm"), 3)
+  
+  plot_id<-c("a)", "b)", "c)", "d)", "e)", "f)")
+  
+  
+  if(no_seg_nee){
+    avd[, c("Fc_gm_mn", "Fc_gm_sde")]<-NA; holl<-paste("no_seg_nee_", holl, sep="")
+  }
+  
+  cols<-c("purple", "black", "blue", "orange")
+  if(!avg_rec3)cols<-c("purple", "black", "orange")
+  
+  
+  ppath<-"E:/REC_7_Data/10_Plots/2_avg_mon_video/"
+  ap<-""; if(add_P)ap<-"add_P_"
+  if(!irga_s)filenm<-paste(ppath, holl, xct, ap, "AmeriFlux_avg_days_", year, "_", substring(1000+mon, 3,4), "corr_EC0_HR.png", sep="")
+  if(irga_s)filenm<-paste(ppath, holl, xct, ap, "AmeriFlux_avg_days_", year, "_corr_HR.png", sep="") # year=e.g Switch1_minus_60
+  if((is.null(mon)&is.null(year))){ filenm<-paste("E:/REC_7_Data/10_Plots/", holl, xct, 
+                                                  "AmeriFlux_avg_days_total_corr_EC0_HR.png", sep="") }
+  
+  
+  png(filenm, width=1200, height=1000)
+  par(mfrow=c(3,2), mar = c(0, 0, 0, 0), oma = c(12, 12, 8, 12), mgp=c(4, 1.5, 0), tck=-0.02)
+  
+  
+  
+  for(i in 1:6){
+    #browser()
+    
+    pcols<-1:4; if(i %in% c(2, 4, 6))pcols<-5:8
+    mns<-avd[,paste(get(fg[i]), "_mn", sep="")[pcols]]
+    sds<-avd[,paste(get(fg[i]), "_sde", sep="")[pcols]]
+    
+    
+    plot(x1, mns[,1], ylim=get(ylims_nm[i]),pch=4, axes=F, xlab="", ylab="", col="purple"); 
+    mtext(titles[i], side=3, line=1, cex=2); box(); mtext(ylabs[i], side=2, line=6, cex=2)
+    if(i %in% c(1,3,5))axis(2, cex.axis=3); 
+    if(i %in% c(5,6)){axis(1, cex.axis=3); mtext("Hour of Day", side=1, line=4, cex=2)}
+    arrows(x1, mns[,1]-sds[,1], x1, mns[,1]+sds[,1], length=0.05, angle=90, code=3, col="purple", lwd=2)
+    points(x2, mns[,2], col="black", pch=4, cex=2); 
+    arrows(x2, mns[,2]-sds[,2], x2, mns[,2]+sds[,2], length=0.05, angle=90, code=3, col="black", lwd=2)
+    if(avg_rec3){
+      points(x3, mns[,3], col="blue", pch=4, cex=2); 
+      arrows(x3, mns[,3]-sds[,3], x2, mns[,3]+sds[,3], length=0.05, angle=90, code=3, col="blue", lwd=2)
+    }
+    points(x4, mns[,4], col="orange", pch=4, cex=2)
+    arrows(x4, mns[,4]-sds[,4], x3, mns[,4]+sds[,4], length=0.05, angle=90, code=3, col="orange", lwd=2)
+    mtext (plot_id[i], side=3, adj=0.03, line=-4, cex=3)    
+    
+    abline(h=0, col="gray")
+    if(i==1)legend("topright", c("EC1", "EC1234", "EC0"), 
+                   col=cols, lty=1, lwd=2, cex=2)    # "SEG mn 3", 
+    #if(i==2)legend("topright", c("EC1", "EC1234", "EC0"), 
+    #               col=cols, lty=1, lwd=2, cex=1)    # "SES mn 3", 
+    if(irga_s & i==1) mtext(mon, line=-6, adj=0.2, cex=2)
+    if(add_P){
+      pd<-pavd[pavd[,"yyyy"]==year & pavd[,"mon"]==mon,c("P_gm_mn", "P_sm_mn")]
+      ylim_p<-c(0, max(pavd[,c("P_gm_mn", "P_sm_mn")])*1.03)
+      wp<-round(pmd[pmd[,"yyyy"]==year & pmd[,"mon"]==mon, c("P_gm", "P_sm")], 1)
+      if(i==3){
+        mtext("Precip:", side=3, adj=0.85, line=-4, cex=2)
+        mtext(paste(wp[,"P_gm"], "mm"), side=3, adj=0.85, line=-8, cex=2)
+        par(new=T)
+        plot(x1, pd[,"P_gm_mn"], axes=F, xlab="", ylab="", ylim=ylim_p, col="cyan", pch=16, cex=2); 
+      }
+      if(i==4){
+        mtext("Precip:", side=3, adj=0.85, line=-4, cex=2)
+        mtext(paste(wp[,"P_sm"], "mm"), side=3, adj=0.85, line=-8, cex=2)
+        par(new=T)
+        plot(x1, pd[,"P_sm_mn"], axes=F, xlab="", ylab="", ylim=ylim_p, col="cyan", pch=16, cex=2); 
+        axis(4, cex.axis=3); mtext("Prec (mm/h)", side=4, line=8, cex=3)
+      }
+      
+      
+    }
+    
+  }
+  
+  dev.off()
+  
+  
+} 
 
 plot_months_3_1<-function(dat=dat, mon=mm, year=yy, telemetry=F, RH="cell", corrected=T, 
         AmeriFlux=F, AmeriFlux_edire=F, avg_rec4=T, avg_rec3=F, no_rec234=T, no_rec1=F, no_seg_nee=F,
@@ -3625,8 +3745,10 @@ if(F){
           avd_m<-merge(avd_mn, avd_sd, by="HOD")
           
           #plot_avg_day(avd=avd_m, mon=mm, year=yy, ylims=ylims, test_2=T)
-          plot_avg_day_AmeriFlux(avd=avd_m, mon=mm, year=yy, ylims=ylims, add_P=F, 
-                             pmd=pm, pavd=p_mn, irga_s=F, no_seg_nee = F)
+          #plot_avg_day_AmeriFlux(avd=avd_m, mon=mm, year=yy, ylims=ylims, add_P=F, 
+           #                  pmd=pm, pavd=p_mn, irga_s=F, no_seg_nee = F)
+          #plot_avg_day_AmeriFlux_HR(avd=avd_m, mon=mm, year=yy, ylims=ylims, add_P=F, 
+           #                 pmd=pm, pavd=p_mn, irga_s=F, no_seg_nee = F)
         }
       }
     }
@@ -4229,7 +4351,7 @@ if(T){
   ### Energy Balance with Tomer's small datasets
   ###
   
-  tpath<-"E:/REC_7_Data/12_AmeriFluxs_data/soil_data/Previous_received_20201125/"
+  tpath<-"E:/REC_7_Data/12_Marcys_data/soil_data/Previous_received_20201125/"
   gt<-read.table(file=paste(tpath, "Seg_eb_table.csv", sep=""), header=TRUE, sep=",")
   st<-read.table(file=paste(tpath, "Ses_eb_table.csv", sep=""), header=TRUE, sep=",")
   
@@ -4256,46 +4378,20 @@ if(T){
                list(gd, sd, gdf, sdf))
   
   
-  # H, LE, Rn are all good
+  # all good
   
-  range(gt[,"H"] -datt[,"H_gm"],   na.rm=T)       # -5e-10  5e-10
-  range(gt[,"LE"]-datt[,"cLE_gm"], na.rm=T)       # -5e-10  5e-10
-  range(gt[,"Rn"]-datt[,"NETRAD_gm"], na.rm=T)    # 0 0
+  range(gt[,"H"] -datt[,"H_gm"],   na.rm=T)             # -5e-10  5e-10
+  range(gt[,"LE"]-datt[,"cLE_gm"], na.rm=T)             # -5e-10  5e-10
+  range(gt[,"Rn"]-datt[,"NETRAD_gm"], na.rm=T)          # 0 0
+  range(gt[,"Gs"]-datt[,"SHF_ALL_AVG_soilg"], na.rm=T)  # 0 0 
   
-  range(st[,"H"] -datt[,"H_sm"],   na.rm=T)       # -4e-10  4e-10
-  range(st[,"LE"]-datt[,"cLE_sm"], na.rm=T)       # -5e-10  5e-10
-  range(st[,"Rn"]-datt[,"NETRAD_sm"], na.rm=T)    # 0 0
-  
-  
-  
-  # G is not the same as in "my" dataset!
-  
-  range(gt[,"Gs"]-datt[,"SHF_ALL_AVG_soilg"], na.rm=T)   # -292.9864  367.2147
-  range(gt[,"Gs"]-datt[,"SHF_G_AVG_soilg"], na.rm=T)     # -316.5721  317.1166
-  range(gt[,"Gs"]-datt[,"SHF_O_AVG_soilg"], na.rm=T)     # -269.4008  367.2147
-  
-  range(gt[,"Gs"]-datt[,"SHF_G1_AVG_soilg"], na.rm=T)    # -316.3975  327.7837
-  range(gt[,"Gs"]-datt[,"SHF_G2_AVG_soilg"], na.rm=T)    # -316.7466  329.5813
-  range(gt[,"Gs"]-datt[,"SHF_O1_AVG_soilg"], na.rm=T)    # -265.5658  303.6792
-  range(gt[,"Gs"]-datt[,"SHF_O2_AVG_soilg"], na.rm=T)    # -277.3604  443.2155
-  
-  plot(gt[,"Gs"]-datt[,"SHF_ALL_AVG_soilg"])     # so random!
-  plot(gt[,"Gs"],datt[,"SHF_ALL_AVG_soilg"])     # quite spread out
+  range(st[,"H"] -datt[,"H_sm"],   na.rm=T)              # -4e-10  4e-10
+  range(st[,"LE"]-datt[,"cLE_sm"], na.rm=T)              # -5e-10  5e-10
+  range(st[,"Rn"]-datt[,"NETRAD_sm"], na.rm=T)           # 0 0
+  range(st[,"Gs"]-datt[,"SHF_ALL_AVG_soils"], na.rm=T)   # 0 0 
   
   
-  
-  range(st[,"Gs"]-datt[,"SHF_ALL_AVG_soils"], na.rm=T)   # -153.6399  160.9787
-  range(st[,"Gs"]-datt[,"SHF_S_AVG_soils"], na.rm=T)     # -157.6690  158.5313
-  range(st[,"Gs"]-datt[,"SHF_O_AVG_soils"], na.rm=T)     # -150.3519  166.0195
-  
-  range(st[,"Gs"]-datt[,"SHF_S1_AVG_soils"], na.rm=T)    # -120.8452  163.0277
-  range(st[,"Gs"]-datt[,"SHF_S2_AVG_soils"], na.rm=T)    # -204.0263  166.5631
-  range(st[,"Gs"]-datt[,"SHF_O1_AVG_soils"], na.rm=T)    # -154.9065  168.8336
-  range(st[,"Gs"]-datt[,"SHF_O2_AVG_soils"], na.rm=T)    # -158.0961  163.2053
-  
-  plot(st[,"Gs"]-datt[,"SHF_ALL_AVG_soils"])     # so random!
-  plot(st[,"Gs"],datt[,"SHF_ALL_AVG_soils"])     # quite spread out
-  
+
   
   
 }  # Test energy balance with files from AmeriFlux
@@ -4582,6 +4678,80 @@ if(T){
   
   
   
+  ### High Resolution version
+  if(F){
+    
+    bplot<-"E:/REC_7_Data/10_Plots/12_barplot_fluxes/"
+    filenm<-paste(bplot, "3_1_barplot", xch, attr, lb, "_EC0_HR.png", sep="")
+    
+    png(filenm, width=1800, height=1800)
+    par(mfrow=c(3,1), mar = c(0, 12, 0, 0), oma = c(26, 12, 16, 1), mgp=c(2, 0.5, 0), tck=-0.01)
+    if(ECs2)par(oma=c(34, 5, 12, 1))
+    
+    
+    bp_h<-barplot(bard[wr, colh], las=3, beside=T, axisnames=F, ylim=ylimh, cex.axis=6, 
+                  col=cols, space=sp); box(); 
+    mtext(expression("H (W m"^"-2"*")"), 2, line=7, cex=4)
+    rect(x1, 0, x2, ylimh[2], col = "grey")
+    rect(x3, 0, x4, ylimh[2], col = "grey")
+    bp_h<-barplot(bard[wr, colh], las=3, beside=T, axisnames=F, ylim=ylimh,
+                  cex.axis=6, col=cols, add=T, space=sp)
+    arrows(x0=bp_h, y0=bard[wr, colh]+bare[wr, colh], x1=bp_h, y1=bard[wr, colh]-bare[wr, colh], 
+           length=0, code=3, lwd=3); abline(v=mean(bp_h), lty=3); #abline(v=21.5, lty=3)
+    mtext ("Grassland", side=3, adj=0.15, line=2, cex=8)
+    mtext ("Shrubland", side=3, adj=0.85, line=2, cex=8)
+    mtext ("a)", side=3, adj=0.01, line=-6, cex=4)
+    
+    
+    barplot(bard[wr, colle],  las=3, beside=T, axisnames=F, ylim=ylimle, cex.axis=6, col=cols, space=sp); box(); 
+    mtext(expression("LE (W m"^"-2"*")"), 2, line=7, cex=4)
+    rect(x1, 0, x2, ylimle[2], col = "grey")
+    rect(x3, 0, x4, ylimle[2], col = "grey")
+    barplot(bard[wr, colle],  las=3, beside=T, axisnames=F, ylim=ylimle,
+            cex.axis=6, col=cols, add=T, space=sp)
+    arrows(x0=bp_h, y0=bard[wr, colle]+bare[wr, colle], x1=bp_h, y1=bard[wr, colle]-bare[wr, colle], 
+           length=0, code=3, lwd=3); abline(v=mean(bp_h), lty=3); #abline(v=21.5, lty=3)
+    mtext ("b)", side=3, adj=0.01, line=-6, cex=4)
+    
+    
+    if(!ECs2){
+      barplot(bard[wr, colnee], las=3, beside=T, ylim=ylimnee, cex.names=6, cex.axis=6, col=cols, space=sp,
+              names.arg = c("Seg EC1234", "Seg EC234", "Seg EC0", "Seg EC1", "Seg EC2", "Seg EC3", "Seg EC4", 
+                            "Ses EC1234", "Ses EC234", "Ses EC0", "Ses EC1", "Ses EC2", "Ses EC3", "Ses EC4"));
+    } else {
+      barplot(bard[wr, colnee], las=3, beside=T, ylim=ylimnee, cex.names=6, cex.axis=6, col=cols, space=sp,
+              names.arg = c("Seg EC1234", "Seg EC234", "Seg EC23", "Seg EC34", "Seg EC42", "Seg EC0", "Seg EC1", "Seg EC2", "Seg EC3", "Seg EC4", 
+                            "Ses EC1234", "Ses EC234", "Ses EC23", "Ses EC34", "Ses EC42", "Ses EC0", "Ses EC1", "Ses EC2", "Ses EC3", "Ses EC4"));
+    }
+    rect(x1, ylimnee[1], x2, ylimnee[2], col = "grey")
+    rect(x3, ylimnee[1], x4, ylimnee[2], col = "grey")
+    barplot(bard[wr, colnee], las=3, beside=T, ylim=ylimnee, cex.names=6, cex.axis=6, col=cols, add=T, names.arg =rep("", 20), space=sp) # was 14
+    arrows(x0=bp_h, y0=bard[wr, colnee]+bare[wr, colnee], x1=bp_h, y1=bard[wr, colnee]-bare[wr, colnee], 
+           length=0, code=3, lwd=3); box(); abline(v=mean(bp_h), lty=3); #abline(v=21.5, lty=3); 
+    
+    mtext(expression("NEE (umol CO"["2"]*" m"^"-2"*"s"^"-1"*")"), 2, line=7, cex=4)
+    abline(h=0, col="black")
+    mtext ("c)", side=3, adj=0.01, line=-6, cex=4)
+    if(!avg_all)legend("bottomright", legend=c("Growing periods", "Dormant periods"), col=cols, pch=16, cex=5)
+    
+    # add horizontal error bars for mean fluxes
+    arrows(x0=bp_h[c(1:5, 11:15)], 
+           y0=bard[wr, colnee][c(1:5, 11:15)]+bare[wr, colnee][c(1:5, 11:15)], 
+           x1=bp_h[c(1:5, 11:15)],
+           y1=bard[wr, colnee][c(1:5, 11:15)]-bare[wr, colnee][c(1:5, 11:15)], 
+           length=0.1, angle=90, code=3, lwd=3)
+    
+    dev.off()
+    
+    
+    
+    
+  }
+
+  
+  
+  
+  
 }  # growing / senescent periods fluxes matrix / barchart
 #
 if(T){
@@ -4823,7 +4993,99 @@ if(T){
   
   dev.off()
   
-}  # cumsum NEE and LE
+  
+  
+  
+  
+  ### ggplot version
+  if(T){
+    
+    gpath<-"E:/REC_7_Data/10_Plots/7_cumsum/"
+    p_nm<-paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot.png", sep="")
+    
+    mthetimes<- as.POSIXct(dmat[,"dt"], format="%d/%m/%y %H:%M:%S") 
+    dmat$dt_2<-mthetimes
+    
+    colors<-c("orange", "purple", "green", "darkgreen", "brown")  # I don't know why but colors order is shifted by 1
+
+    
+    p1<-ggplot(dmat, aes(x=dt_2)) +
+      labs(x = "", y = expression("Cumulative LE (MW m"^"-2"*")",sep=""), title = "a) LE Grassland") +
+      geom_line(aes(y = LE_f_g1, color = "EC1")) + 
+      geom_line(aes(y = LE_f_g2, color = "EC2")) + 
+      geom_line(aes(y = LE_f_g3, color = "EC3")) + 
+      geom_line(aes(y = LE_f_g4, color = "EC4")) +
+      geom_line(aes(y = LE_f_gm, color = "EC0")) +
+      geom_line(aes(y = P_gm), color = "cyan") +
+      theme_bw() + ylim(ylim_l) +
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
+      theme(axis.text.x = element_text(angle = 90)) +
+      #scale_x_datetime(labels = date_format("%b")) + 
+      theme(legend.title = element_blank(), legend.position = c(0.15, 0.50)) +       # legend position
+      scale_color_manual(values = colors)
+      
+    
+    p2<-ggplot(dmat, aes(x=dt_2)) +
+      labs(x = "", y = expression("Cumulative LE (MW m"^"-2"*")",sep=""), title = "b) LE Shrubland") +
+      geom_line(aes(y = LE_f_s1, color = "EC1")) + 
+      geom_line(aes(y = LE_f_s2, color = "EC2")) + 
+      geom_line(aes(y = LE_f_s3, color = "EC3")) + 
+      geom_line(aes(y = LE_f_s4, color = "EC4")) +
+      geom_line(aes(y = LE_f_sm, color = "EC0")) +
+      geom_line(aes(y = P_sm), color = "cyan") +
+      theme_bw() + ylim(ylim_l) +
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
+      theme(axis.text.x = element_text(angle = 90)) +
+      #scale_x_datetime(labels = date_format("%b")) + 
+      theme(legend.title = element_blank(), legend.position = c(0.15, 0.50)) +       # legend position
+      scale_color_manual(values = colors)
+      
+    
+    p3<-ggplot(dmat, aes(x=dt_2)) +
+      labs(x = "", y = expression("Cumulative NEE (gC m"^"-2"*")",sep=""), title = "c) NEE Grassland") +
+      geom_line(aes(y = NEE_uStar_f_g1, color = "EC1")) + 
+      geom_line(aes(y = NEE_uStar_f_g2, color = "EC2")) + 
+      geom_line(aes(y = NEE_uStar_f_g3, color = "EC3")) + 
+      geom_line(aes(y = NEE_uStar_f_g4, color = "EC4")) +
+      geom_line(aes(y = NEE_uStar_f_gm, color = "EC0")) +
+      geom_line(aes(y = P_gm), color = "cyan") +
+      theme_bw() + ylim(ylim_c) +
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
+      theme(axis.text.x = element_text(angle = 90)) +
+      #scale_x_datetime(labels = date_format("%b")) + 
+      theme(legend.title = element_blank(), legend.position = c(0.15, 0.30)) +       # legend position
+      scale_color_manual(values = colors)
+    
+    
+    p4<-ggplot(dmat, aes(x=dt_2)) +
+      labs(x = "", y = expression("Cumulative NEE (gC m"^"-2"*")",sep=""), title = "d) NEE Grassland") +
+      geom_line(aes(y = NEE_uStar_f_s1, color = "EC1")) + 
+      geom_line(aes(y = NEE_uStar_f_s2, color = "EC2")) + 
+      geom_line(aes(y = NEE_uStar_f_s3, color = "EC3")) + 
+      geom_line(aes(y = NEE_uStar_f_s4, color = "EC4")) +
+      geom_line(aes(y = NEE_uStar_f_sm, color = "EC0")) +
+      geom_line(aes(y = P_gm), color = "cyan") +
+      theme_bw() + ylim(ylim_c) +
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
+      theme(axis.text.x = element_text(angle = 90)) +
+      #scale_x_datetime(labels = date_format("%b")) + 
+      theme(legend.title = element_blank(), legend.position = c(0.15, 0.30)) +       # legend position
+      scale_color_manual(values = colors)
+    
+    
+    
+    
+    pall<-ggarrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
+    ggsave(pall, filename = p_nm, width = 20, height = 20, units = "cm")
+    
+  }
+  
+  
+  
+  
+  
+  
+}  # cumsum NEE and LE    (plus ggplot version)
 #
 if(T){
 
@@ -4835,37 +5097,8 @@ if(T){
   #### ideal closure: Y=X
   #### Burba ex: 80% closure H+LE~Rn+G; r2=0.93
   
-  
-  
-  ### if SEG
-  #wcolg<-c("SHF_G1_AVG_soilg", "SHF_G2_AVG_soilg", "SHF_O1_AVG_soilg", "SHF_O2_AVG_soilg",
-   #         "STORAGE_G2_AVG_soilg", "STORAGE_O1_AVG_soilg")
-  ### if SES
-  #wcols<-c("SHF_S1_AVG_soils", "SHF_S2_AVG_soils", "SHF_O1_AVG_soils", "SHF_O2_AVG_soils",
-   #        "STORAGE_O2_AVG_soils", "STORAGE_S1_AVG_soils", "STORAGE_S2_AVG_soils")
-  
-  netg<-datdd[,"NETRAD_gm"]
-  nets<-datdd[,"NETRAD_sm"]
-  
-  shfg<-datdd[,"SHF_ALL_AVG_soilg"]
-  shfs<-datdd[,"SHF_ALL_AVG_soils"]
-  
-  xgs<-matrix(NA, ncol=2, nrow=nrow(datdd)); xgs[,1]<-netg; xgs[,2]<-shfg*(-1); 
-  xss<-matrix(NA, ncol=2, nrow=nrow(datdd)); xss[,1]<-nets; xss[,2]<-shfs*(-1); 
-  
-  
-  #shfg<-apply(datdd[,wcolg[1:4]], 1, mean, na.rm=T); #shfg[is.na(shfg)]<-0
-  #shfs<-apply(datdd[,wcols[1:4]], 1, mean, na.rm=T); #shfs[is.na(shfs)]<-0
-  
-  #hsg<-apply(datdd[,wcolg[5:6]], 1, mean, na.rm=T); #hsg[!is.na(hsg)]<-0
-  #hss<-apply(datdd[,wcols[5:7]], 1, mean, na.rm=T); #hss[!is.na(hss)]<-0
-  
-  #xgs<-matrix(NA, ncol=3, nrow=nrow(datdd)); xgs[,1]<-netg; xgs[,2]<-shfg*(-1); xgs[,3]<-hsg*(-1)
-  #xss<-matrix(NA, ncol=3, nrow=nrow(datdd)); xss[,1]<-nets; xss[,2]<-shfs*(-1); xss[,3]<-hss*(-1)
-  
-  
-  xg<-apply(xgs, 1, sum, na.rm=T)
-  xs<-apply(xss, 1, sum, na.rm=T)
+  xg<-datdd[,"NETRAD_gm"]-datdd[,"SHF_ALL_AVG_soilg"]
+  xs<-datdd[,"NETRAD_sm"]-datdd[,"SHF_ALL_AVG_soils"]
   ygm<-datdd[,"H_gm"] + datdd[,"cLE_gm"]
   ysm<-datdd[,"H_sm"] + datdd[,"cLE_sm"]
   yg1<-datdd[,"Hc_g1"] + datdd[,"cLEc_g1"]
@@ -4874,13 +5107,13 @@ if(T){
   lim<-range(xg, xs, ygm, ysm, yg1, ys1, na.rm=T)
   
   ylab<-expression("H + LE (W m"^"-2"*")") 
-  xlab<-expression("Rn + G (W m"^"-2"*")")
+  xlab<-expression("Rn - G (W m"^"-2"*")")
   
   
   
   plot_nm<-paste(last_date, "energy_balance_", sep="")
   gpath<-"E:/REC_7_Data/10_Plots/11_energy_balance_closure/"
-  png(paste(gpath, plot_nm, "_new_00.png", sep=""), width=1200, height=1200)
+  png(paste(gpath, plot_nm, "_test_TLS.png", sep=""), width=1200, height=1200)
   
   #par(mfrow=c(2,2), mar = c(3, 3, 3, 2), oma = c(3, 3, 5, 1), mgp=c(2, 0.5, 0))
   #if(!add_prec)par(mfrow=c(2,2), mar = c(5, 5, 5, 2), mgp=c(2, 0.5, 0), tck=0.01)
@@ -4895,18 +5128,22 @@ if(T){
     
   
   # Plot 1
-
+  #lm0 <-summary(lm(ygm~xg))
+  #m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
+  #y0<-round(lm0$coefficients[1,1], 0)
+  #r<-round(lm0$r.squared, 2)
+  
   aa<-cbind(xg, ygm); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
   m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
   r <- round( cor(bb, method="pearson")[1,2], 2)
-  l_gm<-lm(ygm~xg)
+  #l_gm<-lm(ygm~xg)
   
   
   plot(xg, ygm, pch=16, xlim=lim, ylim=lim, ylab="", xlab="", main= "Seg EC0", cex.main=4, axes=F, col=alpha(1, 0.2))
   axis(1, cex.axis=3); axis(2, cex.axis=3); box(); mtext ("a)", side=3, adj=0, line=1, cex=3)
   
   mtext(xlab, side=1, line=6, cex=3); mtext(ylab, side=2, line=5, cex=3); 
-  mtext(paste("y =", y0, "+", m0, "x, r=", r), side=3, line=-3, cex=2)
+  mtext(paste("y =", y0, "+", m0, "x, r2=", r), side=3, line=-3, cex=2)
   abline(a=y0, b=m0);
   abline(a=0, b=1, col="grey") 
 
@@ -4914,48 +5151,61 @@ if(T){
   
   # Plot 2
 
+  #lm0 <-summary(lm(ysm~xs))
+  #m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
+  #y0<-round(lm0$coefficients[1,1], 0)
+  #r<-round(lm0$r.squared, 2)
+  
   aa<-cbind(xs, ysm); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
   m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
   r <- round( cor(bb, method="pearson")[1,2], 2)
-  l_sm<-lm(ysm~xs)
+  #l_sm<-lm(ysm~xs)
   
   plot(xs, ysm, pch=16, xlim=lim, ylim=lim, ylab="", xlab="", main= "Ses EC0", cex.main=4, axes=F, col=alpha(1, 0.2))
   axis(1, cex.axis=3); axis(2, cex.axis=3); box(); mtext ("b)", side=3, adj=0, line=1, cex=3)
   
   mtext(xlab, side=1, line=6, cex=3); mtext(ylab, side=2, line=5, cex=3); 
-  mtext(paste("y =", y0, "+", m0, "x, r=", r), side=3, line=-3, cex=2)
+  mtext(paste("y =", y0, "+", m0, "x, r2=", r), side=3, line=-3, cex=2)
   abline(a=y0, b=m0);
   abline(a=0, b=1, col="grey") 
   
   
   # Plot 3
+  #lm0 <-summary(lm(yg1~xg))
+  #m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
+  #y0<-round(lm0$coefficients[1,1], 0)
+  #r<-round(lm0$r.squared, 2)
 
   aa<-cbind(yg1, xg); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
   m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
   r <- round( cor(bb, method="pearson")[1,2], 2)
-  l_g1<-lm(yg1~xg)
+  #l_g1<-lm(yg1~xg)
   
   plot(xg, yg1, pch=16, xlim=lim, ylim=lim, ylab="", xlab="", main= "Seg EC1", cex.main=4, axes=F, col=alpha(1, 0.2))
   axis(1, cex.axis=3); axis(2, cex.axis=3); box(); mtext ("c)", side=3, adj=0, line=1, cex=3)
   
   mtext(xlab, side=1, line=6, cex=3); mtext(ylab, side=2, line=5, cex=3); 
-  mtext(paste("y =", y0, "+", m0, "x, r=", r), side=3, line=-3, cex=2)
+  mtext(paste("y =", y0, "+", m0, "x, r2=", r), side=3, line=-3, cex=2)
   abline(a=y0, b=m0);
   abline(a=0, b=1, col="grey") 
   
   
   # Plot 4
+  #lm0 <-summary(lm(ys1~xs))
+  #m0<-round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
+  #y0<-round(lm0$coefficients[1,1], 0)
+  #r<-round(lm0$r.squared, 2)
 
   aa<-cbind(xs, ys1); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
   m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
   r <- round( cor(bb, method="pearson")[1,2], 2)
-  l_s1<-lm(ys1~xs)
+  #l_s1<-lm(ys1~xs)
   
   plot(xs, ys1, pch=16, xlim=lim, ylim=lim, ylab="", xlab="", main= "Ses EC1", cex.main=4, axes=F, col=alpha(1, 0.2))
   axis(1, cex.axis=3); axis(2, cex.axis=3); box(); mtext ("d)", side=3, adj=0, line=1, cex=3)
   
   mtext(xlab, side=1, line=6, cex=3); mtext(ylab, side=2, line=5, cex=3); 
-  mtext(paste("y =", y0, "+", m0, "x, r=", r), side=3, line=-3, cex=2)
+  mtext(paste("y =", y0, "+", m0, "x, r2=", r), side=3, line=-3, cex=2)
   abline(a=y0, b=m0);
   abline(a=0, b=1, col="grey") 
   
@@ -4973,25 +5223,154 @@ if(T){
   # Energy Balance Ratio
   
   gm_ebr<-(sum(ygm[ygm>0], na.rm=T) + sum(xg[xg<0], na.rm=T)) / 
-    (sum(ygm[ygm<0], na.rm=T) + sum(xg[xg>0], na.rm=T))    # 0.788105
+    (sum(ygm[ygm<0], na.rm=T) + sum(xg[xg>0], na.rm=T))    # 0.7820445
   sm_ebr<-(sum(ysm[ysm>0], na.rm=T) + sum(xs[xs<0], na.rm=T)) / 
-    (sum(ysm[ysm<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.472368
+    (sum(ysm[ysm<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.8446459
   
   g1_ebr<-(sum(yg1[yg1>0], na.rm=T) + sum(xg[xg<0], na.rm=T)) / 
-    (sum(yg1[yg1<0], na.rm=T) + sum(xg[xg>0], na.rm=T))    # 0.9689946
+    (sum(yg1[yg1<0], na.rm=T) + sum(xg[xg>0], na.rm=T))    # 0.9496163
   s1_ebr<-(sum(ys1[ys1>0], na.rm=T) + sum(xs[xs<0], na.rm=T)) / 
-    (sum(ys1[ys1<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.5566649
+    (sum(ys1[ys1<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.9525768
   
   
-  #                       (Intercept)        slope            AmeriFlux (all 2018 & 2019)
-  #l_gm$coefficients         1.3501956   0.8816234            0.81          
-  #l_sm$coefficients         22.997949    0.850126            0.87
-  #l_g1$coefficients         -3.161713    0.935687 
-  #l_s1$coefficients        19.1312371   0.6683983 
+  #                       (Intercept)        slope       AmeriFlux 
+  #l_gm$coefficients          7.4636225   0.8293651           0.81          
+  #l_sm$coefficients          7.3525987   0.8807114           0.88
+  
   
   
   
 }  # Full energy balance (EB) closure
+#
+if(T){
+  
+  # ggplot for Full energy balance (EB) closure 
+  
+  p_nm <-paste("E:/REC_7_Data/10_Plots/11_energy_balance_closure/energy_balance_TLS_ggplot.png", sep="")
+  
+  xg<-datdd[,"NETRAD_gm"]-datdd[,"SHF_ALL_AVG_soilg"]
+  xs<-datdd[,"NETRAD_sm"]-datdd[,"SHF_ALL_AVG_soils"]
+  ygm<-datdd[,"H_gm"] + datdd[,"cLE_gm"]
+  ysm<-datdd[,"H_sm"] + datdd[,"cLE_sm"]
+  yg1<-datdd[,"Hc_g1"] + datdd[,"cLEc_g1"]
+  ys1<-datdd[,"Hc_s1"] + datdd[,"cLEc_s1"]
+  
+  lim<-range(xg, xs, ygm, ysm, yg1, ys1, na.rm=T)
+  
+  ylab<-expression("H + LE (W m"^"-2"*")") 
+  xlab<-expression("Rn - G (W m"^"-2"*")")
+  
+  xg[xg==0]<-NA # xg has 500 zeros, but netg has 0, shfg 3 and xgs 5, so they all arise from the sums
+  # The 500 zeros results in a feature that looks a lot like an artifact, but it really is not
+  # with or without these 500 zeros, the slope of the plot is the same
+  
+  dtf<-data.frame(xg, xs, ygm, ysm, yg1, ys1)
+  
+  
+  
+  
+  
+  # Plot 1
+  aa<-cbind(xg, ygm); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
+  m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  r <- round( cor(bb, method="pearson")[1,2], 2)
+  rr<-paste("y = ", y0, "+", m0, "x - r:", r)
+  
+  p1<- ggplot(dtf, aes(x=xg, y=ygm) ) +
+    labs(x = xlab, y = ylab, title = "a) Seg EC0") +
+    geom_bin2d(bins = 150) +                       # Bin size control 
+    scale_fill_continuous(type = "viridis") +     # color palette
+    theme_bw() + xlim(lim) + ylim(lim) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
+    theme(text = element_text(size=14)) + 
+    theme(legend.key.size = unit(0.4, "cm")) +   # legend size
+    theme(legend.position = c(0.85, 0.25)) +       # legend position
+    theme(plot.title = element_text(size = 14, face = "bold"))  +
+    geom_abline(intercept = 0, slope = 1, color="grey", linetype="dashed") +
+    geom_abline(intercept = y0, slope = m0) +
+    annotate("text", x = 200, y = 700, label = rr, size=4)  
+  
+  
+  
+  # Plot 2
+  aa<-cbind(xs, ysm); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
+  m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  r <- round( cor(bb, method="pearson")[1,2], 2)
+  rr<-paste("y = ", y0, "+", m0, "x - r:", r)
+  
+  p2<- ggplot(dtf, aes(x=xs, y=ysm) ) +
+    labs(x = xlab, y = ylab, title = "b) Ses EC0") +
+    geom_bin2d(bins = 150) +                       # Bin size control 
+    scale_fill_continuous(type = "viridis") +     # color palette
+    theme_bw() + xlim(lim) + ylim(lim) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
+    theme(text = element_text(size=14)) + 
+    theme(legend.key.size = unit(0.4, "cm")) +   # legend size
+    theme(legend.position = c(0.85, 0.25)) +       # legend position
+    theme(plot.title = element_text(size = 14, face = "bold"))  +
+    geom_abline(intercept = 0, slope = 1, color="grey", linetype="dashed") +
+    geom_abline(intercept = y0, slope = m0) +
+    annotate("text", x = 200, y = 700, label = rr, size=4)  
+  
+  
+  
+  # Plot 3
+  aa<-cbind(xg, yg1); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
+  m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  r <- round( cor(bb, method="pearson")[1,2], 2)
+  rr<-paste("y = ", y0, "+", m0, "x - r:", r)
+  
+  p3<- ggplot(dtf, aes(x=xg, y=yg1) ) +
+    labs(x = xlab, y = ylab, title = "c) Seg EC1") +
+    geom_bin2d(bins = 150) +                       # Bin size control 
+    scale_fill_continuous(type = "viridis") +     # color palette
+    theme_bw() + xlim(lim) + ylim(lim) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
+    theme(text = element_text(size=14)) + 
+    theme(legend.key.size = unit(0.4, "cm")) +   # legend size
+    theme(legend.position = c(0.85, 0.25)) +       # legend position
+    theme(plot.title = element_text(size = 14, face = "bold"))  +
+    geom_abline(intercept = 0, slope = 1, color="grey", linetype="dashed") +
+    geom_abline(intercept = y0, slope = m0) +
+    annotate("text", x = 200, y = 700, label = rr, size=4)  
+  
+  
+  
+  # Plot 4
+  aa<-cbind(xs, ys1); bb<-aa[complete.cases(aa),]; cc<-prcomp(bb)$rotation
+  m0<- beta <- round( cc[2,1]/cc[1,1], 2); y0  <- round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  r <- round( cor(bb, method="pearson")[1,2], 2)
+  rr<-paste("y = ", y0, "+", m0, "x - r:", r)
+  
+  p4<- ggplot(dtf, aes(x=xs, y=ys1) ) +
+    labs(x = xlab, y = ylab, title = "d) Ses EC1") +
+    geom_bin2d(bins = 150) +                       # Bin size control 
+    scale_fill_continuous(type = "viridis") +     # color palette
+    theme_bw() + xlim(lim) + ylim(lim) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
+    theme(text = element_text(size=14)) + 
+    theme(legend.key.size = unit(0.4, "cm")) +   # legend size
+    theme(legend.position = c(0.85, 0.25)) +       # legend position
+    theme(plot.title = element_text(size = 14, face = "bold"))  +
+    geom_abline(intercept = 0, slope = 1, color="grey", linetype="dashed") +
+    geom_abline(intercept = y0, slope = m0) +
+    annotate("text", x = 200, y = 700, label = rr, size=4)  
+  
+  
+  
+  
+  
+  
+  
+  ### rearrange
+  pall<-ggarrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
+  
+  ###save
+  ggsave(pall, filename = p_nm, width = 20, height = 20, units = "cm")
+  
+  
+  
+}  # ggplot for Full energy balance (EB) closure 
 #
 if(T){
   
@@ -5078,6 +5457,9 @@ if(T){
   legend("bottomright", legend=c("Bare Ground", "Herbaceous", "Shrubs"), col=rev(cols), pch=16, cex=2.5)
   
   dev.off()
+
+  
+  
   
   
 }  # land cover prob barplot
@@ -5240,6 +5622,135 @@ if(T){
   
   
 }  # RECs agreement xy plots with major axis
+#
+if(T){
+  
+  # RECs agreement xy plots with major axis - two plots
+  
+  dat_ym<-datdd
+  
+  
+  # y-axis: always EC1
+  rfx<-c("H_f_g1",          "H_f_g1",         "H_f_g1",         
+         "LE_f_g1",         "LE_f_g1",        "LE_f_g1",        
+         "NEE_uStar_f_g1",  "NEE_uStar_f_g1", "NEE_uStar_f_g1", 
+         "H_f_s1",         "H_f_s1",         "H_f_s1",
+         "LE_f_s1",        "LE_f_s1",        "LE_f_s1",
+         "NEE_uStar_f_s1", "NEE_uStar_f_s1", "NEE_uStar_f_s1")
+  # x-axis: EC2, EC3, EC4
+  mfx<-c("H_f_g2",          "H_f_g3",         "H_f_g4",         
+         "LE_f_g2",         "LE_f_g3",        "LE_f_g4",        
+         "NEE_uStar_f_g2",  "NEE_uStar_f_g3", "NEE_uStar_f_g4", 
+         "H_f_s2",         "H_f_s3",         "H_f_s4",
+         "LE_f_s2",        "LE_f_s3",        "LE_f_s4",
+         "NEE_uStar_f_s2", "NEE_uStar_f_s3", "NEE_uStar_f_s4")
+  
+  
+  pid<-c("a)", "b)", "c)", "d)", "e)", "f)", "g)", "h)", "i)")
+  
+  #uid<-c("(W m-2)", "(W m-2)", "(umol CO2 m-2 s-1)")
+  uid<-c(  expression("H (W m"^"-2"*")"),
+           expression("LE (W m"^"-2"*")"),
+           expression("NEE (umol CO"["2"]*" m"^"-2"*"s"^"-1"*")")   )
+  
+  
+  
+  
+  # axis-sized labs
+  #slab<-rep( rep(mlabs, each=3), 3) # Seg and Ses
+  ecx<-rep("EC1", 18)
+  ecy<-rep(c("EC2", "EC3", "EC4"), 6)
+  #flab<-rep(c("H", "LE", "NEE"), each=6)
+  #ulab<-rep(uid, each=6)
+  
+  
+  slab<-rep(mlabs, each=9)
+  flab<-rep(c("H", "LE", "NEE", "H", "LE", "NEE"), each=3)
+  ulab<-rep( rep(uid, each=3), 2)
+  
+  
+  xlab0<-paste( slab, ecx, "-", flab)  
+  ylab0<-paste( slab, ecy, "-", flab)
+  
+  # expression() and paste() do not work together      !!!!!!
+  #xlab<-paste( slab, ecx, "-", flab, ulab)   # use bquote instead (see below)
+  
+  
+  # Total least squares
+  ints<-slopes<-cors<-rep(NA, length(mfx))
+  
+  for(i in 1:length(mfx)){
+    
+    aa<-dat_ym[,c(mfx[i], rfx[i])]; bb<-aa[complete.cases(aa),]
+    cc<-prcomp(bb)$rotation
+    cors[i]  <- cor(bb, method="pearson")[1,2]
+    slopes[i]<- beta <- cc[2,1]/cc[1,1]
+    ints[i]  <- mean(bb[,2])-beta*mean(bb[,1])
+    
+  }
+  
+  lims_h<- range(datdd[, paste("H_f", datasets, sep="_")], na.rm=T)
+  lims_le<-range(datdd[, paste("LE_f", datasets, sep="_")], na.rm=T)
+  lims_fc<-range(datdd[, paste("NEE_uStar_f", datasets, sep="_")], na.rm=T)
+  
+  
+  
+  
+  for(st in 1:2){
+  
+  pl_name<-paste("E:/REC_7_Data/10_Plots/", sites[st], "_LEC_cluster_agreement_00.png", sep="")
+  png(pl_name, width=1350, height=1350)   
+  par(mfrow=c(3, 3), mar=c(8,10,5,1) , oma=c(0,0,10,0), mgp=c(4, 2, 0))
+  
+  
+  for(i in 1:(length(mfx)/2)){  
+    
+    par(mar=c(8,10,5,2))
+    #if(vertical & i %in% c(10:12)){par(mar=c(8,10,15,2))}
+    
+    k<-i; if(sites[st]=="SES")k<-i+length(mfx)/2
+    
+    xlab<-bquote(.(xlab0[k]) ~ "(W m"^"-2"*")")  # expression() and paste() do not work together!
+    ylab<-bquote(.(ylab0[k]) ~ "(W m"^"-2"*")")
+    
+    if(i %in% c( 1: 3)){lims<-lims_h; } 
+    if(i %in% c( 4: 6)){lims<-lims_le }
+    if(i %in% c( 7: 9)){lims<-lims_fc 
+    xlab<-bquote(.(xlab0[k]) ~ "(umol CO"["2"]*" m"^"-2"*"s"^"-1"*")")
+    ylab<-bquote(.(ylab0[k]) ~ "(umol CO"["2"]*" m"^"-2"*"s"^"-1"*")")
+    }
+    
+    
+    
+    
+    plot(dat_ym[,mfx[k]], dat_ym[,rfx[k]], ylim=lims, xlim=lims, pch=16, cex.axis=2.5, cex.main=2.5, cex.lab=2.5,
+         xlab="", ylab="", main="", col=alpha(1, 0.2) )
+    mtext(xlab, 1, line=7, cex=2)
+    mtext(ylab, 2, line=5, cex=2)
+    
+    if(k==2) mtext("Grassland", side=3, line=6, cex=4)
+    if(k==11)mtext("Shrubland", side=3, line=6, cex=4)
+    
+    #if(!vertical){
+    #  if(i==5)mtext("Shrubland", side=3, line=6, cex=4)
+    #} else {
+    #  if(i==11)mtext("Shrubland", side=3, line=6, cex=4)
+    #}
+    
+    mtext(paste("y =", round(ints[k],3), "+", round(slopes[k],3),"x"), 
+          side=3, adj=0.05, line=-3, cex=2); abline(a=ints[k], b=slopes[k]);  # total least squares
+    mtext(paste("r:", round(cors[k],2)), side=3, adj=0.05, line=-6, cex=2)    # perason coef.
+    mtext (pid[i], side=3, adj=0, line=1, cex=2.5)
+    abline(a=0, b=1)
+    
+  }  
+  
+  dev.off()
+  
+  }
+  
+  
+}  # RECs agreement xy plots with major axis - two plots
 #
 if(T){
   
