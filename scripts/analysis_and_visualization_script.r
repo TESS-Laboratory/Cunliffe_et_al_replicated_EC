@@ -4720,11 +4720,32 @@ if(T){
     gpath <- "E:/REC_7_Data/10_Plots/7_cumsum/"
     p_nm <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot.png", sep="")
     
+    # time stamp
     mthetimes <-  as.POSIXct(dmat[,"dt"], format="%d/%m/%y %H:%M:%S") 
     dmat$dt_2 <- mthetimes
     
-    colors <- c("orange", "purple", "green", "darkgreen", "brown")  # I don't know why but colors order is shifted by 1
+    # ylim correction factor for precipitation
+    
+    # diff(ylim_l)/ylim_p[2]   = 20.41817
+    # diff(ylim_l)/20.41817    = 36.32201    # ylim that I want
+    
+    # diff(ylim_c)/ylim_p[2]   =  1.629766
+    # diff(ylim_c)/ 1.629766   =  36.322     # ylim that I want
+    
+    
+    
+    # add modified precipitation
+    dmat$P_plot_le_gm <- (dmat$P_gm * (-diff(ylim_l)/ylim_p[2])) + ylim_l[2]
+    dmat$P_plot_le_sm <- (dmat$P_sm * (-diff(ylim_l)/ylim_p[2])) + ylim_l[2]
+    dmat$P_plot_nee_gm <- (dmat$P_gm * (-diff(ylim_c)/ylim_p[2])) + ylim_c[2]
+    dmat$P_plot_nee_sm <- (dmat$P_sm * (-diff(ylim_c)/ylim_p[2])) + ylim_c[2]
+    
+    
+    
+    colors <- c("orange", "purple", "green", "darkgreen", "brown", "cyan")
+    
 
+    
     
     p1 <- ggplot(dmat, aes(x=dt_2)) +
       labs(x = "", y = expression("Cumulative LE (MW m"^"-2"*")",sep=""), title = "a) LE Grassland") +
@@ -4733,12 +4754,12 @@ if(T){
       geom_line(aes(y = LE_f_g3, color = "EC3")) + 
       geom_line(aes(y = LE_f_g4, color = "EC4")) +
       geom_line(aes(y = LE_f_gm, color = "EC0")) +
-      geom_line(aes(y = P_gm), color = "cyan") +
-      theme_bw() + ylim(ylim_l) +
+      geom_line(aes(y = P_plot_le_gm, color = "prec")) +
+      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = "Precipitation (mm)")) +
+      theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 90)) +
-      #scale_x_datetime(labels = date_format("%b")) + 
-      theme(legend.title = element_blank(), legend.position = c(0.15, 0.50)) +       # legend position
+      theme(legend.title = element_blank(), legend.position = c(0.15, 0.50)) +    # legend position
       scale_color_manual(values = colors)
       
     
@@ -4749,12 +4770,12 @@ if(T){
       geom_line(aes(y = LE_f_s3, color = "EC3")) + 
       geom_line(aes(y = LE_f_s4, color = "EC4")) +
       geom_line(aes(y = LE_f_sm, color = "EC0")) +
-      geom_line(aes(y = P_sm), color = "cyan") +
-      theme_bw() + ylim(ylim_l) +
+      geom_line(aes(y = P_plot_le_sm, color = "prec")) +
+      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = "Precipitation (mm)")) +
+      theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 90)) +
-      #scale_x_datetime(labels = date_format("%b")) + 
-      theme(legend.title = element_blank(), legend.position = c(0.15, 0.50)) +       # legend position
+      theme(legend.position="none") +  
       scale_color_manual(values = colors)
       
     
@@ -4765,12 +4786,13 @@ if(T){
       geom_line(aes(y = NEE_uStar_f_g3, color = "EC3")) + 
       geom_line(aes(y = NEE_uStar_f_g4, color = "EC4")) +
       geom_line(aes(y = NEE_uStar_f_gm, color = "EC0")) +
-      geom_line(aes(y = P_gm), color = "cyan") +
-      theme_bw() + ylim(ylim_c) +
+      geom_line(aes(y = P_plot_nee_gm, color = "prec")) +
+      geom_point(aes(x=dt_2[1], y=ylim_c[1]), colour="white") + # only to specify lower end
+      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) + (ylim_p[2]), name = "Precipitation (mm)")) +
+      theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 90)) +
-      #scale_x_datetime(labels = date_format("%b")) + 
-      theme(legend.title = element_blank(), legend.position = c(0.15, 0.30)) +       # legend position
+      theme(legend.position="none") +  
       scale_color_manual(values = colors)
     
     
@@ -4781,14 +4803,14 @@ if(T){
       geom_line(aes(y = NEE_uStar_f_s3, color = "EC3")) + 
       geom_line(aes(y = NEE_uStar_f_s4, color = "EC4")) +
       geom_line(aes(y = NEE_uStar_f_sm, color = "EC0")) +
-      geom_line(aes(y = P_gm), color = "cyan") +
-      theme_bw() + ylim(ylim_c) +
+      geom_line(aes(y = P_plot_nee_sm, color = "prec")) + 
+      geom_point(aes(x=dt_2[1], y=ylim_c[1]), colour="white") + # only to specify lower end
+      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) + (ylim_p[2]), name = "Precipitation (mm)")) +
+      theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 90)) +
-      #scale_x_datetime(labels = date_format("%b")) + 
-      theme(legend.title = element_blank(), legend.position = c(0.15, 0.30)) +       # legend position
+      theme(legend.position="none") +
       scale_color_manual(values = colors)
-    
     
     
     
