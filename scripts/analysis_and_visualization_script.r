@@ -1,9 +1,8 @@
-## This script sources data output from EdiRe or AmeriFlux,
+## This script sources data output from EdiRe and AmeriFlux,
 ## merges them into a single file
 ## performs visualization and data analysis
 
 #### Load packages
-# library(tidyverse)
 library(chron)
 library(oce)
 library(lubridate)                                                              # only for 'month()' function
@@ -12,14 +11,16 @@ library(plotrix)                                                                
 library(ggplot2)
 library(ggpubr)                                                                 # needed for ggarrange
 library(patchwork)
-library(fields)    # to plot footprint
+library(fields)                                                                 # to plot footprint
 library(EBImage)
 library(spatialfil)
-library(viridis)       # color-blind tested (ugly)
+library(viridis)                                                                # color palette
 library(SPEI)
 
 
+###
 ### Paths for sourcing data ####
+###
 ## Local version on Fabio's laptop
 path  <-  "E:/REC_7_Data/8_datasets/"
 rpath  <-  "E:/REC_7_Data/11_ReddyProc/"
@@ -30,12 +31,27 @@ mpath  <-  "E:/REC_7_Data/12_Marcys_data/"
 #rpath  <-  "P:/REC_7_Data/11_ReddyProc/"
 #mpath  <-  "P:/REC_7_Data/12_Marcys_data/"
 
-sites  <-  c("SEG", "SES"); recs  <-  1:4; towers  <-  paste(rep(sites, each=4), rep(recs,2), sep="_REC")
-systems  <-  c(towers, sites); mlabs  <-  c("Seg", "Ses"); soildatasets  <-  c("soilg", "soils")
-asystems  <-  c(systems, "SEG_AVG4", "SES_AVG4", "SEG_AVG3", "SES_AVG3", 
-            "SEG_AVG_23", "SEG_AVG_34", "SEG_AVG_42", "SES_AVG_23", "SES_AVG_34", "SES_AVG_42"); 
 
-
+###
+### Initialize lists ####
+###
+sites  <-  c("SEG", "SES");
+recs  <-  1:4
+towers  <-  paste(rep(sites, each=4), rep(recs,2), sep="_REC")
+systems  <-  c(towers, sites)
+mlabs  <-  c("Seg", "Ses")
+soildatasets  <-  c("soilg", "soils")
+asystems  <-  c(systems, 
+                "SEG_AVG4",
+                "SES_AVG4",
+                "SEG_AVG3",
+                "SES_AVG3",
+                "SEG_AVG_23",
+                "SEG_AVG_34",
+                "SEG_AVG_42",
+                "SES_AVG_23",
+                "SES_AVG_34",
+                "SES_AVG_42"); 
 fluxes  <-  c("H", "cLE", "rLE", "Fc", "Hc", "cLEc", "rLEc", "Fcc") 
 fluxes_reddy  <-  c("NEE", "LE", "H_r", "NEE_uStar_f", "LE_f", "H_f", "Reco_DT_uStar", "GPP_DT_uStar")
 all_fluxes  <-  c(fluxes, fluxes_reddy)
@@ -97,10 +113,6 @@ if(T){
   
   # remove last element from an entire vector
   sub_last <- function(x){x <- x-x[length(x)]}
-  
-  
-  
-  
   
   
   # create custom ggplot2 theme
@@ -165,7 +177,7 @@ for(i in 1:8){
   
   if(T){  # add dt to dat
     
-    ## sometimes, empty fator columns that are not visible in excel are added
+    ## sometimes, empty factor columns that are not visible in Excel are added
     dat <- dat[, !grepl("X", colnames(dat))     ]
     
     dtimes <- as.character(dat[,1])
@@ -181,7 +193,7 @@ for(i in 1:8){
     if(i %in% c(1:8))thetimes0 <- thetimes0-1/24     
     
     
-    # --------------------------------- this ugly piece of code is to solve a problem with rounding of chrom date-times after subtracting  1/24---------
+    # This solves a problem with rounding of chrom date-times after subtracting  1/24---------
     dt_char <- as.character(thetimes0)                                 # without, dat and datm will not merge and lines with same name will be created
     dt_char_c <- substring(dt_char,2,nchar(dt_char)-1)
     
@@ -235,7 +247,7 @@ for(i in 1:8){
   
   
   
-  ####### NAs introduced by coercion!!!!!
+  ####### NAs introduced by coercion!
   
   
   
@@ -4325,8 +4337,6 @@ if(T){
   if(avg_all){x1 <- 8.3; x2 <- 9.9; x3 <- 24.3; x4 <- 25.9}
   
 ## plotting ########### 
-  
-  
   
   
   bplot <- "E:/REC_7_Data/10_Plots/12_barplot_fluxes/"
