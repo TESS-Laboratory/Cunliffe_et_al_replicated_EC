@@ -73,7 +73,7 @@ run_reddy_proc  <-  F            # run gapfilling code
 if(T){
   
   ### flux-specific uncertainty from Hollinger 2005 
-  #https://stats.stackexchange.com/questions/281682/how-to-fit-a-data-against-a-laplace-double-exponential-distribution-and-check
+  # https://stats.stackexchange.com/questions/281682/how-to-fit-a-data-against-a-laplace-double-exponential-distribution-and-check
   laplace_err <- function(x){sqrt(2) * mean(abs(x - median(x, na.rm=T)), na.rm=T) / sqrt(sum(!is.na(x)))}
   
   ### find how many empty rows/cols there are here
@@ -89,7 +89,7 @@ if(T){
   cumsum_unc <- function(x){x <- sqrt( cumsum( x^2 ) )}    
   
   
-  # remove last elemnt from an entire vector
+  # remove last element from an entire vector
   sub_last <- function(x){x <- x-x[length(x)]}
   
   
@@ -97,7 +97,7 @@ if(T){
   
   
   
-  # ggplot2 theme
+  # create custom ggplot2 theme
   theme_fancy  <-  function() {
     theme_bw() +
     theme(
