@@ -14,7 +14,7 @@ library(patchwork)
 library(fields)                                                                 # to plot footprint
 library(EBImage)
 library(spatialfil)
-library(viridis)                                                                # color palette
+library(viridis)                                                                # colour palette
 library(SPEI)
 
 
@@ -57,6 +57,7 @@ fluxes_reddy  <-  c("NEE", "LE", "H_r", "NEE_uStar_f", "LE_f", "H_f", "Reco_DT_u
 all_fluxes  <-  c(fluxes, fluxes_reddy)
 pfluxes  <-  c("H", "Fc", "LE", "Hc", "LEc", "Fcc", "WPL_LE", "WPL_Fc", "LEcw", "Fccw")
 
+colours <- c("orange", "purple", "green", "darkgreen", "brown", "cyan")         # Define colour scheme for visualization.
 
 
 last_date    <-  "2020_01_01_from_flash_Txcor_"
@@ -72,7 +73,8 @@ date_end  <-    "01/11/2019"              # default: "01/11/2019"
 
 xch  <-  xct  <-  ""; if(grepl("Txcor", last_date)){xch  <-  "_Txcor"; xct  <-  "Txcor_"}
 
-mdatasets  <-  c("gm", "sm"); pdatasets  <-  c("gp", "sp"); 
+mdatasets  <-  c("gm", "sm") 
+pdatasets  <-  c("gp", "sp")
 datasets  <-  c("g1", "g2", "g3", "g4", "s1", "s2", "s3", "s4")
 adatasets  <-  c(datasets, mdatasets, "ga4", "sa4", "ga3", "sa3", 
              "ga23", "ga34", "ga42", "sa23", "sa34", "sa42");
@@ -120,11 +122,11 @@ if(T){
     theme_bw() +
     theme(
     text = element_text(family = "Helvetica"),
-    axis.text = element_text(size = 8, color = "black"),
-    axis.title = element_text(size =  10, color = "black"),
-    axis.line.x = element_line(size = 0.3, color = "black"),
-    axis.line.y = element_line(size = 0.3, color = "black"),
-    axis.ticks = element_line(size = 0.3, color = "black"),
+    axis.text = element_text(size = 8, colour = "black"),
+    axis.title = element_text(size =  10, colour = "black"),
+    axis.line.x = element_line(size = 0.3, colour = "black"),
+    axis.line.y = element_line(size = 0.3, colour = "black"),
+    axis.ticks = element_line(size = 0.3, colour = "black"),
     panel.border = element_blank(),
     panel.grid.major.x = element_blank(),
     panel.grid.minor.x = element_blank(),
@@ -135,14 +137,14 @@ if(T){
           size = 10,
           vjust = 1,
           hjust = 0.5,
-          color = "black"
+          colour = "black"
           ),
-    legend.text = element_text(size = 10, color = "black"),
-    legend.title = element_text(size = 10, color = "black"),
+    legend.text = element_text(size = 10, colour = "black"),
+    legend.title = element_text(size = 10, colour = "black"),
     legend.position = c(0.9, 0.9),
     legend.key.size = unit(0.9, "line"),
     legend.background = element_rect(
-          color = "black",
+          colour = "black",
           fill = "transparent",
           size = 2,
           linetype = "blank"
@@ -639,7 +641,7 @@ if(run_reddy_proc){
   #  help('sEddyProc.example')
   
   
-  library(REddyProc)
+  library(REddyProc)  # Only loading here because this large package isn't often needed.
   library(minpack.lm)
 
   setwd("E:/REC_7_Data/11_ReddyProc/")
@@ -1278,7 +1280,7 @@ if(F){
   ### packages needed for footprint climatology
   #source("https://bioconductor.org/biocLite.R")
   #biocLite("EBImage")
-  #library(RColorBrewer)   # max n:9; need combine with colorRampPalette
+  #library(RcolourBrewer)   # max n:9; need combine with colourRampPalette
   
   
   ### AmeriFlux's footprint are currently done with some data from REC1
@@ -3414,7 +3416,7 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
          title = titles[1]) +
     #ggtitle("a) Sensible Heat Flux - Seg")  +
     geom_bin2d(bins = 150, show.legend=T) +   # Bin size control 
-    scale_fill_continuous(type = "viridis") +     # color palette
+    scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lims_h) + ylim(lims_h) +
     #theme_fancy() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
@@ -3422,7 +3424,7 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
     theme(legend.key.size = unit(0.5, "cm")) +   # legend size
     theme(legend.position = c(0.85, 0.25)) +       # legend position
     theme(plot.title = element_text(size = 14, face = "bold"))  +
-    geom_abline(intercept = 0, slope = 1, color="grey", linetype="dashed") +
+    geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = ints[1], slope = slopes[1]) +
     annotate("text", x = 0, y = 500, label = r1[1], size=4)  +
     annotate("text", x = 0, y = 420, label = r2[1], size=4)
@@ -3437,7 +3439,7 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
          y = expression("Ses EC1 - H (W m"^"-2"*")"),
          title = titles[4]) +
     geom_bin2d(bins = 150) +                       # Bin size control 
-    scale_fill_continuous(type = "viridis") +     # color palette
+    scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lims_h) + ylim(lims_h) +
     #theme_fancy() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
@@ -3445,7 +3447,7 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
     theme(legend.key.size = unit(0.5, "cm")) +   # legend size
     theme(legend.position = c(0.85, 0.25)) +       # legend position
     theme(plot.title = element_text(size = 14, face = "bold"))  +
-    geom_abline(intercept = 0, slope = 1, color="grey", linetype="dashed") +
+    geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = ints[4], slope = slopes[4]) +
     annotate("text", x = 0, y = 500, label = r1[4], size=4)  +
     annotate("text", x = 0, y = 420, label = r2[4], size=4)
@@ -3458,7 +3460,7 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
          y = expression("Seg EC1 - LE (W m"^"-2"*")"),
          title = titles[2]) +
     geom_bin2d(bins = 150) +                       # Bin size control 
-    scale_fill_continuous(type = "viridis") +     # color palette
+    scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lims_le) + ylim(lims_le) +
     #theme_fancy() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
@@ -3466,7 +3468,7 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
     theme(legend.key.size = unit(0.5, "cm")) +   # legend size
     theme(legend.position = c(0.85, 0.25)) +       # legend position
     theme(plot.title = element_text(size = 14, face = "bold"))  +
-    geom_abline(intercept = 0, slope = 1, color="grey", linetype="dashed") +
+    geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = ints[2], slope = slopes[2]) +
     annotate("text", x = 20, y = 270, label = r1[2], size=4)  +
     annotate("text", x = 20, y = 220, label = r2[2], size=4)
@@ -3479,7 +3481,7 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
          y = expression("Ses EC1 - LE (W m"^"-2"*")"),
          title = titles[5]) +
     geom_bin2d(bins = 150) +                       # Bin size control 
-    scale_fill_continuous(type = "viridis") +     # color palette
+    scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lims_le) + ylim(lims_le) +
     #theme_fancy() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
@@ -3487,7 +3489,7 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
     theme(legend.key.size = unit(0.5, "cm")) +   # legend size
     theme(legend.position = c(0.85, 0.25)) +       # legend position
     theme(plot.title = element_text(size = 14, face = "bold"))  +
-    geom_abline(intercept = 0, slope = 1, color="grey", linetype="dashed") +
+    geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = ints[5], slope = slopes[5]) +
     annotate("text", x = 20, y = 270, label = r1[5], size=4)  +
     annotate("text", x = 20, y = 220, label = r2[5], size=4)
@@ -3500,7 +3502,7 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
          y = expression("Seg EC1 - NEE (umol CO"["2"]*" m"^"-2"*"s"^"-1"*")"),
          title = titles[3]) +
     geom_bin2d(bins = 150) +                       # Bin size control 
-    scale_fill_continuous(type = "viridis") +     # color palette
+    scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lims_fc) + ylim(lims_fc) +
     #theme_fancy() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
@@ -3508,7 +3510,7 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
     theme(legend.key.size = unit(0.5, "cm")) +   # legend size
     theme(legend.position = c(0.85, 0.25)) +       # legend position
     theme(plot.title = element_text(size = 14, face = "bold"))  +
-    geom_abline(intercept = 0, slope = 1, color="grey", linetype="dashed") +
+    geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = ints[3], slope = slopes[3]) +
     annotate("text", x = -7, y = 7, label = r1[3], size=4)  +
     annotate("text", x = -7, y = 5, label = r2[3], size=4)
@@ -3521,7 +3523,7 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
          y = expression("Seg EC1 - NEE (umol CO"["2"]*" m"^"-2"*"s"^"-1"*")"),
          title = titles[6]) +
     geom_bin2d(bins = 150) +                       # Bin size control 
-    scale_fill_continuous(type = "viridis") +     # color palette
+    scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lims_fc) + ylim(lims_fc) +
     #theme_fancy() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
@@ -3529,7 +3531,7 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
     theme(legend.key.size = unit(0.5, "cm")) +   # legend size
     theme(legend.position = c(0.85, 0.25)) +       # legend position
     theme(plot.title = element_text(size = 14, face = "bold"))  +
-    geom_abline(intercept = 0, slope = 1, color="grey", linetype="dashed") +
+    geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = ints[6], slope = slopes[6]) +
     annotate("text", x = -7, y = 7, label = r1[6], size=4)  +
     annotate("text", x = -7, y = 5, label = r2[6], size=4)
@@ -4758,77 +4760,72 @@ if(T){
     dmat$P_plot_nee_sm <- (dmat$P_sm * (-diff(ylim_c)/ylim_p[2])) + ylim_c[2]
     
     
-    
-    colors <- c("orange", "purple", "green", "darkgreen", "brown", "cyan")
-    
-    
-    
-    
+
     
     p1 <- ggplot(dmat, aes(x=dt_2)) +
       labs(x = "", y = expression("Cumulative LE (MW m"^"-2"*")",sep=""), title = "a) LE Grassland") +
-      geom_line(aes(y = LE_f_g1, color = "EC1")) + 
-      geom_line(aes(y = LE_f_g2, color = "EC2")) + 
-      geom_line(aes(y = LE_f_g3, color = "EC3")) + 
-      geom_line(aes(y = LE_f_g4, color = "EC4")) +
-      geom_line(aes(y = LE_f_gm, color = "EC0")) +
-      geom_line(aes(y = P_plot_le_gm, color = "prec")) +
+      geom_line(aes(y = LE_f_g1, colour = "EC1")) + 
+      geom_line(aes(y = LE_f_g2, colour = "EC2")) + 
+      geom_line(aes(y = LE_f_g3, colour = "EC3")) + 
+      geom_line(aes(y = LE_f_g4, colour = "EC4")) +
+      geom_line(aes(y = LE_f_gm, colour = "EC0")) +
+      geom_line(aes(y = P_plot_le_gm, colour = "prec")) +
       scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 90)) +
       theme(legend.title = element_blank(), legend.position = c(0.15, 0.50)) +    # legend position
-      scale_color_manual(values = colors)
+      scale_colour_manual(values = colours)
       
     
     p2 <- ggplot(dmat, aes(x=dt_2)) +
       labs(x = "", y = expression("Cumulative LE (MW m"^"-2"*")",sep=""), title = "b) LE Shrubland") +
-      geom_line(aes(y = LE_f_s1, color = "EC1")) + 
-      geom_line(aes(y = LE_f_s2, color = "EC2")) + 
-      geom_line(aes(y = LE_f_s3, color = "EC3")) + 
-      geom_line(aes(y = LE_f_s4, color = "EC4")) +
-      geom_line(aes(y = LE_f_sm, color = "EC0")) +
-      geom_line(aes(y = P_plot_le_sm, color = "prec")) +
+      geom_line(aes(y = LE_f_s1, colour = "EC1")) + 
+      geom_line(aes(y = LE_f_s2, colour = "EC2")) + 
+      geom_line(aes(y = LE_f_s3, colour = "EC3")) + 
+      geom_line(aes(y = LE_f_s4, colour = "EC4")) +
+      geom_line(aes(y = LE_f_sm, colour = "EC0")) +
+      geom_line(aes(y = P_plot_le_sm, colour = "prec")) +
       scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 90)) +
       theme(legend.position="none") +  
-      scale_color_manual(values = colors)
+      scale_colour_manual(values = colours)
       
     
     p3 <- ggplot(dmat, aes(x=dt_2)) +
       labs(x = "", y = expression("Cumulative NEE (g C m"^"-2"*")",sep=""), title = "c) NEE Grassland") +
-      geom_line(aes(y = NEE_uStar_f_g1, color = "EC1")) + 
-      geom_line(aes(y = NEE_uStar_f_g2, color = "EC2")) + 
-      geom_line(aes(y = NEE_uStar_f_g3, color = "EC3")) + 
-      geom_line(aes(y = NEE_uStar_f_g4, color = "EC4")) +
-      geom_line(aes(y = NEE_uStar_f_gm, color = "EC0")) +
-      geom_line(aes(y = P_plot_nee_gm, color = "prec")) +
+      geom_line(aes(y = NEE_uStar_f_g1, colour = "EC1")) + 
+      geom_line(aes(y = NEE_uStar_f_g2, colour = "EC2")) + 
+      geom_line(aes(y = NEE_uStar_f_g3, colour = "EC3")) + 
+      geom_line(aes(y = NEE_uStar_f_g4, colour = "EC4")) +
+      geom_line(aes(y = NEE_uStar_f_gm, colour = "EC0")) +
+      geom_line(aes(y = P_plot_nee_gm, colour = "prec")) +
       geom_point(aes(x=dt_2[1], y=ylim_c[1]), colour="white") + # only to specify lower end
       scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) + (ylim_p[2]), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 90)) +
       theme(legend.position="none") +  
-      scale_color_manual(values = colors)
+      scale_colour_manual(values = colours)
     
     
     p4 <- ggplot(dmat, aes(x=dt_2)) +
       labs(x = "", y = expression("Cumulative NEE (g C m"^"-2"*")",sep=""), title = "d) NEE Grassland") +
-      geom_line(aes(y = NEE_uStar_f_s1, color = "EC1")) + 
-      geom_line(aes(y = NEE_uStar_f_s2, color = "EC2")) + 
-      geom_line(aes(y = NEE_uStar_f_s3, color = "EC3")) + 
-      geom_line(aes(y = NEE_uStar_f_s4, color = "EC4")) +
-      geom_line(aes(y = NEE_uStar_f_sm, color = "EC0")) +
-      geom_line(aes(y = P_plot_nee_sm, color = "prec")) + 
+      geom_line(aes(y = NEE_uStar_f_s1, colour = "EC1")) + 
+      geom_line(aes(y = NEE_uStar_f_s2, colour = "EC2")) + 
+      geom_line(aes(y = NEE_uStar_f_s3, colour = "EC3")) + 
+      geom_line(aes(y = NEE_uStar_f_s4, colour = "EC4")) +
+      geom_line(aes(y = NEE_uStar_f_sm, colour = "EC0")) +
+      geom_line(aes(y = P_plot_nee_sm, colour = "prec")) + 
       geom_point(aes(x=dt_2[1], y=ylim_c[1]), colour="white") + # only to specify lower end
       scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) + (ylim_p[2]), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 90)) +
       theme(legend.position="none") +
-      scale_color_manual(values = colors)
+      scale_colour_manual(values = colours)
     
     
     
@@ -5003,11 +5000,6 @@ if(T){
   
   # ggplot for Full energy balance (EB) closure 
   
-  # raster
-  #p_nm<-paste("E:/REC_7_Data/10_Plots/11_energy_balance_closure/energy_balance_TLS_ggplot.png", sep="")
-  # vector
-  p_nm<-paste("E:/REC_7_Data/10_Plots/11_energy_balance_closure/energy_balance_TLS_ggplot.pdf", sep="")
-  
   xg <- datdd[,"NETRAD_gm"]-datdd[,"SHF_ALL_AVG_soilg"]
   xs <- datdd[,"NETRAD_sm"]-datdd[,"SHF_ALL_AVG_soils"]
   ygm <- datdd[,"H_gm"] + datdd[,"cLE_gm"]
@@ -5039,14 +5031,14 @@ if(T){
   p11 <-  ggplot(dtf, aes(x=xg, y=ygm) ) +
     labs(x = xlab, y = ylab, title = "a) Seg EC0") +
     geom_bin2d(bins = 150) +                       # Bin size control 
-    scale_fill_continuous(type = "viridis") +     # color palette
+    scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lim) + ylim(lim) +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
     theme(text = element_text(size=14)) + 
     theme(legend.key.size = unit(0.4, "cm")) +   # legend size
     theme(legend.position = c(0.85, 0.25)) +       # legend position
     theme(plot.title = element_text(size = 14, face = "bold"))  +
-    geom_abline(intercept = 0, slope = 1, color="grey", linetype="dashed") +
+    geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = y0, slope = m0) +
     annotate("text", x = 200, y = 700, label = rr, size=4)  
   
@@ -5061,14 +5053,14 @@ if(T){
   p2 <-  ggplot(dtf, aes(x=xs, y=ysm) ) +
     labs(x = xlab, y = ylab, title = "b) Ses EC0") +
     geom_bin2d(bins = 150) +                       # Bin size control 
-    scale_fill_continuous(type = "viridis") +     # color palette
+    scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lim) + ylim(lim) +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
     theme(text = element_text(size=14)) + 
     theme(legend.key.size = unit(0.4, "cm")) +   # legend size
     theme(legend.position = c(0.85, 0.25)) +       # legend position
     theme(plot.title = element_text(size = 14, face = "bold"))  +
-    geom_abline(intercept = 0, slope = 1, color="grey", linetype="dashed") +
+    geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = y0, slope = m0) +
     annotate("text", x = 200, y = 700, label = rr, size=4)  
   
@@ -5083,14 +5075,14 @@ if(T){
   p3 <-  ggplot(dtf, aes(x=xg, y=yg1) ) +
     labs(x = xlab, y = ylab, title = "c) Seg EC1") +
     geom_bin2d(bins = 150) +                       # Bin size control 
-    scale_fill_continuous(type = "viridis") +     # color palette
+    scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lim) + ylim(lim) +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
     theme(text = element_text(size=14)) + 
     theme(legend.key.size = unit(0.4, "cm")) +   # legend size
     theme(legend.position = c(0.85, 0.25)) +       # legend position
     theme(plot.title = element_text(size = 14, face = "bold"))  +
-    geom_abline(intercept = 0, slope = 1, color="grey", linetype="dashed") +
+    geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = y0, slope = m0) +
     annotate("text", x = 200, y = 700, label = rr, size=4)  
   
@@ -5105,14 +5097,14 @@ if(T){
   p4 <-  ggplot(dtf, aes(x=xs, y=ys1) ) +
     labs(x = xlab, y = ylab, title = "d) Ses EC1") +
     geom_bin2d(bins = 150) +                       # Bin size control 
-    scale_fill_continuous(type = "viridis") +     # color palette
+    scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lim) + ylim(lim) +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
     theme(text = element_text(size=14)) + 
     theme(legend.key.size = unit(0.4, "cm")) +   # legend size
     theme(legend.position = c(0.85, 0.25)) +       # legend position
     theme(plot.title = element_text(size = 14, face = "bold"))  +
-    geom_abline(intercept = 0, slope = 1, color="grey", linetype="dashed") +
+    geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = y0, slope = m0) +
     annotate("text", x = 200, y = 700, label = rr, size=4)  
   
@@ -5125,11 +5117,20 @@ if(T){
   ### rearrange
   pall <- ggarrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
   
-  ###save
-  ggsave(pall, filename = p_nm, width = 20, height = 20, units = "cm")
+  ## save raster
+  ggsave(pall,
+         filename = "E:/REC_7_Data/10_Plots/11_energy_balance_closure/Figure 6 - energy_balance_TLS_ggplot.png",
+         width = 20,
+         height = 20,
+         units = "cm")
   
-  
-  
+  # save vector
+  ggsave(pall,
+         filename = "E:/REC_7_Data/10_Plots/11_energy_balance_closure/Figure 6 - energy_balance_TLS_ggplot.pdf",
+         width = 20,
+         height = 20,
+         units = "cm")
+
 }  # ggplot for Full energy balance (EB) closure 
 #
 if(T){
@@ -5145,7 +5146,7 @@ if(T){
   
   
   #par(xpd=TRUE)   # allows legend outside of the plot
-  par(xpd=NA)      # even better !!!
+  par(xpd=NA)      # even better !
   
   labels=c(-440, seq(-400, 400, 100), 440)
   ats <- c(0, seq(0.04, 0.96, 0.115), 1)
