@@ -165,7 +165,7 @@ for(i in 1:8){
   
   if(T){  # add dt to dat
     
-    ## sometimes, empty fator columns that are not visible in excel are added
+    ## sometimes, empty factor columns that are not visible in Excel are added
     dat <- dat[, !grepl("X", colnames(dat))     ]
     
     dtimes <- as.character(dat[,1])
@@ -181,7 +181,7 @@ for(i in 1:8){
     if(i %in% c(1:8))thetimes0 <- thetimes0-1/24     
     
     
-    # --------------------------------- this ugly piece of code is to solve a problem with rounding of chrom date-times after subtracting  1/24---------
+    # This solves a problem with rounding of chrom date-times after subtracting  1/24---------
     dt_char <- as.character(thetimes0)                                 # without, dat and datm will not merge and lines with same name will be created
     dt_char_c <- substring(dt_char,2,nchar(dt_char)-1)
     
