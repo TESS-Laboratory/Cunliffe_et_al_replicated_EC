@@ -3391,7 +3391,8 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
   
   
   pl_name <- paste("E:/REC_7_Data/10_Plots/6_REC1_vs_Conv/corr_REC1_vs_Conv_", 
-                 xct, year, "_", mon, attr, "_ggplot", sl, "_00_test.png", sep="")
+                 xct, year, "_", mon, attr, "_ggplot", sl, "_00_test.pdf", sep="")
+  
   
   # H / US-SEG
   
@@ -3652,7 +3653,7 @@ dat_ym <- aggregate(datdd[,dcols],by=list(dates(datdd[,"dt"])), sum, na.rm=T)
 
 
 # plot REC1 vs US-SEX (all)
-mon <- mm <- NULL; year <- yy <- NULL; dat_ym <- dat <- datdd
+mon <- mm <- NULL; year <- yy <- NULL; seas_i <- seas <- "nope"; dat_ym <- dat <- datdd
 plot_REC1_vs_conv1_ggplot(mode="reddy", dat_ym=dat_ym, mon=mm, year=yy, no_seg_nee = F)
 
 
@@ -4718,11 +4719,17 @@ if(T){
   if(T){
     
     gpath <- "E:/REC_7_Data/10_Plots/7_cumsum/"
-    p_nm <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot.png", sep="")
+    p_nm <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot.png", sep="") # raster
+    #p_nm <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot.pdf", sep="") # vector
     
     # time stamp
     mthetimes <-  as.POSIXct(dmat[,"dt"], format="%d/%m/%y %H:%M:%S") 
     dmat$dt_2 <- mthetimes
+    
+    ylim_l<-c(0, 800)
+    
+    ya2<-expression("Precipitation (mm h"^"-1"*")",sep="")
+    
     
     # ylim correction factor for precipitation
     
@@ -4744,7 +4751,8 @@ if(T){
     
     colors <- c("orange", "purple", "green", "darkgreen", "brown", "cyan")
     
-
+    
+    
     
     
     p1 <- ggplot(dmat, aes(x=dt_2)) +
@@ -4755,7 +4763,7 @@ if(T){
       geom_line(aes(y = LE_f_g4, color = "EC4")) +
       geom_line(aes(y = LE_f_gm, color = "EC0")) +
       geom_line(aes(y = P_plot_le_gm, color = "prec")) +
-      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = "Precipitation (mm)")) +
+      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 90)) +
@@ -4771,7 +4779,7 @@ if(T){
       geom_line(aes(y = LE_f_s4, color = "EC4")) +
       geom_line(aes(y = LE_f_sm, color = "EC0")) +
       geom_line(aes(y = P_plot_le_sm, color = "prec")) +
-      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = "Precipitation (mm)")) +
+      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 90)) +
@@ -4780,7 +4788,7 @@ if(T){
       
     
     p3 <- ggplot(dmat, aes(x=dt_2)) +
-      labs(x = "", y = expression("Cumulative NEE (gC m"^"-2"*")",sep=""), title = "c) NEE Grassland") +
+      labs(x = "", y = expression("Cumulative NEE (g C m"^"-2"*")",sep=""), title = "c) NEE Grassland") +
       geom_line(aes(y = NEE_uStar_f_g1, color = "EC1")) + 
       geom_line(aes(y = NEE_uStar_f_g2, color = "EC2")) + 
       geom_line(aes(y = NEE_uStar_f_g3, color = "EC3")) + 
@@ -4788,7 +4796,7 @@ if(T){
       geom_line(aes(y = NEE_uStar_f_gm, color = "EC0")) +
       geom_line(aes(y = P_plot_nee_gm, color = "prec")) +
       geom_point(aes(x=dt_2[1], y=ylim_c[1]), colour="white") + # only to specify lower end
-      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) + (ylim_p[2]), name = "Precipitation (mm)")) +
+      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) + (ylim_p[2]), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 90)) +
@@ -4797,7 +4805,7 @@ if(T){
     
     
     p4 <- ggplot(dmat, aes(x=dt_2)) +
-      labs(x = "", y = expression("Cumulative NEE (gC m"^"-2"*")",sep=""), title = "d) NEE Grassland") +
+      labs(x = "", y = expression("Cumulative NEE (g C m"^"-2"*")",sep=""), title = "d) NEE Grassland") +
       geom_line(aes(y = NEE_uStar_f_s1, color = "EC1")) + 
       geom_line(aes(y = NEE_uStar_f_s2, color = "EC2")) + 
       geom_line(aes(y = NEE_uStar_f_s3, color = "EC3")) + 
@@ -4805,7 +4813,7 @@ if(T){
       geom_line(aes(y = NEE_uStar_f_sm, color = "EC0")) +
       geom_line(aes(y = P_plot_nee_sm, color = "prec")) + 
       geom_point(aes(x=dt_2[1], y=ylim_c[1]), colour="white") + # only to specify lower end
-      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) + (ylim_p[2]), name = "Precipitation (mm)")) +
+      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) + (ylim_p[2]), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 90)) +
@@ -4985,7 +4993,10 @@ if(T){
   
   # ggplot for Full energy balance (EB) closure 
   
-  p_nm  <- paste("E:/REC_7_Data/10_Plots/11_energy_balance_closure/energy_balance_TLS_ggplot.png", sep="")
+  # raster
+  #p_nm<-paste("E:/REC_7_Data/10_Plots/11_energy_balance_closure/energy_balance_TLS_ggplot.png", sep="")
+  # vector
+  p_nm<-paste("E:/REC_7_Data/10_Plots/11_energy_balance_closure/energy_balance_TLS_ggplot.pdf", sep="")
   
   xg <- datdd[,"NETRAD_gm"]-datdd[,"SHF_ALL_AVG_soilg"]
   xs <- datdd[,"NETRAD_sm"]-datdd[,"SHF_ALL_AVG_soils"]
@@ -5015,7 +5026,7 @@ if(T){
   r  <-  round( cor(bb, method="pearson")[1,2], 2)
   rr <- paste("y = ", y0, "+", m0, "x - r:", r)
   
-  p1 <-  ggplot(dtf, aes(x=xg, y=ygm) ) +
+  p11 <-  ggplot(dtf, aes(x=xg, y=ygm) ) +
     labs(x = xlab, y = ylab, title = "a) Seg EC0") +
     geom_bin2d(bins = 150) +                       # Bin size control 
     scale_fill_continuous(type = "viridis") +     # color palette
