@@ -12,17 +12,23 @@ library(plotrix)                                                                
 library(ggplot2)
 library(ggpubr)                                                                 # needed for ggarrange
 library(patchwork)
+library(fields)    # to plot footprint
+library(EBImage)
+library(spatialfil)
+library(viridis)       # color-blind tested (ugly)
+library(SPEI)
+
 
 ### Paths for sourcing data ####
 ## Local version on Fabio's laptop
-# path  <-  "E:/REC_7_Data/8_datasets/"
-# rpath  <-  "E:/REC_7_Data/11_ReddyProc/"
-# mpath  <-  "E:/REC_7_Data/12_Marcys_data/"
+path  <-  "E:/REC_7_Data/8_datasets/"
+rpath  <-  "E:/REC_7_Data/11_ReddyProc/"
+mpath  <-  "E:/REC_7_Data/12_Marcys_data/"
 
 ## P drive
-path  <-  "P:/REC_7_Data/8_datasets/"
-rpath  <-  "P:/REC_7_Data/11_ReddyProc/"
-mpath  <-  "P:/REC_7_Data/12_Marcys_data/"
+#path  <-  "P:/REC_7_Data/8_datasets/"
+#rpath  <-  "P:/REC_7_Data/11_ReddyProc/"
+#mpath  <-  "P:/REC_7_Data/12_Marcys_data/"
 
 sites  <-  c("SEG", "SES"); recs  <-  1:4; towers  <-  paste(rep(sites, each=4), rep(recs,2), sep="_REC")
 systems  <-  c(towers, sites); mlabs  <-  c("Seg", "Ses"); soildatasets  <-  c("soilg", "soils")
@@ -1256,15 +1262,10 @@ if(F){
   
   source("E:/REC_7_Data/9_R/FFP_R/calc_footprint_FFP.R")
   source("E:/REC_7_Data/9_R/FFP_R/calc_footprint_FFP_climatology.R")
-  library(fields)    # to plot footprint
-  #library(abind)
   
   ### packages needed for footprint climatology
   #source("https://bioconductor.org/biocLite.R")
   #biocLite("EBImage")
-  library(EBImage)
-  library(spatialfil)
-  library(viridis)       # color-blind tested (ugly)
   #library(RColorBrewer)   # max n:9; need combine with colorRampPalette
   
   
@@ -1404,7 +1405,6 @@ if(F){
   
   source("E:/REC_7_Data/9_R/FFP_R/calc_footprint_FFP.R")
   source("E:/REC_7_Data/9_R/FFP_R/calc_footprint_FFP_climatology.R")
-  library(fields)    # to plot footprint
   
   
   # example
@@ -3322,9 +3322,6 @@ plot_REC1_vs_conv1 <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_seg_nee=
 
 
 plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_seg_nee=F, seas=seas_i){
-  
-  library(ggplot2)
-  library(ggpubr)      # needed for ggarrange
   
   # https://www.r-graph-gallery.com/2d-density-plot-with-ggplot2.html - for reference
   
@@ -5749,8 +5746,6 @@ if(T){
   
   # calculate potential evapotranspiration
   
-  library("SPEI")
-  
   # from: https://cran.r-project.org/web/packages/SPEI/SPEI.pdf
   # info on SPEI: https://spei.csic.es/home.html
   
@@ -5870,9 +5865,6 @@ if(T){
   eras$mon <- as.integer(substring(as.character(eras[,1]), 5,6))   
   ps <- tapply(eras$P_ERA, eras$mon, mean)
   sum(ps[7:9])/sum(ps)   # 0.3945769
-  
-  # the ERA reanalysis goes against Petrie - maybe it is not good
-  
   
   
   
