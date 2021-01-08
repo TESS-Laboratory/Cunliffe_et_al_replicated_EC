@@ -423,7 +423,7 @@ if(make_txt_for_reddy){
     
     dti <- dti[dti[,"dt"] <= "30/12/2021", ]
     
-    #dti <- dti[dti[,"dt"] <= last_date_use, ]   ================
+    #dti <- dti[dti[,"dt"] <= last_date_use, ]   
     #dti <- dti[dti[,"dt"] <= dtir[nrow(dtir),"dt"], ]
     
     #dti <- dti[!is.na(dti[,paste("Date.Time_", datasets[i], sep="")]),] # filter Jan-Oct 2018
@@ -2067,8 +2067,7 @@ if(F){
         xyf5$id <- id
         
         
-        
-        ### don't know if I need this anymore
+
         fb <- function(x){x <- unique(x)}  # keep only the coordinate
         
         # use tapply for f,x,y, so that they remain in the same order
@@ -4339,58 +4338,59 @@ if(T){
 ## plotting ########### 
   
   
+  
   bplot <- "E:/REC_7_Data/10_Plots/12_barplot_fluxes/"
-  filenm <- paste(bplot, "3_1_barplot", xch, attr, lb, "_corr_00.png", sep="")
+  filenm <- paste(bplot, "3_1_barplot", xch, attr, lb, "_EC0_HR.png", sep="")
   
-  png(filenm, width=900, height=900)
-  par(mfrow=c(3,1), mar = c(0, 6, 0, 0), oma = c(13, 6, 8, 0.5), mgp=c(2, 0.5, 0), tck=-0.01)
-  if(ECs2)par(oma=c(17, 6, 8, 0.5))
+  png(filenm, width=1800, height=1800)
+  par(mfrow=c(3,1), mar = c(0, 12, 0, 0), oma = c(26, 12, 16, 1), mgp=c(2, 0.5, 0), tck=-0.01)
+  if(ECs2)par(oma=c(34, 5, 12, 1))
   
   
-  bp_h <- barplot(bard[wr, colh], las=3, beside=T, axisnames=F, ylim=ylimh, cex.axis=3, 
-                col=cols, space=sp); box(); 
-  mtext(expression("H (W m"^"-2"*")"), 2, line=5, cex=2)
+  bp_h <- barplot(bard[wr, colh], las=3, beside=T, axisnames=F, ylim=ylimh, cex.axis=6, 
+                  col=cols, space=sp); box(); 
+  mtext(expression("H (W m"^"-2"*")"), 2, line=7, cex=4)
   rect(x1, 0, x2, ylimh[2], col = "grey")
   rect(x3, 0, x4, ylimh[2], col = "grey")
   bp_h <- barplot(bard[wr, colh], las=3, beside=T, axisnames=F, ylim=ylimh,
-                cex.axis=3, col=cols, add=T, space=sp)
+                  cex.axis=6, col=cols, add=T, space=sp)
   arrows(x0=bp_h, y0=bard[wr, colh]+bare[wr, colh], x1=bp_h, y1=bard[wr, colh]-bare[wr, colh], 
          length=0, code=3, lwd=3); abline(v=mean(bp_h), lty=3); #abline(v=21.5, lty=3)
-  mtext ("Grassland", side=3, adj=0.15, line=2, cex=4)
-  mtext ("Shrubland", side=3, adj=0.85, line=2, cex=4)
-  mtext ("a)", side=3, adj=0.01, line=-3, cex=2)
+  mtext ("Grassland", side=3, adj=0.15, line=2, cex=8)
+  mtext ("Shrubland", side=3, adj=0.85, line=2, cex=8)
+  mtext ("a)", side=3, adj=0.01, line=-6, cex=4)
   
   
-  barplot(bard[wr, colle],  las=3, beside=T, axisnames=F, ylim=ylimle, cex.axis=3, col=cols, space=sp); box(); 
-  mtext(expression("LE (W m"^"-2"*")"), 2, line=5, cex=2)
+  barplot(bard[wr, colle],  las=3, beside=T, axisnames=F, ylim=ylimle, cex.axis=6, col=cols, space=sp); box(); 
+  mtext(expression("LE (W m"^"-2"*")"), 2, line=7, cex=4)
   rect(x1, 0, x2, ylimle[2], col = "grey")
   rect(x3, 0, x4, ylimle[2], col = "grey")
   barplot(bard[wr, colle],  las=3, beside=T, axisnames=F, ylim=ylimle,
-          cex.axis=3, col=cols, add=T, space=sp)
+          cex.axis=6, col=cols, add=T, space=sp)
   arrows(x0=bp_h, y0=bard[wr, colle]+bare[wr, colle], x1=bp_h, y1=bard[wr, colle]-bare[wr, colle], 
          length=0, code=3, lwd=3); abline(v=mean(bp_h), lty=3); #abline(v=21.5, lty=3)
-  mtext ("b)", side=3, adj=0.01, line=-3, cex=2)
+  mtext ("b)", side=3, adj=0.01, line=-6, cex=4)
   
   
   if(!ECs2){
-    barplot(bard[wr, colnee], las=3, beside=T, ylim=ylimnee, cex.names=3, cex.axis=3, col=cols, space=sp,
+    barplot(bard[wr, colnee], las=3, beside=T, ylim=ylimnee, cex.names=6, cex.axis=6, col=cols, space=sp,
             names.arg = c("Seg EC1234", "Seg EC234", "Seg EC0", "Seg EC1", "Seg EC2", "Seg EC3", "Seg EC4", 
                           "Ses EC1234", "Ses EC234", "Ses EC0", "Ses EC1", "Ses EC2", "Ses EC3", "Ses EC4"));
   } else {
-    barplot(bard[wr, colnee], las=3, beside=T, ylim=ylimnee, cex.names=3, cex.axis=3, col=cols, space=sp,
+    barplot(bard[wr, colnee], las=3, beside=T, ylim=ylimnee, cex.names=6, cex.axis=6, col=cols, space=sp,
             names.arg = c("Seg EC1234", "Seg EC234", "Seg EC23", "Seg EC34", "Seg EC42", "Seg EC0", "Seg EC1", "Seg EC2", "Seg EC3", "Seg EC4", 
                           "Ses EC1234", "Ses EC234", "Ses EC23", "Ses EC34", "Ses EC42", "Ses EC0", "Ses EC1", "Ses EC2", "Ses EC3", "Ses EC4"));
   }
   rect(x1, ylimnee[1], x2, ylimnee[2], col = "grey")
   rect(x3, ylimnee[1], x4, ylimnee[2], col = "grey")
-  barplot(bard[wr, colnee], las=3, beside=T, ylim=ylimnee, cex.names=3, cex.axis=3, col=cols, add=T, names.arg =rep("", 20), space=sp) # was 14
+  barplot(bard[wr, colnee], las=3, beside=T, ylim=ylimnee, cex.names=6, cex.axis=6, col=cols, add=T, names.arg =rep("", 20), space=sp) # was 14
   arrows(x0=bp_h, y0=bard[wr, colnee]+bare[wr, colnee], x1=bp_h, y1=bard[wr, colnee]-bare[wr, colnee], 
          length=0, code=3, lwd=3); box(); abline(v=mean(bp_h), lty=3); #abline(v=21.5, lty=3); 
   
-  mtext(expression("NEE (umol CO"["2"]*" m"^"-2"*"s"^"-1"*")"), 2, line=5, cex=2)
+  mtext(expression("NEE (umol CO"["2"]*" m"^"-2"*"s"^"-1"*")"), 2, line=7, cex=4)
   abline(h=0, col="black")
-  mtext ("c)", side=3, adj=0.01, line=-3, cex=2)
-  if(!avg_all)legend("bottomright", legend=c("Growing periods", "Dormant periods"), col=cols, pch=16, cex=2.5)
+  mtext ("c)", side=3, adj=0.01, line=-6, cex=4)
+  if(!avg_all)legend("bottomright", legend=c("Growing periods", "Dormant periods"), col=cols, pch=16, cex=5)
   
   # add horizontal error bars for mean fluxes
   arrows(x0=bp_h[c(1:5, 11:15)], 
@@ -4404,77 +4404,6 @@ if(T){
   
   
   
-  
-  
-  ### High Resolution version
-  if(F){
-    
-    bplot <- "E:/REC_7_Data/10_Plots/12_barplot_fluxes/"
-    filenm <- paste(bplot, "3_1_barplot", xch, attr, lb, "_EC0_HR.png", sep="")
-    
-    png(filenm, width=1800, height=1800)
-    par(mfrow=c(3,1), mar = c(0, 12, 0, 0), oma = c(26, 12, 16, 1), mgp=c(2, 0.5, 0), tck=-0.01)
-    if(ECs2)par(oma=c(34, 5, 12, 1))
-    
-    
-    bp_h <- barplot(bard[wr, colh], las=3, beside=T, axisnames=F, ylim=ylimh, cex.axis=6, 
-                  col=cols, space=sp); box(); 
-    mtext(expression("H (W m"^"-2"*")"), 2, line=7, cex=4)
-    rect(x1, 0, x2, ylimh[2], col = "grey")
-    rect(x3, 0, x4, ylimh[2], col = "grey")
-    bp_h <- barplot(bard[wr, colh], las=3, beside=T, axisnames=F, ylim=ylimh,
-                  cex.axis=6, col=cols, add=T, space=sp)
-    arrows(x0=bp_h, y0=bard[wr, colh]+bare[wr, colh], x1=bp_h, y1=bard[wr, colh]-bare[wr, colh], 
-           length=0, code=3, lwd=3); abline(v=mean(bp_h), lty=3); #abline(v=21.5, lty=3)
-    mtext ("Grassland", side=3, adj=0.15, line=2, cex=8)
-    mtext ("Shrubland", side=3, adj=0.85, line=2, cex=8)
-    mtext ("a)", side=3, adj=0.01, line=-6, cex=4)
-    
-    
-    barplot(bard[wr, colle],  las=3, beside=T, axisnames=F, ylim=ylimle, cex.axis=6, col=cols, space=sp); box(); 
-    mtext(expression("LE (W m"^"-2"*")"), 2, line=7, cex=4)
-    rect(x1, 0, x2, ylimle[2], col = "grey")
-    rect(x3, 0, x4, ylimle[2], col = "grey")
-    barplot(bard[wr, colle],  las=3, beside=T, axisnames=F, ylim=ylimle,
-            cex.axis=6, col=cols, add=T, space=sp)
-    arrows(x0=bp_h, y0=bard[wr, colle]+bare[wr, colle], x1=bp_h, y1=bard[wr, colle]-bare[wr, colle], 
-           length=0, code=3, lwd=3); abline(v=mean(bp_h), lty=3); #abline(v=21.5, lty=3)
-    mtext ("b)", side=3, adj=0.01, line=-6, cex=4)
-    
-    
-    if(!ECs2){
-      barplot(bard[wr, colnee], las=3, beside=T, ylim=ylimnee, cex.names=6, cex.axis=6, col=cols, space=sp,
-              names.arg = c("Seg EC1234", "Seg EC234", "Seg EC0", "Seg EC1", "Seg EC2", "Seg EC3", "Seg EC4", 
-                            "Ses EC1234", "Ses EC234", "Ses EC0", "Ses EC1", "Ses EC2", "Ses EC3", "Ses EC4"));
-    } else {
-      barplot(bard[wr, colnee], las=3, beside=T, ylim=ylimnee, cex.names=6, cex.axis=6, col=cols, space=sp,
-              names.arg = c("Seg EC1234", "Seg EC234", "Seg EC23", "Seg EC34", "Seg EC42", "Seg EC0", "Seg EC1", "Seg EC2", "Seg EC3", "Seg EC4", 
-                            "Ses EC1234", "Ses EC234", "Ses EC23", "Ses EC34", "Ses EC42", "Ses EC0", "Ses EC1", "Ses EC2", "Ses EC3", "Ses EC4"));
-    }
-    rect(x1, ylimnee[1], x2, ylimnee[2], col = "grey")
-    rect(x3, ylimnee[1], x4, ylimnee[2], col = "grey")
-    barplot(bard[wr, colnee], las=3, beside=T, ylim=ylimnee, cex.names=6, cex.axis=6, col=cols, add=T, names.arg =rep("", 20), space=sp) # was 14
-    arrows(x0=bp_h, y0=bard[wr, colnee]+bare[wr, colnee], x1=bp_h, y1=bard[wr, colnee]-bare[wr, colnee], 
-           length=0, code=3, lwd=3); box(); abline(v=mean(bp_h), lty=3); #abline(v=21.5, lty=3); 
-    
-    mtext(expression("NEE (umol CO"["2"]*" m"^"-2"*"s"^"-1"*")"), 2, line=7, cex=4)
-    abline(h=0, col="black")
-    mtext ("c)", side=3, adj=0.01, line=-6, cex=4)
-    if(!avg_all)legend("bottomright", legend=c("Growing periods", "Dormant periods"), col=cols, pch=16, cex=5)
-    
-    # add horizontal error bars for mean fluxes
-    arrows(x0=bp_h[c(1:5, 11:15)], 
-           y0=bard[wr, colnee][c(1:5, 11:15)]+bare[wr, colnee][c(1:5, 11:15)], 
-           x1=bp_h[c(1:5, 11:15)],
-           y1=bard[wr, colnee][c(1:5, 11:15)]-bare[wr, colnee][c(1:5, 11:15)], 
-           length=0.1, angle=90, code=3, lwd=3)
-    
-    dev.off()
-    
-    
-    
-    
-  }
 
   
   
@@ -4852,7 +4781,7 @@ if(T){
   
   #### try plot H+LE vs Rn+G
   #### ideal closure: Y=X
-  #### Burba ex: 80% closure H+LE~Rn+G; r2=0.93
+  #### experiment from Burba et al, 2010: 80% closure H+LE~Rn+G; r2=0.93
   
   xg <- datdd[,"NETRAD_gm"]-datdd[,"SHF_ALL_AVG_soilg"]
   xs <- datdd[,"NETRAD_sm"]-datdd[,"SHF_ALL_AVG_soils"]
