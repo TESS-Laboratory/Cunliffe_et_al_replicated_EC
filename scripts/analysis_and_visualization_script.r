@@ -2,6 +2,9 @@
 ## merges them into a single file
 ## performs visualization and data analysis
 
+# Tested and working with R version 4.0.3
+
+
 #### Load packages
 library(chron)
 library(oce)
@@ -12,24 +15,27 @@ library(ggplot2)
 library(ggpubr)                                                                 # needed for ggarrange
 library(patchwork)
 library(fields)                                                                 # to plot footprint
-library(EBImage)
+library("BiocManager")
+BiocManager::install("EBImage")
 library(spatialfil)
 library(viridis)                                                                # colour palette
 library(SPEI)
+
+
 
 
 ###
 ### Paths for sourcing data ####
 ###
 ## Local version on Fabio's laptop
-path  <-  "E:/REC_7_Data/8_datasets/"
-rpath  <-  "E:/REC_7_Data/11_ReddyProc/"
-mpath  <-  "E:/REC_7_Data/12_Marcys_data/"
+# path  <-  "E:/REC_7_Data/8_datasets/"
+# rpath  <-  "E:/REC_7_Data/11_ReddyProc/"
+# mpath  <-  "E:/REC_7_Data/12_Marcys_data/"
 
 ## P drive
-#path  <-  "P:/REC_7_Data/8_datasets/"
-#rpath  <-  "P:/REC_7_Data/11_ReddyProc/"
-#mpath  <-  "P:/REC_7_Data/12_Marcys_data/"
+path  <-  "P:/REC_7_Data/8_datasets/"
+rpath  <-  "P:/REC_7_Data/11_ReddyProc/"
+mpath  <-  "P:/REC_7_Data/12_Marcys_data/"
 
 
 ###
@@ -256,10 +262,10 @@ for(i in 1:8){
   
   
   
-  # rm outliers/despike before ustar/gapfilling as in FLUXNET_2015 data processing protocol
+  # remove outliers/despike before ustar/gapfilling as in FLUXNET_2015 data processing protocol
   
   # remove outliers according to Tukey's Fence: 
-  # 1.5 times the inter-quartile difference (3 times iqd, it is "far out") 
+  # 1.5 times the interquartile difference (3 times iqd, it is "far out") 
   
   for(fx in fluxesc){ # iqd*30 is 10 times what is considered "far out"
     #fx <- "Fcc"
