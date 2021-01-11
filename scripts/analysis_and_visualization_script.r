@@ -12,8 +12,7 @@ library(lubridate)                                                              
 library(scales)                                                                 # for alpha in base r plots
 library(plotrix)                                                                # for std.error() function
 library(ggplot2)
-library(ggpubr)                                                                 # needed for ggarrange
-library(patchwork)
+library(patchwork)                                                              # to arrange plots
 library(fields)                                                                 # to plot footprint
 library("BiocManager")
 BiocManager::install("EBImage")
@@ -3363,16 +3362,14 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
   
   
   sl <- ""
-  titles <- c("a) Sensible Heat Flux - Seg", "b) Latent Heat Flux - Seg", "c) Net Ecosys. Exchange - Seg",
-            "d) Sensible Heat Flux - Ses", "e) Latent Heat Flux - Ses", "f) Net Ecosys. Exchange - Ses")
+  titles <- c("Sensible Heat Flux - Seg", "Latent Heat Flux - Seg", "Net Ecosys. Exchange - Seg",
+            "Sensible Heat Flux - Ses", "Latent Heat Flux - Ses", "Net Ecosys. Exchange - Ses")
   
   
   
-  
-  # when plotting seasonal fluxes
-  titles_b <- c("a) H - Seg", "b) LE - Seg", "c) NEE - Seg",
-              "d) H - Ses", "e) LE - Ses", "f) NEE - Ses")
-    
+  # Create list of plot titles for seasonal fluxes
+  titles_b <- c("H - Seg", "LE - Seg", "NEE - Seg",
+              "H - Ses", "LE - Ses", "NEE - Ses")
   if(seas=="gro"){titles <- paste(titles_b, "- growing season");   sl <- "_gro_seas"}
   if(seas=="sen"){titles <- paste(titles_b, "- senescent season"); sl <- "_sen_seas"} 
 
@@ -3419,7 +3416,6 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
     labs(x = expression("Seg EC0 - H (W m"^"-2"*")"),
          y = expression("Seg EC1 - H (W m"^"-2"*")"),    #,
          title = titles[1]) +
-    #ggtitle("a) Sensible Heat Flux - Seg")  +
     geom_bin2d(bins = 150, show.legend=T) +   # Bin size control 
     scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lims_h) + ylim(lims_h) +
@@ -3542,15 +3538,15 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
     annotate("text", x = -7, y = 5, label = r2[6], size=4)
   
   
-  ### rearrange
-  pall <- ggarrange(gh, sh, gl, sl, gn, sn, 
-                  ncol = 2, nrow = 3)
+  ### combine plots using Patchwork
+  pall <- (gh + sh) / (gl + sl) / (gn + sn) +
+    plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97))
   
   ggsave(
     pall,
     filename = pl_name,
-    width = 20,
-    height = 30,
+    width = 17,
+    height = 26,
     units = "cm"
   )
   
@@ -4698,7 +4694,7 @@ if(T){
 
     
     p1 <- ggplot(dmat, aes(x=dt_2)) +
-      labs(x = "", y = expression("Cumulative LE (MW m"^"-2"*")",sep=""), title = "a) LE Grassland") +
+      labs(x = "", y = expression("Cumulative LE (MW m"^"-2"*")",sep=""), title = "LE Grassland") +
       geom_line(aes(y = LE_f_g1, colour = "EC1")) + 
       geom_line(aes(y = LE_f_g2, colour = "EC2")) + 
       geom_line(aes(y = LE_f_g3, colour = "EC3")) + 
@@ -4714,7 +4710,7 @@ if(T){
       
     
     p2 <- ggplot(dmat, aes(x=dt_2)) +
-      labs(x = "", y = expression("Cumulative LE (MW m"^"-2"*")",sep=""), title = "b) LE Shrubland") +
+      labs(x = "", y = expression("Cumulative LE (MW m"^"-2"*")",sep=""), title = "LE Shrubland") +
       geom_line(aes(y = LE_f_s1, colour = "EC1")) + 
       geom_line(aes(y = LE_f_s2, colour = "EC2")) + 
       geom_line(aes(y = LE_f_s3, colour = "EC3")) + 
@@ -4730,7 +4726,7 @@ if(T){
       
     
     p3 <- ggplot(dmat, aes(x=dt_2)) +
-      labs(x = "", y = expression("Cumulative NEE (g C m"^"-2"*")",sep=""), title = "c) NEE Grassland") +
+      labs(x = "", y = expression("Cumulative NEE (g C m"^"-2"*")",sep=""), title = "NEE Grassland") +
       geom_line(aes(y = NEE_uStar_f_g1, colour = "EC1")) + 
       geom_line(aes(y = NEE_uStar_f_g2, colour = "EC2")) + 
       geom_line(aes(y = NEE_uStar_f_g3, colour = "EC3")) + 
@@ -4747,7 +4743,7 @@ if(T){
     
     
     p4 <- ggplot(dmat, aes(x=dt_2)) +
-      labs(x = "", y = expression("Cumulative NEE (g C m"^"-2"*")",sep=""), title = "d) NEE Grassland") +
+      labs(x = "", y = expression("Cumulative NEE (g C m"^"-2"*")",sep=""), title = "NEE Grassland") +
       geom_line(aes(y = NEE_uStar_f_s1, colour = "EC1")) + 
       geom_line(aes(y = NEE_uStar_f_s2, colour = "EC2")) + 
       geom_line(aes(y = NEE_uStar_f_s3, colour = "EC3")) + 
@@ -4764,8 +4760,16 @@ if(T){
     
     
     
-    pall <- ggarrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
-    ggsave(pall, filename = p_nm, width = 20, height = 20, units = "cm")
+    ## combine plot susing Patchwork
+    pall <- (p1 + p2) / (p3 + p4) +
+      plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97)) 
+    
+    
+    ggsave(pall,
+           filename = p_nm,
+           width = 17,
+           height = 17,
+           units = "cm")
     
   }
   
@@ -4774,18 +4778,22 @@ if(T){
   
   
   
-}  # cumsum NEE and LE    (plus ggplot version)
-#
+}  # cumsum NEE and LE
+
+
+###
+###  Energy balance (EB) closure ####
+###
+
 if(T){
 
-  # Full energy balance (EB) closure
+  # Rn + H + LE + G ~ 0     
+  # G: soil heat flux + soil heat storage (neg)
+  # ideal closure: Y=X
+  # Burba et al. (2010) found 80% closure H+LE~Rn+G; r2=0.93
+
   
-  # Rn + H + LE + G ~ 0     # G: soil heat flux + soil heat storage (neg)
-  
-  #### try plot H+LE vs Rn+G
-  #### ideal closure: Y=X
-  #### experiment from Burba et al, 2010: 80% closure H+LE~Rn+G; r2=0.93
-  
+  ## select data
   xg <- datdd[,"NETRAD_gm"]-datdd[,"SHF_ALL_AVG_soilg"]
   xs <- datdd[,"NETRAD_sm"]-datdd[,"SHF_ALL_AVG_soils"]
   ygm <- datdd[,"H_gm"] + datdd[,"cLE_gm"]
@@ -4793,115 +4801,29 @@ if(T){
   yg1 <- datdd[,"Hc_g1"] + datdd[,"cLEc_g1"]
   ys1 <- datdd[,"Hc_s1"] + datdd[,"cLEc_s1"]
   
-  lim <- range(xg, xs, ygm, ysm, yg1, ys1, na.rm=T)
-  
-  ylab <- expression("H + LE (W m"^"-2"*")") 
-  xlab <- expression("Rn - G (W m"^"-2"*")")
-  
-  
-  
-  plot_nm <- paste(last_date, "energy_balance_", sep="")
-  gpath <- "E:/REC_7_Data/10_Plots/11_energy_balance_closure/"
-  png(paste(gpath, plot_nm, "_test_TLS.png", sep=""), width=1200, height=1200)
-  
-  #par(mfrow=c(2,2), mar = c(3, 3, 3, 2), oma = c(3, 3, 5, 1), mgp=c(2, 0.5, 0))
-  #if(!add_prec)par(mfrow=c(2,2), mar = c(5, 5, 5, 2), mgp=c(2, 0.5, 0), tck=0.01)
-  #if(add_prec)
-  par(mfrow=c(2,2), mar = c(7, 9, 5, 2), mgp=c(3, 1.5, 0), tck=0.01) 
-  
   
   xg[xg==0] <- NA # xg has 500 zeros, but netg has 0, shfg 3 and xgs 5, so they all arise from the sums
-                # The 500 zeros results in a feature that looks a lot like an artifact, but it really is not
-                # with or without these 500 zeros, the slope of the plot is the same
-  
-    
-  
-  # Plot 1
-  #lm0  <- summary(lm(ygm~xg))
-  #m0 <- round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
-  #y0 <- round(lm0$coefficients[1,1], 0)
-  #r <- round(lm0$r.squared, 2)
-  
-  aa <- cbind(xg, ygm); bb <- aa[complete.cases(aa),]; cc <- prcomp(bb)$rotation
-  m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2); y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-  r  <-  round( cor(bb, method="pearson")[1,2], 2)
-  #l_gm <- lm(ygm~xg)
+  # The 500 zeros results in a feature that looks a lot like an artifact, but it really is not
+  # with or without these 500 zeros, the slope of the plot is the same
   
   
-  plot(xg, ygm, pch=16, xlim=lim, ylim=lim, ylab="", xlab="", main= "Seg EC0", cex.main=4, axes=F, col=alpha(1, 0.2))
-  axis(1, cex.axis=3); axis(2, cex.axis=3); box(); mtext ("a)", side=3, adj=0, line=1, cex=3)
+  ##
+  ## Calculate Energy Balance Ratio
+  ##
+  gm_ebr <- (sum(ygm[ygm>0], na.rm=T) + sum(xg[xg<0], na.rm=T)) / 
+    (sum(ygm[ygm<0], na.rm=T) + sum(xg[xg>0], na.rm=T))    # 0.7820
+  sm_ebr <- (sum(ysm[ysm>0], na.rm=T) + sum(xs[xs<0], na.rm=T)) / 
+    (sum(ysm[ysm<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.8446
   
-  mtext(xlab, side=1, line=6, cex=3); mtext(ylab, side=2, line=5, cex=3); 
-  mtext(paste("y =", y0, "+", m0, "x, r2=", r), side=3, line=-3, cex=2)
-  abline(a=y0, b=m0);
-  abline(a=0, b=1, col="grey") 
-
-  
-  
-  # Plot 2
-
-  #lm0  <- summary(lm(ysm~xs))
-  #m0 <- round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
-  #y0 <- round(lm0$coefficients[1,1], 0)
-  #r <- round(lm0$r.squared, 2)
-  
-  aa <- cbind(xs, ysm); bb <- aa[complete.cases(aa),]; cc <- prcomp(bb)$rotation
-  m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2); y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-  r  <-  round( cor(bb, method="pearson")[1,2], 2)
-  #l_sm <- lm(ysm~xs)
-  
-  plot(xs, ysm, pch=16, xlim=lim, ylim=lim, ylab="", xlab="", main= "Ses EC0", cex.main=4, axes=F, col=alpha(1, 0.2))
-  axis(1, cex.axis=3); axis(2, cex.axis=3); box(); mtext ("b)", side=3, adj=0, line=1, cex=3)
-  
-  mtext(xlab, side=1, line=6, cex=3); mtext(ylab, side=2, line=5, cex=3); 
-  mtext(paste("y =", y0, "+", m0, "x, r2=", r), side=3, line=-3, cex=2)
-  abline(a=y0, b=m0);
-  abline(a=0, b=1, col="grey") 
+  g1_ebr <- (sum(yg1[yg1>0], na.rm=T) + sum(xg[xg<0], na.rm=T)) / 
+    (sum(yg1[yg1<0], na.rm=T) + sum(xg[xg>0], na.rm=T))    # 0.9496
+  s1_ebr <- (sum(ys1[ys1>0], na.rm=T) + sum(xs[xs<0], na.rm=T)) / 
+    (sum(ys1[ys1<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.9525
   
   
-  # Plot 3
-  #lm0  <- summary(lm(yg1~xg))
-  #m0 <- round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
-  #y0 <- round(lm0$coefficients[1,1], 0)
-  #r <- round(lm0$r.squared, 2)
-
-  aa <- cbind(yg1, xg); bb <- aa[complete.cases(aa),]; cc <- prcomp(bb)$rotation
-  m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2); y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-  r  <-  round( cor(bb, method="pearson")[1,2], 2)
-  #l_g1 <- lm(yg1~xg)
-  
-  plot(xg, yg1, pch=16, xlim=lim, ylim=lim, ylab="", xlab="", main= "Seg EC1", cex.main=4, axes=F, col=alpha(1, 0.2))
-  axis(1, cex.axis=3); axis(2, cex.axis=3); box(); mtext ("c)", side=3, adj=0, line=1, cex=3)
-  
-  mtext(xlab, side=1, line=6, cex=3); mtext(ylab, side=2, line=5, cex=3); 
-  mtext(paste("y =", y0, "+", m0, "x, r2=", r), side=3, line=-3, cex=2)
-  abline(a=y0, b=m0);
-  abline(a=0, b=1, col="grey") 
-  
-  
-  # Plot 4
-  #lm0  <- summary(lm(ys1~xs))
-  #m0 <- round(lm0$coefficients[2,1], 2)   # perfect closure is 1 (100% closure)
-  #y0 <- round(lm0$coefficients[1,1], 0)
-  #r <- round(lm0$r.squared, 2)
-
-  aa <- cbind(xs, ys1); bb <- aa[complete.cases(aa),]; cc <- prcomp(bb)$rotation
-  m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2); y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-  r  <-  round( cor(bb, method="pearson")[1,2], 2)
-  #l_s1 <- lm(ys1~xs)
-  
-  plot(xs, ys1, pch=16, xlim=lim, ylim=lim, ylab="", xlab="", main= "Ses EC1", cex.main=4, axes=F, col=alpha(1, 0.2))
-  axis(1, cex.axis=3); axis(2, cex.axis=3); box(); mtext ("d)", side=3, adj=0, line=1, cex=3)
-  
-  mtext(xlab, side=1, line=6, cex=3); mtext(ylab, side=2, line=5, cex=3); 
-  mtext(paste("y =", y0, "+", m0, "x, r2=", r), side=3, line=-3, cex=2)
-  abline(a=y0, b=m0);
-  abline(a=0, b=1, col="grey") 
-  
-  
-  dev.off()
-  
-  
+  #                       (Intercept)        slope       AmeriFlux 
+  #l_gm$coefficients          7.4636225   0.8293651           0.81          
+  #l_sm$coefficients          7.3525987   0.8807114           0.88
   
   # estimate of bowen ratio beta = H/LE (on x,y axis)
   #x <- datdd[,"cLEc_g1"];y <- datdd[,"Hc_g1"];lim <- range(c(x,y), na.rm=T); plot(x, y, pch=16, xlim=lim, ylim=lim)
@@ -4909,62 +4831,29 @@ if(T){
   
   
   
-  # Energy Balance Ratio
+  ### visualize energy balance (EB) closure 
   
-  gm_ebr <- (sum(ygm[ygm>0], na.rm=T) + sum(xg[xg<0], na.rm=T)) / 
-    (sum(ygm[ygm<0], na.rm=T) + sum(xg[xg>0], na.rm=T))    # 0.7820445
-  sm_ebr <- (sum(ysm[ysm>0], na.rm=T) + sum(xs[xs<0], na.rm=T)) / 
-    (sum(ysm[ysm<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.8446459
-  
-  g1_ebr <- (sum(yg1[yg1>0], na.rm=T) + sum(xg[xg<0], na.rm=T)) / 
-    (sum(yg1[yg1<0], na.rm=T) + sum(xg[xg>0], na.rm=T))    # 0.9496163
-  s1_ebr <- (sum(ys1[ys1>0], na.rm=T) + sum(xs[xs<0], na.rm=T)) / 
-    (sum(ys1[ys1<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.9525768
-  
-  
-  #                       (Intercept)        slope       AmeriFlux 
-  #l_gm$coefficients          7.4636225   0.8293651           0.81          
-  #l_sm$coefficients          7.3525987   0.8807114           0.88
-  
-  
-  
-  
-}  # Full energy balance (EB) closure
-#
-if(T){
-  
-  # ggplot for Full energy balance (EB) closure 
-  
-  xg <- datdd[,"NETRAD_gm"]-datdd[,"SHF_ALL_AVG_soilg"]
-  xs <- datdd[,"NETRAD_sm"]-datdd[,"SHF_ALL_AVG_soils"]
-  ygm <- datdd[,"H_gm"] + datdd[,"cLE_gm"]
-  ysm <- datdd[,"H_sm"] + datdd[,"cLE_sm"]
-  yg1 <- datdd[,"Hc_g1"] + datdd[,"cLEc_g1"]
-  ys1 <- datdd[,"Hc_s1"] + datdd[,"cLEc_s1"]
-  
+  # Determine axis range
   lim <- range(xg, xs, ygm, ysm, yg1, ys1, na.rm=T)
   
+  # create dataframe for ggplot
+  dtf <- data.frame(xg, xs, ygm, ysm, yg1, ys1)                                 
+  
+  # prepare axis labels
   ylab <- expression("H + LE (W m"^"-2"*")") 
   xlab <- expression("Rn - G (W m"^"-2"*")")
   
-  xg[xg==0] <- NA # xg has 500 zeros, but netg has 0, shfg 3 and xgs 5, so they all arise from the sums
-  # The 500 zeros results in a feature that looks a lot like an artifact, but it really is not
-  # with or without these 500 zeros, the slope of the plot is the same
-  
-  dtf <- data.frame(xg, xs, ygm, ysm, yg1, ys1)
-  
-  
-  
-  
   
   # Plot 1
-  aa <- cbind(xg, ygm); bb <- aa[complete.cases(aa),]; cc <- prcomp(bb)$rotation
-  m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2); y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  aa <- cbind(xg, ygm); bb <- aa[complete.cases(aa),]
+  cc <- prcomp(bb)$rotation
+  m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2)
+  y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
   r  <-  round( cor(bb, method="pearson")[1,2], 2)
   rr <- paste("y = ", y0, "+", m0, "x - r:", r)
   
-  p11 <-  ggplot(dtf, aes(x=xg, y=ygm) ) +
-    labs(x = xlab, y = ylab, title = "a) Seg EC0") +
+  p1 <-  ggplot(dtf, aes(x=xg, y=ygm) ) +
+    labs(x = xlab, y = ylab, title = "Seg EC0") +
     geom_bin2d(bins = 150) +                       # Bin size control 
     scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lim) + ylim(lim) +
@@ -4978,15 +4867,16 @@ if(T){
     annotate("text", x = 200, y = 700, label = rr, size=4)  
   
   
-  
   # Plot 2
-  aa <- cbind(xs, ysm); bb <- aa[complete.cases(aa),]; cc <- prcomp(bb)$rotation
-  m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2); y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  aa <- cbind(xs, ysm); bb <- aa[complete.cases(aa),]
+  cc <- prcomp(bb)$rotation
+  m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2)
+  y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
   r  <-  round( cor(bb, method="pearson")[1,2], 2)
   rr <- paste("y = ", y0, "+", m0, "x - r:", r)
   
   p2 <-  ggplot(dtf, aes(x=xs, y=ysm) ) +
-    labs(x = xlab, y = ylab, title = "b) Ses EC0") +
+    labs(x = xlab, y = ylab, title = "Ses EC0") +
     geom_bin2d(bins = 150) +                       # Bin size control 
     scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lim) + ylim(lim) +
@@ -5000,15 +4890,16 @@ if(T){
     annotate("text", x = 200, y = 700, label = rr, size=4)  
   
   
-  
   # Plot 3
-  aa <- cbind(xg, yg1); bb <- aa[complete.cases(aa),]; cc <- prcomp(bb)$rotation
-  m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2); y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  aa <- cbind(xg, yg1); bb <- aa[complete.cases(aa),]
+  cc <- prcomp(bb)$rotation
+  m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2)
+  y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
   r  <-  round( cor(bb, method="pearson")[1,2], 2)
   rr <- paste("y = ", y0, "+", m0, "x - r:", r)
   
   p3 <-  ggplot(dtf, aes(x=xg, y=yg1) ) +
-    labs(x = xlab, y = ylab, title = "c) Seg EC1") +
+    labs(x = xlab, y = ylab, title = "Seg EC1") +
     geom_bin2d(bins = 150) +                       # Bin size control 
     scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lim) + ylim(lim) +
@@ -5022,15 +4913,16 @@ if(T){
     annotate("text", x = 200, y = 700, label = rr, size=4)  
   
   
-  
   # Plot 4
-  aa <- cbind(xs, ys1); bb <- aa[complete.cases(aa),]; cc <- prcomp(bb)$rotation
-  m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2); y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
+  aa <- cbind(xs, ys1); bb <- aa[complete.cases(aa),]
+  cc <- prcomp(bb)$rotation
+  m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2)
+  y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
   r  <-  round( cor(bb, method="pearson")[1,2], 2)
   rr <- paste("y = ", y0, "+", m0, "x - r:", r)
   
   p4 <-  ggplot(dtf, aes(x=xs, y=ys1) ) +
-    labs(x = xlab, y = ylab, title = "d) Ses EC1") +
+    labs(x = xlab, y = ylab, title = "Ses EC1") +
     geom_bin2d(bins = 150) +                       # Bin size control 
     scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lim) + ylim(lim) +
@@ -5044,33 +4936,33 @@ if(T){
     annotate("text", x = 200, y = 700, label = rr, size=4)  
   
   
+  ### combine plots using Patchwork
+  pall <- (p1 + p2) / (p3 + p4) +
+    plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97)) 
   
-  
-  
-  
-  
-  ### rearrange
-  pall <- ggarrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
   
   ## save raster
   ggsave(pall,
          filename = "E:/REC_7_Data/10_Plots/11_energy_balance_closure/Figure 6 - energy_balance_TLS_ggplot.png",
-         width = 20,
-         height = 20,
+         width = 17,
+         height = 17,
          units = "cm")
   
   # save vector
   ggsave(pall,
          filename = "E:/REC_7_Data/10_Plots/11_energy_balance_closure/Figure 6 - energy_balance_TLS_ggplot.pdf",
-         width = 20,
-         height = 20,
+         width = 17,
+         height = 17,
          units = "cm")
 
-}  # ggplot for Full energy balance (EB) closure 
-#
+}
+
+
+
+###
+### Land cover maps ####
+###
 if(T){
-  
-  # Land cover maps
 
   ppath <- "E:/REC_7_Data/10_Plots/9_footprints/"
   filenm <- paste(ppath, "land_cover_maps.png", sep="")
