@@ -4,6 +4,10 @@
 
 # Tested and working with R version 4.0.3
 
+# Note that this script currently includes many static file paths for outputs 
+# as well as buried setwd commands, which will prevent execution on different
+# machines as it stands.
+
 
 #### Load packages
 library(chron)
@@ -21,11 +25,10 @@ library(viridis)                                                                
 library(SPEI)
 
 
-
-
 ###
 ### Paths for sourcing data ####
 ###
+
 ## Local version on Fabio's laptop
 # path  <-  "E:/REC_7_Data/8_datasets/"
 # rpath  <-  "E:/REC_7_Data/11_ReddyProc/"
@@ -37,10 +40,11 @@ rpath  <-  "P:/REC_7_Data/11_ReddyProc/"
 mpath  <-  "P:/REC_7_Data/12_Marcys_data/"
 
 
+
 ###
 ### Initialize lists ####
 ###
-sites  <-  c("SEG", "SES");
+sites  <-  c("SEG", "SES")
 recs  <-  1:4
 towers  <-  paste(rep(sites, each=4), rep(recs,2), sep="_REC")
 systems  <-  c(towers, sites)
@@ -56,7 +60,7 @@ asystems  <-  c(systems,
                 "SEG_AVG_42",
                 "SES_AVG_23",
                 "SES_AVG_34",
-                "SES_AVG_42"); 
+                "SES_AVG_42")
 fluxes  <-  c("H", "cLE", "rLE", "Fc", "Hc", "cLEc", "rLEc", "Fcc") 
 fluxes_reddy  <-  c("NEE", "LE", "H_r", "NEE_uStar_f", "LE_f", "H_f", "Reco_DT_uStar", "GPP_DT_uStar")
 all_fluxes  <-  c(fluxes, fluxes_reddy)
@@ -76,13 +80,14 @@ date_end  <-    "01/11/2019"              # default: "01/11/2019"
 
 
 
-xch  <-  xct  <-  ""; if(grepl("Txcor", last_date)){xch  <-  "_Txcor"; xct  <-  "Txcor_"}
+xch  <-  xct  <-  ""
+if(grepl("Txcor", last_date)){xch  <-  "_Txcor"; xct  <-  "Txcor_"}
 
 mdatasets  <-  c("gm", "sm") 
 pdatasets  <-  c("gp", "sp")
 datasets  <-  c("g1", "g2", "g3", "g4", "s1", "s2", "s3", "s4")
 adatasets  <-  c(datasets, mdatasets, "ga4", "sa4", "ga3", "sa3", 
-             "ga23", "ga34", "ga42", "sa23", "sa34", "sa42");
+             "ga23", "ga34", "ga42", "sa23", "sa34", "sa42")
 
 
 datasets_f  <-  paste(datasets, "f", sep="_")
@@ -114,7 +119,7 @@ if(T){
   pm_days_be_fun <- function(x, pm_days){x <- (x[[1]]-(pm_days*48)):(x[[2]]+(pm_days*48))}   # consider data up to ndays before and after a time span
   
   
-  # calculate the sd of cumsum
+  # calculate the standard deviation of the cumulative sum
   cumsum_unc <- function(x){x <- sqrt( cumsum( x^2 ) )}    
   
   
@@ -122,40 +127,40 @@ if(T){
   sub_last <- function(x){x <- x-x[length(x)]}
   
   
-  # create custom ggplot2 theme
-  theme_fancy  <-  function() {
-    theme_bw() +
-    theme(
-    text = element_text(family = "Helvetica"),
-    axis.text = element_text(size = 8, colour = "black"),
-    axis.title = element_text(size =  10, colour = "black"),
-    axis.line.x = element_line(size = 0.3, colour = "black"),
-    axis.line.y = element_line(size = 0.3, colour = "black"),
-    axis.ticks = element_line(size = 0.3, colour = "black"),
-    panel.border = element_blank(),
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor.x = element_blank(),
-    panel.grid.minor.y = element_blank(),
-    panel.grid.major.y = element_blank(),
-    plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), units = , "cm"),
-    plot.title = element_text(
-          size = 10,
-          vjust = 1,
-          hjust = 0.5,
-          colour = "black"
-          ),
-    legend.text = element_text(size = 10, colour = "black"),
-    legend.title = element_text(size = 10, colour = "black"),
-    legend.position = c(0.9, 0.9),
-    legend.key.size = unit(0.9, "line"),
-    legend.background = element_rect(
-          colour = "black",
-          fill = "transparent",
-          size = 2,
-          linetype = "blank"
-          )
-     )
-  }
+  # create custom ggplot2 theme  # Not currently used
+  # theme_fancy  <-  function() {
+  #   theme_bw() +
+  #   theme(
+  #   text = element_text(family = "Helvetica"),
+  #   axis.text = element_text(size = 8, colour = "black"),
+  #   axis.title = element_text(size =  10, colour = "black"),
+  #   axis.line.x = element_line(size = 0.3, colour = "black"),
+  #   axis.line.y = element_line(size = 0.3, colour = "black"),
+  #   axis.ticks = element_line(size = 0.3, colour = "black"),
+  #   panel.border = element_blank(),
+  #   panel.grid.major.x = element_blank(),
+  #   panel.grid.minor.x = element_blank(),
+  #   panel.grid.minor.y = element_blank(),
+  #   panel.grid.major.y = element_blank(),
+  #   plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), units = , "cm"),
+  #   plot.title = element_text(
+  #         size = 10,
+  #         vjust = 1,
+  #         hjust = 0.5,
+  #         colour = "black"
+  #         ),
+  #   legend.text = element_text(size = 10, colour = "black"),
+  #   legend.title = element_text(size = 10, colour = "black"),
+  #   legend.position = c(0.9, 0.9),
+  #   legend.key.size = unit(0.9, "line"),
+  #   legend.background = element_rect(
+  #         colour = "black",
+  #         fill = "transparent",
+  #         size = 2,
+  #         linetype = "blank"
+  #         )
+  #    )
+  # }
 
 }
 
@@ -165,7 +170,7 @@ if(T){
 
 
 ### 
-### 1.0 get REC csv datasets   =====================
+### 1.0 read REC csv datasets   ####
 ### 
 for(i in 1:8){
   
@@ -189,7 +194,8 @@ for(i in 1:8){
     
     dtimes <- as.character(dat[,1])
     
-    dtparts  <-  t(as.data.frame(strsplit(dtimes,' '))); row.names(dtparts) = NULL
+    dtparts  <-  t(as.data.frame(strsplit(dtimes,' ')))
+    row.names(dtparts) = NULL
     if(unique(nchar(dtparts[,2]))==5)dtparts[,2] <- paste(dtparts[,2], ":00", sep="")
     thetimes0  <-  chron(dates=dtparts[,1],times=dtparts[,2],format=c("d/m/y","h:m:s"))
     #thetimes <-  as.POSIXct(paste(as.Date(dates(thetimes0)),times(thetimes0)%%1), tz="GMT") # Mountain Standard Time (New Mexico)
@@ -204,7 +210,8 @@ for(i in 1:8){
     dt_char <- as.character(thetimes0)                                 # without, dat and datm will not merge and lines with same name will be created
     dt_char_c <- substring(dt_char,2,nchar(dt_char)-1)
     
-    dtparts2  <-  t(as.data.frame(strsplit(dt_char_c,' '))); row.names(dtparts2) = NULL
+    dtparts2  <-  t(as.data.frame(strsplit(dt_char_c,' ')))
+    row.names(dtparts2) = NULL
     if(unique(nchar(dtparts2[,2]))==5)dtparts2[,2] <- paste(dtparts2[,2], ":00", sep="")
     thetimes0  <-  chron(dates=dtparts2[,1],times=dtparts2[,2],format=c("d/m/y","h:m:s"))  
     dat$dt <- thetimes0
@@ -224,7 +231,8 @@ for(i in 1:8){
       
       dtimes2 <- as.character(dat2[,1])
       
-      dtparts2  <-  t(as.data.frame(strsplit(dtimes2,' '))); row.names(dtparts2) = NULL
+      dtparts2  <-  t(as.data.frame(strsplit(dtimes2,' ')))
+      row.names(dtparts2) = NULL
       if(unique(nchar(dtparts2[,2]))==5)dtparts2[,2] <- paste(dtparts2[,2], ":00", sep="")
       thetimes0_2  <-  chron(dates=dtparts2[,1],times=dtparts2[,2],format=c("d/m/y","h:m:s"))
       #thetimes <-  as.POSIXct(paste(as.Date(dates(thetimes0)),times(thetimes0)%%1), tz="GMT") # Mountain Standard Time (New Mexico)
@@ -270,9 +278,12 @@ for(i in 1:8){
     #fx <- "Fcc"
     vec <- as.numeric(as.character(dat[,fx]))
     #vec <- dat[,fx]
-    med_p <- median(vec[vec>=0], na.rm=T); top_p <- med_p*30 
-    med_n <- median(vec[vec<0], na.rm=T);  top_n <- med_n*30
-    vec[vec>top_p | vec<top_n] <- NA; dat[,fx] <- vec
+    med_p <- median(vec[vec>=0], na.rm=T)
+    top_p <- med_p*30 
+    med_n <- median(vec[vec<0], na.rm=T)
+    top_n <- med_n*30
+    vec[vec>top_p | vec<top_n] <- NA
+    dat[,fx] <- vec
   }
   
    dat[, fluxesc] <- despike(dat[, fluxesc])    # despike from oce package
@@ -315,7 +326,8 @@ for(im in 1:2){
     
     
     # invert AmeriFlux wind directions (CSAT vs Windmaster)
-    datm[,"WD"] <- datm[,"WD"]+180; datm[ datm[,"WD"]>360 ,"WD"] <-  datm[datm[,"WD"]>360  ,"WD"]-360
+    datm[,"WD"] <- datm[,"WD"]+180
+    datm[ datm[,"WD"]>360 ,"WD"] <-  datm[datm[,"WD"]>360  ,"WD"]-360
     
     
     datm[datm==-9999] <- NA
@@ -347,9 +359,12 @@ for(im in 1:2){
       #dc <- "Fcc_g1"
       #vec <- as.numeric(datf[,dc])
       vec <- datm[,fx]
-      med_p <- median(vec[vec>=0], na.rm=T); top_p <- med_p*30 
-      med_n <- median(vec[vec<0], na.rm=T);  top_n <- med_n*30
-      vec[vec>top_p | vec<top_n] <- NA; datm[,fx] <- vec
+      med_p <- median(vec[vec>=0], na.rm=T)
+      top_p <- med_p*30 
+      med_n <- median(vec[vec<0], na.rm=T)
+      top_n <- med_n*30
+      vec[vec>top_p | vec<top_n] <- NA
+      datm[,fx] <- vec
     }
     
     datm[,c("H", "LE", "FC")] <- despike(datm[,c("H", "LE", "FC")])    # despike from oce package
@@ -391,7 +406,8 @@ for(is in 1:2){
   dt_char <- as.character(gdt)                                 # without, dat and datm will not merge and lines with same name will be created
   dt_char_c <- substring(dt_char,2,nchar(dt_char)-1)
   
-  dtparts2  <-  t(as.data.frame(strsplit(dt_char_c,' '))); row.names(dtparts2) = NULL
+  dtparts2  <-  t(as.data.frame(strsplit(dt_char_c,' ')))
+  row.names(dtparts2) = NULL
   if(unique(nchar(dtparts2[,2]))==5)dtparts2[,2] <- paste(dtparts2[,2], ":00", sep="")
   thetimes0  <-  chron(dates=dtparts2[,1],times=dtparts2[,2],format=c("d/m/y","h:m:s"))  
   ####
@@ -549,24 +565,34 @@ if(make_txt_for_reddy){
     #### get 5 datasets, and merge them all by dt
     
     dat5 <- Reduce(function(x,y) merge(x=x, y=y, by="dt", all=T), list(g1, g2, g3, g4, gm))
-    sts <- rep("_g", each=4);
+    sts <- rep("_g", each=4)
     
     if(ia %in% c(2, 4, 6, 8, 10)){
       dat5 <- Reduce(function(x,y) merge(x=x, y=y, by="dt", all=T), list(s1, s2, s3, s4, sm))
-      sts <- rep("_s", each=4); 
+      sts <- rep("_s", each=4)
     }
     
     dat5 <- dat5[ dat5[,"dt"]>="01/10/18" & dat5[,"dt"]<=last_date_use  ,]
     
   
     ## make avg fluxes
-    wrecs <- recs; iam <- ia; avg_lab <- "_AVG4"
-    if(ia %in% c(3, 4)){wrecs <- recs[2:4]; iam <- ia-2; avg_lab <- "_AVG3"}
-    if(ia %in% c(5, 6)){wrecs <- recs[c(2, 3)]; iam <- ia-4; avg_lab <- "_AVG_23"}
-    if(ia %in% c(7, 8)){wrecs <- recs[c(3, 4)]; iam <- ia-6; avg_lab <- "_AVG_34"}
-    if(ia %in% c(9,10)){wrecs <- recs[c(4, 2)]; iam <- ia-8; avg_lab <- "_AVG_42"}
+    wrecs <- recs
+    iam <- ia
+    avg_lab <- "_AVG4"
+    if(ia %in% c(3, 4)){wrecs <- recs[2:4]
+    iam <- ia-2
+    avg_lab <- "_AVG3"}
+    if(ia %in% c(5, 6)){wrecs <- recs[c(2, 3)]
+    iam <- ia-4
+    avg_lab <- "_AVG_23"}
+    if(ia %in% c(7, 8)){wrecs <- recs[c(3, 4)]
+    iam <- ia-6
+    avg_lab <- "_AVG_34"}
+    if(ia %in% c(9,10)){wrecs <- recs[c(4, 2)]
+    iam <- ia-8
+    avg_lab <- "_AVG_42"}
     
-    mat <- matrix(NA, ncol=4, nrow=nrow(dat5)); 
+    mat <- matrix(NA, ncol=4, nrow=nrow(dat5))
     colnames(mat) <- c("Hc", "cLEc", "Fcc", "friction_velocity")
     
     for(i in 1:ncol(mat)){
@@ -670,10 +696,12 @@ if(run_reddy_proc){
     EddyProc.C  <-  sEddyProc$new(asystems[i], EddyDataWithPosix.F, c('NEE','LE','H','Rg','Tair','VPD', 'Tsoil', 'Ustar'))
     
     
-    LatDeg <- 34.3623; LongDeg <- (-106.7020)
+    LatDeg <- 34.3623
+    LongDeg <- (-106.7020)
     
     if(asystems[i] %in% c("SES_REC1", "SES_REC2", "SES_REC3", "SES_REC4", "SES", "SES_AVG4", "SES_AVG3")){
-      LatDeg <- 34.3350; LongDeg <- (-106.7448)
+      LatDeg <- 34.3350
+      LongDeg <- (-106.7448)
     }
     
     
@@ -807,7 +835,8 @@ for(ir in c(1:20)){
   dt_dates <- paste(substring(dt_dates0, 9, 10), substring(dt_dates0, 6, 7), substring(dt_dates0, 3, 4), sep="/")
   
   hh <- substring(as.character(trunc(1000+datr[,"Hour"])), 3, 4)
-  min <- rep("15", nrow(datr)); min[datr[,"Hour"]%%1==0.5] <- "45"   # fractional part: %%1
+  min <- rep("15", nrow(datr))
+  min[datr[,"Hour"]%%1==0.5] <- "45"   # fractional part: %%1
   dt_times <- paste(hh, min, "00", sep=":")
   
   thetimes_r  <-  chron(dates=dt_dates, times=dt_times, format=c("d/m/y","h:m:s"))
@@ -867,7 +896,7 @@ if(T){
   
   # add REC_AVG4, REC_AVG3 and 3 AVG2 data (un-filled)
   
-  mat4 <- mat3 <- mat23 <- mat34 <- mat42 <- matrix(NA, ncol=length(fluxes)*2, nrow=nrow(data)); 
+  mat4 <- mat3 <- mat23 <- mat34 <- mat42 <- matrix(NA, ncol=length(fluxes)*2, nrow=nrow(data))
   colnames(mat4) <- paste(rep(fluxes, 2), rep(c("ga4", "sa4"), each=length(fluxes)), sep="_" )
   colnames(mat3) <- paste(rep(fluxes, 2), rep(c("ga3", "sa3"), each=length(fluxes)), sep="_" )
   
@@ -912,11 +941,16 @@ if(T){
   
   
   # add month, year and hour columns
-  yyyy <- year(data[,"dt"]); mon <- month(data[,"dt"]); dd <- day(data[,"dt"]); 
-  hh <- chron::hours(data[,"dt"]); min <- minute(data[,"dt"])
+  yyyy <- year(data[,"dt"])
+  mon <- month(data[,"dt"])
+  dd <- day(data[,"dt"]); 
+  hh <- chron::hours(data[,"dt"])
+  min <- minute(data[,"dt"])
   
-  seas <- rep(1, nrow(data));      seas[mon %in% c(5, 6, 7)] <- 2
-  seas[mon %in% c(8, 9, 10)] <- 3; seas[mon %in% c(11,12,1)] <- 4
+  seas <- rep(1, nrow(data))
+  seas[mon %in% c(5, 6, 7)] <- 2
+  seas[mon %in% c(8, 9, 10)] <- 3
+  seas[mon %in% c(11,12,1)] <- 4
   
   
   # add growing season columns (see 4.1 for dates)
@@ -959,7 +993,8 @@ if(T){
   
   
   dat48 <- datdd[49:nrow(datdd),]
-  datc <- matrix(NA, nrow=48, ncol=ncol(datdd)); colnames(datc) <- colnames(datdd)
+  datc <- matrix(NA, nrow=48, ncol=ncol(datdd))
+  colnames(datc) <- colnames(datdd)
   dat48 <- rbind(dat48, datc)
   
   mat_res <- matrix(NA, ncol=length(dcols), nrow=nrow(datdd))
@@ -968,7 +1003,8 @@ if(T){
   
   # loop over all 20 "towers" (10 are mean fluxes)
   for(i in adatasets){
-    SEG <- T; if(substring(i, 1, 1)=="s")SEG <- F
+    SEG <- T
+    if(substring(i, 1, 1)=="s")SEG <- F
     if(SEG){mi <- "gm"} else {mi <- "sm"}
     
     fli <- dcols[grep(i, dcols)]
@@ -986,7 +1022,8 @@ if(T){
     
     # fill residuals matrix
     # x+dx -> dx = 1/sqrt(2) * d(x1-x2)
-    sel <- wds & tss & pfs; sel[is.na(sel)] <- F
+    sel <- wds & tss & pfs
+    sel[is.na(sel)] <- F
     for(j in fli){ mat_res[sel, j] <-  1/sqrt(2) * (datdd[sel, j] - dat48[sel, j]) }
     
 
@@ -1030,7 +1067,8 @@ if(F){
     
     ### make daily sums (new datasets)
     dtimes <- as.character(datdd[,"dt"])
-    dtparts  <-  t(as.data.frame(strsplit(dtimes,' '))); row.names(dtparts) = NULL
+    dtparts  <-  t(as.data.frame(strsplit(dtimes,' ')))
+    row.names(dtparts) = NULL
     ddays <- substring(dtparts[,1], 2, 9)
     
     
@@ -1048,7 +1086,8 @@ if(F){
     
     
     # aggregate to gC m-2 d-1
-    dggp <- aggregate(dc[,c(2,3)],by=list(date(dc[,"dt"])), sum, na.rm=T); colnames(dggp)[1] <- "Date"
+    dggp <- aggregate(dc[,c(2,3)],by=list(date(dc[,"dt"])), sum, na.rm=T)
+    colnames(dggp)[1] <- "Date"
     dggp0 <- dggp  
     
     
@@ -1156,7 +1195,7 @@ if(F){
 #### 
 if(T){
   
-  matp <- matrix(NA, ncol=8, nrow=nrow(datdd)); 
+  matp <- matrix(NA, ncol=8, nrow=nrow(datdd))
   matp <- datdd[, c("yyyy", "mon", "dd", "hh", "P_gm", "P_F_gm", "P_sm", "P_F_sm")]
   colnames(matp)[5:8] <- c("P_hh_gm", "P_F_hh_gm", "P_hh_sm", "P_F_hh_sm")
   
@@ -1296,8 +1335,10 @@ if(F){
   AmeriFlux_f <- T
   xl <- 440      # default
   
-  if(time_f=="day_time")  {lb <- "_day";   xl <- 250}
-  if(time_f=="night_time"){lb <- "_night"; xl <- 350}
+  if(time_f=="day_time")  {lb <- "_day"
+  xl <- 250}
+  if(time_f=="night_time"){lb <- "_night"
+  xl <- 350}
   
   
   wcols <- paste(rep( c("MO_stability", "sigma_V", "friction_velocity", "Wind_Dir"), length(datasets)),
@@ -1317,8 +1358,11 @@ if(F){
   # lcm <- matrix(1, ncol=(2*xl)+1, nrow=(2*xl)+1)
   # lcm[1:xl, (xl+1):((2*xl)+1)] <- 2
   # lcm[(xl+1):((2*xl)+1), (xl+1):((2*xl)+1)] <- 3
-  # lcm <- apply(lcm, 2, rev); lcm <- t(lcm) # image.plot plots rotated images (FFP is right, so adjust lcm)
-  # sel1 <- lcm==1; sel2 <- lcm==2; sel3 <- lcm==3   
+  # lcm <- apply(lcm, 2, rev)
+  # lcm <- t(lcm) # image.plot plots rotated images (FFP is right, so adjust lcm)
+  # sel1 <- lcm==1
+  # sel2 <- lcm==2
+  # sel3 <- lcm==3   
   
 
   
@@ -1337,7 +1381,8 @@ if(F){
     
     #seg_tiff <- "U:/ArcGIS/Projects/SEV_land_cover/SEG_cent_circ_extract_tif.tif"
     seg_tiff <- "U:/ArcGIS/Projects/SEV_land_cover/SEG_Extract_SEG_1.tif"
-    segr <- raster(seg_tiff); segm0 <- as.matrix(segr, nrow=955, ncol=937)
+    segr <- raster(seg_tiff)
+    segm0 <- as.matrix(segr, nrow=955, ncol=937)
     segm <- t(apply(segm0, 2, rev))
     # re-orient because climatology's output is set for image.plot (starts filling from ll corner)
     #image.plot(segm)   
@@ -1349,14 +1394,16 @@ if(F){
     #sum(rr!=937)               # number of rows not entirely NA - 880
     #table(rr)                  # find row with min amount of data
     which(rr == 906)
-    rrna0 <- which(rr == 937); rrna <- rrna0[rrna0 != 25]      # rows to remove
+    rrna0 <- which(rr == 937)
+    rrna <- rrna0[rrna0 != 25]      # rows to remove
     selr <- !(1:length(rr) %in% rrna)
     
     cc <- apply(segm, 1, sum_na)
     #sum(cc!=955)               # number of cols not entirely NA - 880
     #table(cc)                  # find row with min amount of data
     #which(cc == 921)
-    ccna0 <- which(cc == 955); ccna <- ccna0[ccna0 != 14]     # cols to remove
+    ccna0 <- which(cc == 955)
+    ccna <- ccna0[ccna0 != 14]     # cols to remove
     selc <- !(1:length(cc) %in% ccna)
     
     segmap <- segm[selc, selr]
@@ -1379,7 +1426,8 @@ if(F){
     
     
     ses_tiff <- "U:/ArcGIS/Projects/SEV_land_cover/SES_Extract_Bloc1.tif"
-    sesr <- raster(ses_tiff); sesm0 <- as.matrix(sesr, nrow=994, ncol=929)
+    sesr <- raster(ses_tiff)
+    sesm0 <- as.matrix(sesr, nrow=994, ncol=929)
     sesm <- t(apply(sesm0, 2, rev))
     # re-orient because climatology's output is set for image.plot (starts filling from ll corner)
     #image.plot(sesm)   
@@ -1392,14 +1440,16 @@ if(F){
     #sum(rr!=929)               # number of rows not entirely NA - 880
     #table(rr)                  # find row with min amount of data
     #which(rr == 892)
-    rrna0 <- which(rr == 929); rrna <- rrna0[rrna0 != 941]      # rows to remove
+    rrna0 <- which(rr == 929)
+    rrna <- rrna0[rrna0 != 941]      # rows to remove
     selr <- !(1:length(rr) %in% rrna)
     
     cc <- apply(sesm, 1, sum_na)
     #sum(cc!=994)               # number of cols not entirely NA - 880
     #table(cc)                  # find row with min amount of data
     #which(cc == 984)
-    ccna0 <- which(cc == 994); ccna <- ccna0[ccna0 != 14]     # cols to remove
+    ccna0 <- which(cc == 994)
+    ccna <- ccna0[ccna0 != 14]     # cols to remove
     selc <- !(1:length(cc) %in% ccna)
     
     sesmap <- sesm[selc, selr]
@@ -1621,7 +1671,7 @@ if(F){
         sigmav=   datfoot[is,paste("sigma_V", adatasets[dt], sep="_")],
         ustar=    datfoot[is,paste("friction_velocity", adatasets[dt], sep="_")],
         wind_dir= datfoot[is,paste("Wind_Dir", adatasets[dt], sep="_")],
-        domain=c(-xl,xl,-xl,xl),  # x and y cormers in m
+        domain=c(-xl,xl,-xl,xl),  # x and y corners in m
         nx=2*xl,                      # 2x2 m each as default
         r=seq(10,80,10), smooth_data=1)
     }
@@ -1641,7 +1691,7 @@ if(F){
         sigmav=   datfoot[is,paste("V_SIGMA", adatasets[dt], sep="_")],
         ustar=    datfoot[is,paste("USTAR", adatasets[dt], sep="_")],
         wind_dir= datfoot[is,paste("WD", adatasets[dt], sep="_")],
-        domain=c(-xl,xl,-xl,xl),  # x and y cormers in m
+        domain=c(-xl,xl,-xl,xl),  # x and y corners in m
         nx=2*xl,                      # 2x2 m each as default
         r=seq(10,80,10), smooth_data=1)
     }
@@ -1697,40 +1747,60 @@ if(F){
     
     
     ### filter NAs
-    x50 <- FFP$xr[[5]]; x50 <- x50[!is.na(x50)]
-    y50 <- FFP$yr[[5]]; y50 <- y50[!is.na(y50)]
-    x80 <- FFP$xr[[8]]; x80 <- x80[!is.na(x80)]
-    y80 <- FFP$yr[[8]]; y80 <- y80[!is.na(y80)]
+    x50 <- FFP$xr[[5]]
+    x50 <- x50[!is.na(x50)]
+    y50 <- FFP$yr[[5]]
+    y50 <- y50[!is.na(y50)]
+    x80 <- FFP$xr[[8]]
+    x80 <- x80[!is.na(x80)]
+    y80 <- FFP$yr[[8]]
+    y80 <- y80[!is.na(y80)]
     
     
     ### add NAD83 coordinates of the towers
-    if(dt %in% c(1:4,9)) {xc <- 343643; yc <- 3803412}
-    if(dt %in% c(5:8,10)){xc <- 339497; yc <- 3800677}
+    if(dt %in% c(1:4,9)) {xc <- 343643
+    yc <- 3803412}
+    if(dt %in% c(5:8,10)){xc <- 339497
+    yc <- 3800677}
       
     xt <- yt <- 0
     
-    if(mt3=="SEG_REC1"){xt <- (-15); yt <-   15 }
-    if(mt3=="SEG_REC2"){xt <-  (-6); yt <-   81 }
-    if(mt3=="SEG_REC3"){xt <-  (72); yt <- (-38)}
-    if(mt3=="SEG_REC4"){xt <- (-76); yt <- (-32)}
+    if(mt3=="SEG_REC1"){xt <- (-15)
+    yt <-   15 }
+    if(mt3=="SEG_REC2"){xt <-  (-6)
+    yt <-   81 }
+    if(mt3=="SEG_REC3"){xt <-  (72)
+    yt <- (-38)}
+    if(mt3=="SEG_REC4"){xt <- (-76)
+    yt <- (-32)}
     
-    if(mt3=="SES_REC1"){xt <-  (15); yt <-  (-5)}
-    if(mt3=="SES_REC2"){xt <-   (4); yt <-   83 }
-    if(mt3=="SES_REC3"){xt <-  (70); yt <- (-44)}
-    if(mt3=="SES_REC4"){xt <- (-72); yt <- (-38)}
+    if(mt3=="SES_REC1"){xt <-  (15)
+    yt <-  (-5)}
+    if(mt3=="SES_REC2"){xt <-   (4)
+    yt <-   83 }
+    if(mt3=="SES_REC3"){xt <-  (70)
+    yt <- (-44)}
+    if(mt3=="SES_REC4"){xt <- (-72)
+    yt <- (-38)}
     
-    x50 <- x50+xc+xt; y50 <- y50+yc+yt;
-    x80 <- x80+xc+xt; y80 <- y80+yc+yt;
+    x50 <- x50+xc+xt
+    y50 <- y50+yc+yt
+    x80 <- x80+xc+xt
+    y80 <- y80+yc+yt
     
     
     
     
     ### save obj with lines
-    mat50 <- matrix(NA, ncol=2, nrow=length(x50)); colnames(mat50) <- c("x", "y")
-    mat80 <- matrix(NA, ncol=2, nrow=length(x80)); colnames(mat80) <- c("x", "y")
+    mat50 <- matrix(NA, ncol=2, nrow=length(x50))
+    colnames(mat50) <- c("x", "y")
+    mat80 <- matrix(NA, ncol=2, nrow=length(x80))
+    colnames(mat80) <- c("x", "y")
     
-    mat50[,"x"] <- x50; mat50[,"y"] <- y50
-    mat80[,"x"] <- x80; mat80[,"y"] <- y80
+    mat50[,"x"] <- x50
+    mat50[,"y"] <- y50
+    mat80[,"x"] <- x80
+    mat80[,"y"] <- y80
     
     spath <- "E:/REC_7_Data/9_R/footdata/"
     write.csv(mat50, paste(spath, mt3, '_foot_50.csv', sep=""), row.names=F)
@@ -1744,7 +1814,7 @@ if(F){
   do_plot <- F
   mon_ys <- unique(datfoot0[,c("yyyy", "mon")])
   
-  pmat <- matrix(NA, ncol=8, nrow=nrow(mon_ys) * 24); 
+  pmat <- matrix(NA, ncol=8, nrow=nrow(mon_ys) * 24)
   colnames(pmat) <- c("yyyy", "mon", "hh", "pt", "p1", "p2", "p3", "ps")
   
   #logmat <- matrix(NA, ncol=13, nrow=nrow(mon_ys) * 24)
@@ -1802,7 +1872,7 @@ if(F){
             sigmav=   datfoot[is,paste("sigma_V", adatasets[dt], sep="_")],
             ustar=    datfoot[is,paste("friction_velocity", adatasets[dt], sep="_")],
             wind_dir= datfoot[is,paste("Wind_Dir", adatasets[dt], sep="_")],
-            domain=c(-xl,xl,-xl,xl),  # x and y cormers in m
+            domain=c(-xl,xl,-xl,xl),  # x and y corners in m
             nx=2*xl,                      # 2x2 m each as default
             r=seq(10,80,10), smooth_data=1)
         }
@@ -1822,7 +1892,7 @@ if(F){
             sigmav=   datfoot[is,paste("V_SIGMA", adatasets[dt], sep="_")],
             ustar=    datfoot[is,paste("USTAR", adatasets[dt], sep="_")],
             wind_dir= datfoot[is,paste("WD", adatasets[dt], sep="_")],
-            domain=c(-xl,xl,-xl,xl),  # x and y cormers in m
+            domain=c(-xl,xl,-xl,xl),  # x and y corners in m
             nx=2*xl,                      # 2x2 m each as default
             r=seq(10,80,10), smooth_data=1)
         }
@@ -1847,7 +1917,8 @@ if(F){
           png(filenm, width=600, height=600)
           par(mar=c(5,5,4,4), oma=c(1,1,1,2) )
           
-          zmax <- 0.0021; nlevs <- 1000
+          zmax <- 0.0021
+          nlevs <- 1000
           image.plot(FFP$x_2d[1,], FFP$y_2d[,1], FFP$fclim_2d, zlim=c(0,zmax), 
                      col=magma(nlevs), breaks=(0:nlevs)^5/(nlevs+1)^5*zmax)
           lines(FFP$xr[[5]], FFP$yr[[5]], type="l", col="black")
@@ -1881,16 +1952,18 @@ if(F){
         
         
         
-        ### this currently produces a plot EVERY HOUR !!!
+        ### this currently produces a plot EVERY HOUR!
         if(F){  
-          mt3 <- towers[dt]; if(dt %in% c(9,10)){mt3 <- sites[dt-8]}
+          mt3 <- towers[dt]
+          if(dt %in% c(9,10)){mt3 <- sites[dt-8]}
           
           ppath <- paste("E:/REC_7_Data/10_Plots/footprints/monthly_avg_days/", mt3, "/", sep="")
           filenm <- paste(ppath, mt3, "_prob_plot_", mon_ys[i,1], "_", mon_ys[i,2], "_", hi, ".png", sep="")
           
           png(filenm, width=600, height=600)
           
-          plot(pmat[1:24,"pt"], type="n", ylim=c(0,1), axes=T, xlab="", ylab=""); box()
+          plot(pmat[1:24,"pt"], type="n", ylim=c(0,1), axes=T, xlab="", ylab="")
+          box()
           #axis(1, at=1:24, labels=paste("2018_10", 0:23), las=3); axis(2); 
           mtext("Probability", 2, line=2.5); mtext("Hour of Day", 1, line=2.5)
           mtext(paste(mon_ys[i,"yyyy"], "/", mon_ys[i,"mon"], "-", towers[dt]), line=0.5, cex=2)
@@ -1944,8 +2017,10 @@ if(F){
       for(cluster in sites){
         
         cluster <- sites[1]
-        dts <- c(1:4, 9); canopy_h <- 0.5; 
-        if(cluster=="SES"){dts <- c(5:8, 10); canopy_h <- 1.0}
+        dts <- c(1:4, 9)
+        canopy_h <- 0.5
+        if(cluster=="SES"){dts <- c(5:8, 10)
+        canopy_h <- 1.0}
         
         
         tpoint <- paste(substring(as.character(datfoot[i, "dt"]), 2, 9), " H:", datfoot[i, "hh"], sep="")
@@ -1955,7 +2030,8 @@ if(F){
           #dt <- dts[1]
           print(paste(towers[dt]))
           
-          mt3 <- towers[dt]; if(dt %in% c(9,10)){mt3 <- sites[dt-8]}
+          mt3 <- towers[dt]
+          if(dt %in% c(9,10)){mt3 <- sites[dt-8]}
           
           
           
@@ -1989,7 +2065,7 @@ if(F){
               sigmav=   datfoot[is,paste("sigma_V", adatasets[dt], sep="_")],
               ustar=    datfoot[is,paste("friction_velocity", adatasets[dt], sep="_")],
               wind_dir= datfoot[is,paste("Wind_Dir", adatasets[dt], sep="_")],
-              domain=c(-xl,xl,-xl,xl),  # x and y cormers in m
+              domain=c(-xl,xl,-xl,xl),  # x and y corners in m
               nx=2*xl,                      # 2x2 m each as default
               r=seq(10,80,10), smooth_data=1)
             
@@ -2027,7 +2103,7 @@ if(F){
               sigmav=   datfoot[is,paste("V_SIGMA", adatasets[dt], sep="_")],
               ustar=    datfoot[is,paste("USTAR", adatasets[dt], sep="_")],
               wind_dir= datfoot[is,paste("WD", adatasets[dt], sep="_")],
-              domain=c(-xl,xl,-xl,xl),  # x and y cormers in m
+              domain=c(-xl,xl,-xl,xl),  # x and y corners in m
               nx=2*xl,                      # 2x2 m each as default
               r=seq(10,80,10), smooth_data=1)
           }
@@ -2127,16 +2203,24 @@ if(F){
           par(mfrow=c(2,2), mar=c(5,5,4,4), oma=c(1,1,1,1) )
           
           
-          g1x <- c(FFP_g1$x_2d); g1y <- c(FFP_g1$y_2d); g1f <- c(FFP_g1$f_2d);
+          g1x <- c(FFP_g1$x_2d)
+          g1y <- c(FFP_g1$y_2d)
+          g1f <- c(FFP_g1$f_2d)
           quilt.plot(g1x, g1y, g1f, nx=1000,ny=1000, xlim=c(-499,500),ylim=c(-499,500))   # max: 0.0002
           mtext("SEG_REC1", 3, line=1, font=2, cex=1.5)
-          g2x <- c(FFP_g2$x_2d); g2y <- c(FFP_g2$y_2d); g2f <- c(FFP_g2$f_2d);
+          g2x <- c(FFP_g2$x_2d)
+          g2y <- c(FFP_g2$y_2d)
+          g2f <- c(FFP_g2$f_2d)
           quilt.plot(g2x, g2y, g2f, nx=1000,ny=1000, xlim=c(-499,500),ylim=c(-499,500))   # max: 0.00015
           mtext("SEG_REC2", 3, line=1, font=2, cex=1.5)
-          g3x <- c(FFP_g3$x_2d); g3y <- c(FFP_g3$y_2d); g3f <- c(FFP_g3$f_2d);
+          g3x <- c(FFP_g3$x_2d)
+          g3y <- c(FFP_g3$y_2d)
+          g3f <- c(FFP_g3$f_2d)
           quilt.plot(g3x, g3y, g3f, nx=1000,ny=1000, xlim=c(-499,500),ylim=c(-499,500))   # max: 0.00015
           mtext("SEG_REC3", 3, line=1, font=2, cex=1.5)
-          g4x <- c(FFP_g4$x_2d); g4y <- c(FFP_g4$y_2d); g4f <- c(FFP_g4$f_2d);
+          g4x <- c(FFP_g4$x_2d)
+          g4y <- c(FFP_g4$y_2d)
+          g4f <- c(FFP_g4$f_2d);
           quilt.plot(g4x, g4y, g4f, nx=1000,ny=1000, xlim=c(-499,500),ylim=c(-499,500))   # max: 0.0004
           mtext("SEG_REC4", 3, line=1, font=2, cex=1.5)
           
@@ -2170,14 +2254,16 @@ if(F){
           
           
           
-          mt3 <- towers[dt]; if(dt %in% c(9,10)){mt3 <- sites[dt-8]}
+          mt3 <- towers[dt]
+          if(dt %in% c(9,10)){mt3 <- sites[dt-8]}
           
           ppath <- paste("E:/REC_7_Data/10_Plots/footprints/monthly_avg_days/", mt3, "/", sep="")
           filenm <- paste(ppath, mt3, "_prob_plot_", mon_ys[i,1], "_", mon_ys[i,2], "_", hi, ".png", sep="")
           
           png(filenm, width=600, height=600)
           
-          plot(pmat[1:24,"pt"], type="n", ylim=c(0,1), axes=T, xlab="", ylab=""); box()
+          plot(pmat[1:24,"pt"], type="n", ylim=c(0,1), axes=T, xlab="", ylab="")
+          box()
           #axis(1, at=1:24, labels=paste("2018_10", 0:23), las=3); axis(2); 
           mtext("Probability", 2, line=2.5); mtext("Hour of Day", 1, line=2.5)
           mtext(paste(mon_ys[i,"yyyy"], "/", mon_ys[i,"mon"], "-", towers[dt]), line=0.5, cex=2)
@@ -2223,7 +2309,7 @@ if(F){
     
     datfoot <- datfoot_t[  datfoot_t[,"yyyy"]==mon_ys[k,"yyyy"] & datfoot_t[,"mon"]==mon_ys[k,"mon"] , ]
     
-    pmat <- matrix(NA, ncol=5+5*12, nrow=nrow(datfoot)); 
+    pmat <- matrix(NA, ncol=5+5*12, nrow=nrow(datfoot))
     colnames(pmat) <- c("yyyy", "mon", "dd", "hh", "min",
                       paste( rep( c("pt", "p1", "p2", "p3", "ps"), 12), # 10 towers and 2 clusters
                              rep( c(adatasets[1:10], sites), each=5), sep="_" )  )
@@ -2245,7 +2331,8 @@ if(F){
         
         
         #cluster <- sites[1]
-        dts <- c(1:4, 9); canopy_h <- 0.5; 
+        dts <- c(1:4, 9)
+        canopy_h <- 0.5
         if(cluster=="SES"){dts <- c(5:8, 10); canopy_h <- 1.0}
         
         pmat[i, 1:5]    <- c(datfoot[i,"yyyy"], datfoot[i,"mon"], datfoot[i,"dd"], datfoot[i,"hh"],   datfoot[i,"min"])
@@ -2282,7 +2369,7 @@ if(F){
               sigmav=   datfoot[i,paste("sigma_V", adatasets[dt], sep="_")],
               ustar=    datfoot[i,paste("friction_velocity", adatasets[dt], sep="_")],
               wind_dir= datfoot[i,paste("Wind_Dir", adatasets[dt], sep="_")],
-              domain=c(-xl,xl,-xl,xl),  # x and y cormers in m
+              domain=c(-xl,xl,-xl,xl),  # x and y corners in m
               nx=2*xl,                      # 2x2 m each as default
               r=seq(10,80,10), smooth_data=1)
             
@@ -2415,12 +2502,9 @@ if(F){
         
         
         
-        ### Plot =============================
+        ### Plot 
         if(T){
-          
-          
-          #file.exists()
-          
+
           #exists("E:/REC_7_Data/10_Plots/footprints/hourly_cluster/SES/2018_11/SES_footprint_5_2018_11_01_0_1500.png")
           
           ppath <- paste("E:/REC_7_Data/10_Plots/footprints/hourly_cluster/", cluster,  "/",  #"_foot_movie/", 
@@ -2434,7 +2518,6 @@ if(F){
             
             image.plot(FFP$y_2d, FFP$x_2d, totfootn, xlab="", ylab="", zlim=c(-0.00001, 0.0005),
                        cex.axis=1.5) #, legend.args=list(text="", cex.legend=1.5))   # FFP_gm
-            
             
             
             
@@ -2468,7 +2551,7 @@ if(F){
         
         
         
-        ## land cover probability (cluster) ==================================================
+        ## land cover probability (cluster) =================
         
         #pt <- sum(fp3); p1 <- sum(fp3[sel1]); p2 <- sum(fp3[sel2]); p3 <- sum(fp3[sel3]); ps <- sum(p1+p2+p3)
         pt <- sum(totfootn)
@@ -2481,9 +2564,6 @@ if(F){
         p1 <- sum(totfootn[sel1&sel80c], na.rm=T); p2 <- sum(totfootn[sel2&sel80c], na.rm=T); p3 <- sum(totfootn[sel3&sel80c], na.rm=T)
         ps <- sum(p1+p2+p3)
         pmat_80[i , paste(c("pt", "p1", "p2", "p3", "ps"), cluster, sep="_")] <- c(pt, p1, p2, p3, ps)
-        
-        
-        
         
       
       }
@@ -2547,7 +2627,7 @@ plot_avg_day <- function(avd=avd, mon=NULL, year=NULL, ylims=NULL, test_2=F){
     ylim_F <- ylims[[3]]
   } 
   holl <- "holl_"; 
-  titles <- c("Grassland (US-SEG)", "Shrubland (US-SES)", "", "", "", "")
+  titles <- c("Grassland (US-Seg)", "Shrubland (US-Ses)", "", "", "", "")
   if(!(is.null(mon)&is.null(year))){titles[1:2] <- paste(titles[1:2], " / ", month.abb[mon], "-", year)}
   
   #ylabs <- c("H (W m-2)", "", "LE (W m-2)", "", "NEE (umolC m-2 s-1)", "")
@@ -2597,7 +2677,6 @@ plot_avg_day <- function(avd=avd, mon=NULL, year=NULL, ylims=NULL, test_2=F){
       if(i==1)legend("topright", c("mn EC23 ", "mn EC34", "mn EC42"), 
                      col=c("purple", "green", "darkgreen"), pch=16, cex=1)
     }
-    
     
     
   }
@@ -3037,9 +3116,7 @@ plot_months_3_1 <- function(dat=dat, mon=mm, year=yy, telemetry=F, RH="cell", co
   
   
   
-  
-  
-  # SEG - Latent heat
+  # Seg - Latent heat
   scol <- grepl("LE", cols_to_plot)&grepl("g", cols_to_plot)
   ylim <- range(dat[, cols_to_plot[scol]], na.rm=T)
   plot(dat[,"cLE_g1"]~dat[,"dt"], type='n', xlim=xlim, ylim=ylim, axes=F) 
@@ -3057,7 +3134,7 @@ plot_months_3_1 <- function(dat=dat, mon=mm, year=yy, telemetry=F, RH="cell", co
   }
   
   
-  # SEG - NEE
+  # Seg - NEE
   scol <- grepl("F", cols_to_plot)&grepl("g", cols_to_plot)
   ylim <- range(dat[, cols_to_plot[scol]], na.rm=T)
   plot(dat[,"Fc_g1"]~dat[,"dt"], type='n', xlim=xlim, ylim=ylim, axes=F) 
@@ -3084,9 +3161,6 @@ plot_months_3_1 <- function(dat=dat, mon=mm, year=yy, telemetry=F, RH="cell", co
     axis(4, cex.axis=4, line=-8); mtext("unrot W (m-1 s-1)", side=4, line=-2, cex=3)
     abline(h=0, col="grey", lty=3)
   }
-  
-  
-  
   
   
   dev.off()
@@ -3127,7 +3201,7 @@ plot_months_3_1 <- function(dat=dat, mon=mm, year=yy, telemetry=F, RH="cell", co
   }
   
   
-  # SES - Latent heat
+  # Ses - Latent heat
   scol <- grepl("LE", cols_to_plot)&grepl("s", cols_to_plot)
   ylim <- range(dat[, cols_to_plot[scol]], na.rm=T)
   plot(dat[,"cLE_g1"]~dat[,"dt"], type='n', xlim=xlim, ylim=ylim, axes=F) 
@@ -3145,7 +3219,7 @@ plot_months_3_1 <- function(dat=dat, mon=mm, year=yy, telemetry=F, RH="cell", co
   }
   
   
-  # SES - NEE
+  # Ses - NEE
   scol <- grepl("F", cols_to_plot)&grepl("s", cols_to_plot)
   ylim <- range(dat[, cols_to_plot[scol]], na.rm=T)
   plot(dat[,"Fc_g1"]~dat[,"dt"], type='n', xlim=xlim, ylim=ylim, axes=F) 
@@ -3172,8 +3246,6 @@ plot_months_3_1 <- function(dat=dat, mon=mm, year=yy, telemetry=F, RH="cell", co
     axis(4, cex.axis=4, line=-8); mtext("unrot W (m-1 s-1)", side=4, line=-2, cex=3)
     abline(h=0, col="grey", lty=3)
   }
-  
-  
   
   
   
@@ -4225,11 +4297,11 @@ if(T){
   
   
 }  # daily land cover probabilities
-#
+
+###
+### growing / senescent periods fluxes matrix / barchart ####
+###
 if(T){
-  
-  # growing / senescent periods fluxes matrix / barchart
-  
   reddy <- T
   hollinger <- T  # if reddy & hollinger
   ECs2 <- T       # use mean of 2 towers
@@ -4305,8 +4377,11 @@ if(T){
   
   
   ### barplot needs vector or matrix 
-  bard <- merge(seg_af, ses_af, by="Group.1"); bard <- as.matrix(bard[,2:ncol(bard)])
-  bare <- merge(seg_se, ses_se, by="Group.1"); bare <- as.matrix(bare[,2:ncol(bare)])
+  bard <- merge(seg_af, ses_af, by="Group.1")
+  bard <- as.matrix(bard[,2:ncol(bard)])
+  
+  bare <- merge(seg_se, ses_se, by="Group.1")
+  bare <- as.matrix(bare[,2:ncol(bare)])
   
   # reorder to Means, AmeriFlux, RECs
   bard <- bard[,    ll*rep(0:5, each=ll) + rep(c(6:ll, 5, 1:4), 6)   ]
@@ -4339,10 +4414,8 @@ if(T){
   if(ECs2){x1 <- 15.5; x2 <- 18.5; x3 <- 45.5; x4 <- 48.5}
   if(avg_all){x1 <- 8.3; x2 <- 9.9; x3 <- 24.3; x4 <- 25.9}
   
-## plotting ########### 
   
-  
-  
+  ## plotting
   bplot <- "E:/REC_7_Data/10_Plots/12_barplot_fluxes/"
   filenm <- paste(bplot, "3_1_barplot", xch, attr, lb, "_EC0_HR.png", sep="")
   
@@ -4414,11 +4487,14 @@ if(T){
   
   
 }  # growing / senescent periods fluxes matrix / barchart
-#
+
+
+
+###
+### cumulative sum of LE and NEE ####
+###
 if(T){
-  
-  ### cumulative sum of LE and NEE
-  
+
   cols <- rep(c("purple", "green", "darkgreen", "brown"), 2)
   add_AmeriFlux <- T
   add_AmeriFlux_edire <- F
@@ -4441,7 +4517,6 @@ if(T){
   
   legend_g <- c("EC1", "EC2", "EC3", "EC4")
   # u* filtered (NEE only) and gapfilled
-  
   
   
   if(add_AmeriFlux){
@@ -4536,7 +4611,8 @@ if(T){
   if(no_seg_nee){ 
     ec <- grepl("_gm", colnames(dmat)) & 
        (grepl("NEE", colnames(dmat)) | grepl("Fcc", colnames(dmat)))
-    dmat[, ec] <- NA; attr <- paste("_no_seg_nee", attr, sep="")  
+    dmat[, ec] <- NA
+    attr <- paste("_no_seg_nee", attr, sep="")  
   } 
   
   
@@ -4606,8 +4682,6 @@ if(T){
   
   
   
-  
-  
   ## plot 3
   plot(dmat[,1]~dmat[,"dt"], type='n', xlim=xlim, ylim=ylim_c, axes=F, xlab="", ylab="") 
   for(i in tp1){lines(dmat[,nees[i]]~dmat[,"dt"], col=cols[i])}
@@ -4650,37 +4724,26 @@ if(T){
     axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
   }
   
-  
-  
   dev.off()
   
   
-  
-  
-  
   ### ggplot version
-  if(T){
-    
-    gpath <- "E:/REC_7_Data/10_Plots/7_cumsum/"
-    p_nm <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot.png", sep="") # raster
-    #p_nm <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot.pdf", sep="") # vector
-    
     # time stamp
     mthetimes <-  as.POSIXct(dmat[,"dt"], format="%d/%m/%y %H:%M:%S") 
     dmat$dt_2 <- mthetimes
     
-    ylim_l<-c(0, 800)
+    ylim_l <- c(0, 800)
     
-    ya2<-expression("Precipitation (mm h"^"-1"*")",sep="")
+    ya2 <- expression("Precipitation (mm h"^"-1"*")",sep="")
     
     
     # ylim correction factor for precipitation
     
     # diff(ylim_l)/ylim_p[2]   = 20.41817
-    # diff(ylim_l)/20.41817    = 36.32201    # ylim that I want
+    # diff(ylim_l)/20.41817    = 36.32201    # desired ylim
     
     # diff(ylim_c)/ylim_p[2]   =  1.629766
-    # diff(ylim_c)/ 1.629766   =  36.322     # ylim that I want
+    # diff(ylim_c)/ 1.629766   =  36.322     # desired ylim
     
     
     
@@ -4692,7 +4755,6 @@ if(T){
     
     
 
-    
     p1 <- ggplot(dmat, aes(x=dt_2)) +
       labs(x = "", y = expression("Cumulative LE (MW m"^"-2"*")",sep=""), title = "LE Grassland") +
       geom_line(aes(y = LE_f_g1, colour = "EC1")) + 
@@ -4702,10 +4764,11 @@ if(T){
       geom_line(aes(y = LE_f_gm, colour = "EC0")) +
       geom_line(aes(y = P_plot_le_gm, colour = "prec")) +
       scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = ya2)) +
-      theme_bw() + 
+      theme_bw() +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-      theme(axis.text.x = element_text(angle = 90)) +
+      theme(axis.text.x = element_text(angle = 45)) +
       theme(legend.title = element_blank(), legend.position = c(0.15, 0.50)) +    # legend position
+      theme( axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
       scale_colour_manual(values = colours)
       
     
@@ -4720,8 +4783,9 @@ if(T){
       scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-      theme(axis.text.x = element_text(angle = 90)) +
+      theme(axis.text.x = element_text(angle = 45)) +
       theme(legend.position="none") +  
+      theme( axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
       scale_colour_manual(values = colours)
       
     
@@ -4737,8 +4801,9 @@ if(T){
       scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) + (ylim_p[2]), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-      theme(axis.text.x = element_text(angle = 90)) +
+      theme(axis.text.x = element_text(angle = 45)) +
       theme(legend.position="none") +  
+      theme( axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
       scale_colour_manual(values = colours)
     
     
@@ -4754,31 +4819,42 @@ if(T){
       scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) + (ylim_p[2]), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-      theme(axis.text.x = element_text(angle = 90)) +
+      theme(axis.text.x = element_text(angle = 45)) +
       theme(legend.position="none") +
+      theme( axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
       scale_colour_manual(values = colours)
     
     
     
-    ## combine plot susing Patchwork
+    ## combine plots using Patchwork
     pall <- (p1 + p2) / (p3 + p4) +
       plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97)) 
     
     
+    
+    
+    # Save raster
+    gpath <- "E:/REC_7_Data/10_Plots/7_cumsum/"
+    outfile_r <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot.png", sep="")
+    
     ggsave(pall,
-           filename = p_nm,
+           filename = outfile_r,
            width = 17,
            height = 17,
            units = "cm")
     
-  }
-  
-  
-  
-  
-  
-  
-}  # cumsum NEE and LE
+    # Save vector
+    gpath <- "E:/REC_7_Data/10_Plots/7_cumsum/"
+    outfile_v <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot.pdf", sep="")
+    
+    ggsave(pall,
+           filename = outfile_v,
+           width = 17,
+           height = 17,
+           units = "cm")
+   
+}  # cumulative LE and NEE
+
 
 
 ###
@@ -4845,12 +4921,13 @@ if(T){
   
   
   # Plot 1
-  aa <- cbind(xg, ygm); bb <- aa[complete.cases(aa),]
-  cc <- prcomp(bb)$rotation
-  m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2)
-  y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-  r  <-  round( cor(bb, method="pearson")[1,2], 2)
-  rr <- paste("y = ", y0, "+", m0, "x - r:", r)
+  aa <- cbind(xg, ygm)  # Create object with two vectors
+  bb <- aa[complete.cases(aa),]  # Subset completed data only
+  cc <- prcomp(bb)$rotation  # Apply Principle Components Analysis
+  m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2)  # Extract coefficient
+  y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)  # Extract coefficient
+  r  <-  round( cor(bb, method="pearson")[1,2], 2)  # Compute pearsons rho
+  rr <- paste("y = ", y0, "+", m0, "x - r:", r)  # create annotation text
   
   p1 <-  ggplot(dtf, aes(x=xg, y=ygm) ) +
     labs(x = xlab, y = ylab, title = "Seg EC0") +
@@ -4866,7 +4943,7 @@ if(T){
     geom_abline(intercept = y0, slope = m0) +
     annotate("text", x = 200, y = 700, label = rr, size=4)  
   
-  
+
   # Plot 2
   aa <- cbind(xs, ysm); bb <- aa[complete.cases(aa),]
   cc <- prcomp(bb)$rotation
@@ -4891,7 +4968,8 @@ if(T){
   
   
   # Plot 3
-  aa <- cbind(xg, yg1); bb <- aa[complete.cases(aa),]
+  aa <- cbind(xg, yg1)
+  bb <- aa[complete.cases(aa),]
   cc <- prcomp(bb)$rotation
   m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2)
   y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
@@ -4914,7 +4992,8 @@ if(T){
   
   
   # Plot 4
-  aa <- cbind(xs, ys1); bb <- aa[complete.cases(aa),]
+  aa <- cbind(xs, ys1)
+  bb <- aa[complete.cases(aa),]
   cc <- prcomp(bb)$rotation
   m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2)
   y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
@@ -4980,15 +5059,21 @@ if(T){
   
   cols <- c("moccasin", "darkgreen", "olivedrab3")
   
-  image(segmap, col=cols, axes=F); box()
-  axis(1, at=ats, labels=labels, las=3); mtext("Distance (m)", side=1, line=4, cex=2)
-  axis(2, at=ats, labels=labels, las=1); mtext("Distance (m)", side=2, line=3, cex=2)
+  image(segmap, col=cols, axes=F)
+  box()
+  axis(1, at=ats, labels=labels, las=3)
+  mtext("Distance (m)", side=1, line=4, cex=2)
+  axis(2, at=ats, labels=labels, las=1)
+  mtext("Distance (m)", side=2, line=3, cex=2)
   mtext(paste("US-SEG Land Cover"), 3, line=1, font=2, cex=2)
   
   
-  image(sesmap, col=cols, axes=F); box()
-  axis(1, at=ats, labels=labels, las=3); mtext("Distance (m)", side=1, line=4, cex=2)
-  axis(4, at=ats, labels=labels, las=1); mtext("Distance (m)", side=4, line=4, cex=2)
+  image(sesmap, col=cols, axes=F)
+  box()
+  axis(1, at=ats, labels=labels, las=3)
+  mtext("Distance (m)", side=1, line=4, cex=2)
+  axis(4, at=ats, labels=labels, las=1)
+  mtext("Distance (m)", side=4, line=4, cex=2)
   mtext(paste("US-SES Land Cover"), 3, line=1, font=2, cex=2)
   
   legend(1.12, 1, c("Bare", "Shrubs", "Herbaceous"), pch = 16, col=cols, cex=1.5)
@@ -5015,11 +5100,15 @@ if(T){
   pcols <- paste( rep(c("p1", "p2", "p3"), 10), rep(adatasets[1:10], each=3), sep="_" )
   
   pv <- apply(pmat[,pcols], 2, mean, na.r=T)
-  pb <- matrix(pv, nrow=3); colnames(pb) <- adatasets[1:10]; rownames(pb) <- c("p1", "p2", "p3")
+  pb <- matrix(pv, nrow=3)
+  colnames(pb) <- adatasets[1:10]
+  rownames(pb) <- c("p1", "p2", "p3")
   pb <- pb[,c(9, 1:4, 10, 5:8)]
   
   ps <- apply(pmat[,pcols], 2, sd, na.r=T)
-  pa <- matrix(ps, nrow=3); colnames(pa) <- adatasets[1:10]; rownames(pa) <- c("p1", "p2", "p3")
+  pa <- matrix(ps, nrow=3)
+  colnames(pa) <- adatasets[1:10]
+  rownames(pa) <- c("p1", "p2", "p3")
   pa <- pa[,c(9, 1:4, 10, 5:8)]
   
   
@@ -5028,8 +5117,8 @@ if(T){
   
   
   #### reshape data
-  pbi <- pb[c(2, 3, 1), 10:1];
-  pai <- pa[c(2, 3, 1), 10:1];
+  pbi <- pb[c(2, 3, 1), 10:1]
+  pai <- pa[c(2, 3, 1), 10:1]
   
   bplot <- "E:/REC_7_Data/10_Plots/9_footprints/"
   filenm <- paste(bplot, "land_cover_probabilities_all_year_h_EC0.png", sep="")
@@ -5039,9 +5128,11 @@ if(T){
   
   pbi_h <- barplot(pbi, las=1, beside=T, xlim=c(0, 1), cex.names=3, cex.axis=3, col=cols, horiz=T,
           names.arg = c("Ses EC4", "Ses EC3", "Ses EC2", "Ses EC1", "Ses EC0", 
-                        "Seg EC4", "Seg EC3", "Seg EC2", "Seg EC1", "Seg EC0"));
+                        "Seg EC4", "Seg EC3", "Seg EC2", "Seg EC1", "Seg EC0"))
   arrows(x0=pbi+pai, y0=pbi_h, x1=pbi-pai, y1=pbi_h, length=0, code=3, lwd=3)
-  mtext("Probability", 1, line=5, cex=3); abline(v=0.8, col="grey", lty=3); box()
+  mtext("Probability", 1, line=5, cex=3)
+  abline(v=0.8, col="grey", lty=3)
+  box()
   legend("bottomright", legend=c("Bare Ground", "Herbaceous", "Shrubs"), col=rev(cols), pch=16, cex=2.5)
   
   dev.off()
@@ -5128,7 +5219,8 @@ if(T){
   
   for(i in 1:length(mfx)){
   
-    aa <- dat_ym[,c(mfx[i], rfx[i])]; bb <- aa[complete.cases(aa),]
+    aa <- dat_ym[,c(mfx[i], rfx[i])]
+    bb <- aa[complete.cases(aa),]
     cc <- prcomp(bb)$rotation
     cors[i]   <-  cor(bb, method="pearson")[1,2]
     slopes[i] <-  beta  <-  cc[2,1]/cc[1,1]
@@ -5140,7 +5232,8 @@ if(T){
   lims_le <- range(datdd[, paste("LE_f", datasets, sep="_")], na.rm=T)
   lims_fc <- range(datdd[, paste("NEE_uStar_f", datasets, sep="_")], na.rm=T)
   
-  attr <- ""; if(vertical)attr <- "_vert"
+  attr <- ""
+  if(vertical)attr <- "_vert"
   pl_name <- paste("E:/REC_7_Data/10_Plots/LEC_cluster_agreement", attr, "_00.png", sep="")
   if(!vertical){
     png(pl_name, width=2700, height=1350)   
@@ -5199,7 +5292,8 @@ if(T){
       if(i==11)mtext("Shrubland", side=3, line=6, cex=4)
     }
     mtext(paste("y =", round(ints[i],3), "+", round(slopes[i],3),"x"), 
-          side=3, adj=0.05, line=-3, cex=2); abline(a=ints[i], b=slopes[i]);  # total least squares
+          side=3, adj=0.05, line=-3, cex=2)
+    abline(a=ints[i], b=slopes[i])  # total least squares
     mtext(paste("r:", round(cors[i],2)), side=3, adj=0.05, line=-6, cex=2)    # perason coef.
     mtext (pid[i], side=3, adj=0, line=1, cex=2.5)
     abline(a=0, b=1)
@@ -5269,7 +5363,8 @@ if(T){
   
   for(i in 1:length(mfx)){
     
-    aa <- dat_ym[,c(mfx[i], rfx[i])]; bb <- aa[complete.cases(aa),]
+    aa <- dat_ym[,c(mfx[i], rfx[i])]
+    bb <- aa[complete.cases(aa),]
     cc <- prcomp(bb)$rotation
     cors[i]   <-  cor(bb, method="pearson")[1,2]
     slopes[i] <-  beta  <-  cc[2,1]/cc[1,1]
@@ -5296,7 +5391,8 @@ if(T){
     par(mar=c(8,10,5,2))
     #if(vertical & i %in% c(10:12)){par(mar=c(8,10,15,2))}
     
-    k <- i; if(sites[st]=="SES")k <- i+length(mfx)/2
+    k <- i
+    if(sites[st]=="SES")k <- i+length(mfx)/2
     
     xlab <- bquote(.(xlab0[k]) ~ "(W m"^"-2"*")")  # expression() and paste() do not work together!
     ylab <- bquote(.(ylab0[k]) ~ "(W m"^"-2"*")")
@@ -5326,7 +5422,8 @@ if(T){
     #}
     
     mtext(paste("y =", round(ints[k],3), "+", round(slopes[k],3),"x"), 
-          side=3, adj=0.05, line=-3, cex=2); abline(a=ints[k], b=slopes[k]);  # total least squares
+          side=3, adj=0.05, line=-3, cex=2)
+    abline(a=ints[k], b=slopes[k])  # total least squares
     mtext(paste("r:", round(cors[k],2)), side=3, adj=0.05, line=-6, cex=2)    # perason coef.
     mtext (pid[i], side=3, adj=0, line=1, cex=2.5)
     abline(a=0, b=1)
