@@ -4845,7 +4845,7 @@ if(T){
     
     # Save vector
     gpath <- "E:/REC_7_Data/10_Plots/7_cumsum/"
-    outfile_v <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot_test.png", sep="")
+    outfile_v <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot_test.pdf", sep="")
     
     ggsave(pall,
            filename = outfile_v,
