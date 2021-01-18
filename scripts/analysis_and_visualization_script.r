@@ -18,8 +18,8 @@ library(plotrix)                                                                
 library(ggplot2)
 library(patchwork)                                                              # to arrange plots
 library(fields)                                                                 # to plot footprint
-library("BiocManager")
-BiocManager::install("EBImage")
+#library("BiocManager")
+#BiocManager::install("EBImage")
 library(spatialfil)
 library(viridis)                                                                # colour palette
 library(SPEI)
@@ -30,14 +30,14 @@ library(SPEI)
 ###
 
 ## Local version on Fabio's laptop
-# path  <-  "E:/REC_7_Data/8_datasets/"
-# rpath  <-  "E:/REC_7_Data/11_ReddyProc/"
-# mpath  <-  "E:/REC_7_Data/12_Marcys_data/"
+path  <-  "E:/REC_7_Data/8_datasets/"
+rpath  <-  "E:/REC_7_Data/11_ReddyProc/"
+mpath  <-  "E:/REC_7_Data/12_Marcys_data/"
 
 ## P drive
-path  <-  "P:/REC_7_Data/8_datasets/"
-rpath  <-  "P:/REC_7_Data/11_ReddyProc/"
-mpath  <-  "P:/REC_7_Data/12_Marcys_data/"
+#path  <-  "P:/REC_7_Data/8_datasets/"
+#rpath  <-  "P:/REC_7_Data/11_ReddyProc/"
+#mpath  <-  "P:/REC_7_Data/12_Marcys_data/"
 
 
 
@@ -4505,9 +4505,9 @@ if(T){
   
   
   day_only <- F
-  night_only <- F    # MUST be different from day_only !!!!
+  night_only <- F    
   pre_prec <- F
-  post_prec <- F     # MUST be different from post_prec !!!!
+  post_prec <- F     
   
   
   
@@ -4798,7 +4798,7 @@ if(T){
       geom_line(aes(y = NEE_uStar_f_gm, colour = "EC0")) +
       geom_line(aes(y = P_plot_nee_gm, colour = "prec")) +
       geom_point(aes(x=dt_2[1], y=ylim_c[1]), colour="white") + # only to specify lower end
-      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) + (ylim_p[2]), name = ya2)) +
+      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) - min(ylim_c*(-ylim_p[2]/diff(ylim_c))), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 45)) +
@@ -4816,7 +4816,7 @@ if(T){
       geom_line(aes(y = NEE_uStar_f_sm, colour = "EC0")) +
       geom_line(aes(y = P_plot_nee_sm, colour = "prec")) + 
       geom_point(aes(x=dt_2[1], y=ylim_c[1]), colour="white") + # only to specify lower end
-      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) + (ylim_p[2]), name = ya2)) +
+      scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) - min(ylim_c*(-ylim_p[2]/diff(ylim_c))), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 45)) +
@@ -4845,7 +4845,7 @@ if(T){
     
     # Save vector
     gpath <- "E:/REC_7_Data/10_Plots/7_cumsum/"
-    outfile_v <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot.pdf", sep="")
+    outfile_v <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot_test.png", sep="")
     
     ggsave(pall,
            filename = outfile_v,
