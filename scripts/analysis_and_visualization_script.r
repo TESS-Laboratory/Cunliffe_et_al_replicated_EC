@@ -5,8 +5,8 @@
 # Tested and working with R version 4.0.3
 
 # Note that this script currently includes many static file paths for outputs 
-# as well as buried setwd commands, which will prevent execution on different
-# machines as it stands.
+# as well as buried setwd commands, which prevent execution on different
+# machines.
 
 
 #### Load packages
@@ -18,8 +18,6 @@ library(plotrix)                                                                
 library(ggplot2)
 library(patchwork)                                                              # to arrange plots
 library(fields)                                                                 # to plot footprint
-#library("BiocManager")
-#BiocManager::install("EBImage")
 library(spatialfil)
 library(viridis)                                                                # colour palette
 library(SPEI)
@@ -29,10 +27,16 @@ library(SPEI)
 ### Paths for sourcing data ####
 ###
 
-## Local version on Fabio's laptop
+## Fabio's machine
 path  <-  "E:/REC_7_Data/8_datasets/"
 rpath  <-  "E:/REC_7_Data/11_ReddyProc/"
 mpath  <-  "E:/REC_7_Data/12_Marcys_data/"
+
+## Andy's machine
+# path  <-  "/REC_7_Data/8_datasets/"
+# rpath  <-  "/REC_7_Data/11_ReddyProc/"
+# mpath  <-  "/REC_7_Data/12_Marcys_data/"
+
 
 ## P drive
 #path  <-  "P:/REC_7_Data/8_datasets/"
@@ -72,7 +76,7 @@ colours <- c("orange", "purple", "green", "darkgreen", "brown", "cyan")         
 last_date    <-  "2020_01_01_from_flash_Txcor_"
 last_date_2  <-  "2020_02_19_from_flash_Txcor_"
 
-last_date_reddy  <-  "_2019_365"          # used for files ID    ----- from point 2.2 !!! 
+last_date_reddy  <-  "_2019_365"          # used for files ID    ----- from point 2.2 ! 
 last_date_use  <-  "01/11/2019"           # used for chron filtering
 
 date_start  <-  "01/11/2018"              # default: "01/11/2018"
@@ -95,8 +99,8 @@ datasets_fa  <-  c(datasets_f, "gm_f", "sm_f", "ga4_f", "sa4_f", "ga3_f", "sa3_f
                "ga23_f", "ga34_f", "ga42_f", "sa23_f", "sa34_f", "sa42_f")
 
 
-make_txt_for_reddy  <-  F        # prepare datasets for gapfilling
-run_reddy_proc  <-  F            # run gapfilling code
+make_txt_for_reddy  <-  F        # prepare datasets for gap filling
+run_reddy_proc  <-  F            # run gap filling code
 
 
 
@@ -125,46 +129,8 @@ if(T){
   
   # remove last element from an entire vector
   sub_last <- function(x){x <- x-x[length(x)]}
-  
-  
-  # create custom ggplot2 theme  # Not currently used
-  # theme_fancy  <-  function() {
-  #   theme_bw() +
-  #   theme(
-  #   text = element_text(family = "Helvetica"),
-  #   axis.text = element_text(size = 8, colour = "black"),
-  #   axis.title = element_text(size =  10, colour = "black"),
-  #   axis.line.x = element_line(size = 0.3, colour = "black"),
-  #   axis.line.y = element_line(size = 0.3, colour = "black"),
-  #   axis.ticks = element_line(size = 0.3, colour = "black"),
-  #   panel.border = element_blank(),
-  #   panel.grid.major.x = element_blank(),
-  #   panel.grid.minor.x = element_blank(),
-  #   panel.grid.minor.y = element_blank(),
-  #   panel.grid.major.y = element_blank(),
-  #   plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), units = , "cm"),
-  #   plot.title = element_text(
-  #         size = 10,
-  #         vjust = 1,
-  #         hjust = 0.5,
-  #         colour = "black"
-  #         ),
-  #   legend.text = element_text(size = 10, colour = "black"),
-  #   legend.title = element_text(size = 10, colour = "black"),
-  #   legend.position = c(0.9, 0.9),
-  #   legend.key.size = unit(0.9, "line"),
-  #   legend.background = element_rect(
-  #         colour = "black",
-  #         fill = "transparent",
-  #         size = 2,
-  #         linetype = "blank"
-  #         )
-  #    )
-  # }
 
 }
-
-
 
 
 
@@ -2057,7 +2023,7 @@ if(F){
           if(!(dt %in% c(9,10))){
             #zmax <- 0.00031
             FFP <-  calc_footprint_FFP_climatology(
-              zm=   rep(6 - (0.67 * canopy_h), length(is)),    # Meas h. above displacement h.  
+              zm=   rep(6 - (0.67 * canopy_h), length(is)),    # Measurement height above displacement height.  
               z0=   rep(     0.15 * canopy_h,  length(is)),    # Roughness length
               umean=NA,
               h=    rep(1000, length(is)),             # PBL depth (set always at 1000)
@@ -2095,7 +2061,7 @@ if(F){
           
           if(dt %in% c(9,10)){
             FFP <-  calc_footprint_FFP_climatology(
-              zm=   rep(3 - (0.67 * canopy_h), length(is)),    # Meas h. above displacement h.  
+              zm=   rep(3 - (0.67 * canopy_h), length(is)),    # Measurement height above displacement height.
               z0=   rep(     0.15 * canopy_h,  length(is)),    # Roughness length
               umean=NA,
               h=    rep(1000, length(is)),             # PBL depth (set always at 1000)
@@ -3491,7 +3457,6 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
     geom_bin2d(bins = 150, show.legend=T) +   # Bin size control 
     scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lims_h) + ylim(lims_h) +
-    #theme_fancy() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
     theme(text = element_text(size=14)) + 
     theme(legend.key.size = unit(0.5, "cm")) +   # legend size
@@ -3514,7 +3479,6 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
     geom_bin2d(bins = 150) +                       # Bin size control 
     scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lims_h) + ylim(lims_h) +
-    #theme_fancy() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
     theme(text = element_text(size=14)) + 
     theme(legend.key.size = unit(0.5, "cm")) +   # legend size
@@ -3535,7 +3499,6 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
     geom_bin2d(bins = 150) +                       # Bin size control 
     scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lims_le) + ylim(lims_le) +
-    #theme_fancy() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
     theme(text = element_text(size=14)) + 
     theme(legend.key.size = unit(0.5, "cm")) +   # legend size
@@ -3556,7 +3519,6 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
     geom_bin2d(bins = 150) +                       # Bin size control 
     scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lims_le) + ylim(lims_le) +
-    #theme_fancy() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
     theme(text = element_text(size=14)) + 
     theme(legend.key.size = unit(0.5, "cm")) +   # legend size
@@ -3577,7 +3539,6 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
     geom_bin2d(bins = 150) +                       # Bin size control 
     scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lims_fc) + ylim(lims_fc) +
-    #theme_fancy() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
     theme(text = element_text(size=14)) + 
     theme(legend.key.size = unit(0.5, "cm")) +   # legend size
@@ -3598,7 +3559,6 @@ plot_REC1_vs_conv1_ggplot <- function(mode, dat_ym=dat_ym, mon=mm, year=yy, no_s
     geom_bin2d(bins = 150) +                       # Bin size control 
     scale_fill_continuous(type = "viridis") +     # colour palette
     theme_bw() + xlim(lims_fc) + ylim(lims_fc) +
-    #theme_fancy() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
     theme(text = element_text(size=14)) + 
     theme(legend.key.size = unit(0.5, "cm")) +   # legend size
@@ -4632,99 +4592,99 @@ if(T){
   
   
   gpath <- "E:/REC_7_Data/10_Plots/7_cumsum/"
-  png(paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_corr_00.png", sep=""), width=1200, height=1200)
-  
-  #par(mfrow=c(2,2), mar = c(3, 3, 3, 2), oma = c(3, 3, 5, 1), mgp=c(2, 0.5, 0))
-  if(!add_prec)par(mfrow=c(2,2), mar = c(7, 6, 5, 2), mgp=c(2, 0.5, 0), tck=0.01)  # mar = c(5, 6, 5, 2)
-  if(add_prec)par(mfrow=c(2,2), mar = c(7, 6, 5, 5), mgp=c(2, 0.5, 0), tck=0.01)
-  
-  
-  
-  
-  ## plot 1
-  plot(dmat[,1]~dmat[,"dt"], type='n', xlim=xlim, ylim=ylim_l, axes=F, xlab="", ylab="") 
-  for(i in tp1){lines(dmat[,les[i]]~dmat[,"dt"], col=cols[i])}
-  
-  
-  axis(2, cex.axis=2); box(); 
-  #mtext(paste("Cumulative LE (MW m-2)",sep=""), side=2, line=3, cex=2)
-  mtext(expression("Cumulative LE (MW m"^"-2"*")",sep=""), side=2, line=3, cex=2)
-  mtext("LE Grassland", side=3, line=1, cex=3)
-  mtext ("a)", side=3, adj=0, line=1, cex=3)
-  
-  #legend("top", les[tp1], ncol=2, col=cols[tp1], pch=16, cex=2)
-  legend("left", c(legend_g, "Precip"), ncol=2, col=c(cols[tp1],"cyan"), pch=16, cex=1.5)
-  axis.Date(1, at=seq(min(datdd[,"dt"]), max(datdd[,"dt"]), by="months"), cex.axis=2, las=2, format="%b-%y"); 
-  if(add_prec){  par(new=T)
-    plot(dmat[,"dt"], dmat[,"P_gm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
-    axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
-  }
-  
-  
-  
-  ## plot 2
-  plot(dmat[,1]~dmat[,"dt"], type='n', xlim=xlim, ylim=ylim_l, axes=F, xlab="", ylab="") 
-  for(i in tp2){lines(dmat[,les[i]]~dmat[,"dt"], col=cols[i])}
-  
-  axis(2, cex.axis=2); box(); 
-  #mtext(paste("Cumulative LE (MW m-2)",sep=""), side=2, line=3, cex=2)
-  mtext(expression("Cumulative LE (MW m"^"-2"*")",sep=""), side=2, line=3, cex=2)
-  mtext("LE Shrubland", side=3, line=1 ,cex=3)
-  mtext ("b)", side=3, adj=0, line=1, cex=3)
-  
-  #legend("top", les[tp2], ncol=2, col=cols[tp2], pch=16, cex=2)
-  #legend("left", c(legend_s, "Precip"), ncol=2, col=c(cols[tp1],"cyan"), pch=16, cex=1.5)
-  axis.Date(1, at=seq(min(datdd[,"dt"]), max(datdd[,"dt"]), by="months"), cex.axis=2, las=2, format="%b-%y"); 
-  if(add_prec){  par(new=T)
-    plot(dmat[,"dt"], dmat[,"P_sm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
-    axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
-  }
-  
-  
-  
-  ## plot 3
-  plot(dmat[,1]~dmat[,"dt"], type='n', xlim=xlim, ylim=ylim_c, axes=F, xlab="", ylab="") 
-  for(i in tp1){lines(dmat[,nees[i]]~dmat[,"dt"], col=cols[i])}
-  abline(h=0, col="grey")
-  
-  axis(2, cex.axis=2); box(); 
-  mtext(expression("Cumulative NEE (gC m"^"-2"*")",sep=""), side=2, line=3, cex=2)
-  
-  #mtext(expression("Cumulative LE (MW m"^"-2"*")",sep=""), side=2, line=3, cex=2)
-  
-  mtext("NEE Grassland", side=3, line=1, cex=3)
-  mtext ("c)", side=3, adj=0, line=1, cex=3)
-  
-  #legend("top", nees[tp1], ncol=2, col=cols[tp1], pch=16, cex=2)
-  #legend("bottomleft", c(legend_g, "Precip"), ncol=2, col=c(cols[tp1],"cyan"), pch=16, cex=1.5)
-  axis.Date(1, at=seq(min(datdd[,"dt"]), max(datdd[,"dt"]), by="months"), cex.axis=2, las=2, format="%b-%y"); 
-  if(add_prec){  par(new=T)
-    plot(dmat[,"dt"], dmat[,"P_gm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
-    axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
-  }
-  
-  
-  
-  ## plot 4 
-  plot(dmat[,1]~dmat[,"dt"], type='n', xlim=xlim, ylim=ylim_c, axes=F, xlab="", ylab="") 
-  for(i in tp2){lines(dmat[,nees[i]]~dmat[,"dt"], col=cols[i])}
-  abline(h=0, col="grey")
-  
-  axis(2, cex.axis=2); box(); 
-  #mtext(paste("Cumulative NEE (gC m-2)",sep=""), side=2, line=3, cex=2)
-  mtext(expression("Cumulative NEE (gC m"^"-2"*")",sep=""), side=2, line=3, cex=2)
-  mtext("NEE Shrubland", side=3, line=1 ,cex=3)
-  mtext ("d)", side=3, adj=0, line=1, cex=3)
-  
-  #legend("top", nees[tp2], ncol=2, col=cols[tp2], pch=16, cex=2)
-  #legend("bottomleft", c(legend_s, "Precip"), ncol=2, col=c(cols[tp1],"cyan"), pch=16, cex=1.5)
-  axis.Date(1, at=seq(min(datdd[,"dt"]), max(datdd[,"dt"]), by="months"), cex.axis=2, las=2, format="%b-%y"); 
-  if(add_prec){  par(new=T)
-    plot(dmat[,"dt"], dmat[,"P_sm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
-    axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
-  }
-  
-  dev.off()
+  # png(paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_corr_00.png", sep=""), width=1200, height=1200)
+  # 
+  # #par(mfrow=c(2,2), mar = c(3, 3, 3, 2), oma = c(3, 3, 5, 1), mgp=c(2, 0.5, 0))
+  # if(!add_prec)par(mfrow=c(2,2), mar = c(7, 6, 5, 2), mgp=c(2, 0.5, 0), tck=0.01)  # mar = c(5, 6, 5, 2)
+  # if(add_prec)par(mfrow=c(2,2), mar = c(7, 6, 5, 5), mgp=c(2, 0.5, 0), tck=0.01)
+  # 
+  # 
+  # 
+  # 
+  # ## plot 1
+  # plot(dmat[,1]~dmat[,"dt"], type='n', xlim=xlim, ylim=ylim_l, axes=F, xlab="", ylab="") 
+  # for(i in tp1){lines(dmat[,les[i]]~dmat[,"dt"], col=cols[i])}
+  # 
+  # 
+  # axis(2, cex.axis=2); box(); 
+  # #mtext(paste("Cumulative LE (MW m-2)",sep=""), side=2, line=3, cex=2)
+  # mtext(expression("Cumulative LE (MW m"^"-2"*")",sep=""), side=2, line=3, cex=2)
+  # mtext("LE Grassland", side=3, line=1, cex=3)
+  # mtext ("a)", side=3, adj=0, line=1, cex=3)
+  # 
+  # #legend("top", les[tp1], ncol=2, col=cols[tp1], pch=16, cex=2)
+  # legend("left", c(legend_g, "Precip"), ncol=2, col=c(cols[tp1],"cyan"), pch=16, cex=1.5)
+  # axis.Date(1, at=seq(min(datdd[,"dt"]), max(datdd[,"dt"]), by="months"), cex.axis=2, las=2, format="%b-%y"); 
+  # if(add_prec){  par(new=T)
+  #   plot(dmat[,"dt"], dmat[,"P_gm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
+  #   axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
+  # }
+  # 
+  # 
+  # 
+  # ## plot 2
+  # plot(dmat[,1]~dmat[,"dt"], type='n', xlim=xlim, ylim=ylim_l, axes=F, xlab="", ylab="") 
+  # for(i in tp2){lines(dmat[,les[i]]~dmat[,"dt"], col=cols[i])}
+  # 
+  # axis(2, cex.axis=2); box(); 
+  # #mtext(paste("Cumulative LE (MW m-2)",sep=""), side=2, line=3, cex=2)
+  # mtext(expression("Cumulative LE (MW m"^"-2"*")",sep=""), side=2, line=3, cex=2)
+  # mtext("LE Shrubland", side=3, line=1 ,cex=3)
+  # mtext ("b)", side=3, adj=0, line=1, cex=3)
+  # 
+  # #legend("top", les[tp2], ncol=2, col=cols[tp2], pch=16, cex=2)
+  # #legend("left", c(legend_s, "Precip"), ncol=2, col=c(cols[tp1],"cyan"), pch=16, cex=1.5)
+  # axis.Date(1, at=seq(min(datdd[,"dt"]), max(datdd[,"dt"]), by="months"), cex.axis=2, las=2, format="%b-%y"); 
+  # if(add_prec){  par(new=T)
+  #   plot(dmat[,"dt"], dmat[,"P_sm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
+  #   axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
+  # }
+  # 
+  # 
+  # 
+  # ## plot 3
+  # plot(dmat[,1]~dmat[,"dt"], type='n', xlim=xlim, ylim=ylim_c, axes=F, xlab="", ylab="") 
+  # for(i in tp1){lines(dmat[,nees[i]]~dmat[,"dt"], col=cols[i])}
+  # abline(h=0, col="grey")
+  # 
+  # axis(2, cex.axis=2); box(); 
+  # mtext(expression("Cumulative NEE (gC m"^"-2"*")",sep=""), side=2, line=3, cex=2)
+  # 
+  # #mtext(expression("Cumulative LE (MW m"^"-2"*")",sep=""), side=2, line=3, cex=2)
+  # 
+  # mtext("NEE Grassland", side=3, line=1, cex=3)
+  # mtext ("c)", side=3, adj=0, line=1, cex=3)
+  # 
+  # #legend("top", nees[tp1], ncol=2, col=cols[tp1], pch=16, cex=2)
+  # #legend("bottomleft", c(legend_g, "Precip"), ncol=2, col=c(cols[tp1],"cyan"), pch=16, cex=1.5)
+  # axis.Date(1, at=seq(min(datdd[,"dt"]), max(datdd[,"dt"]), by="months"), cex.axis=2, las=2, format="%b-%y"); 
+  # if(add_prec){  par(new=T)
+  #   plot(dmat[,"dt"], dmat[,"P_gm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
+  #   axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
+  # }
+  # 
+  # 
+  # 
+  # ## plot 4 
+  # plot(dmat[,1]~dmat[,"dt"], type='n', xlim=xlim, ylim=ylim_c, axes=F, xlab="", ylab="") 
+  # for(i in tp2){lines(dmat[,nees[i]]~dmat[,"dt"], col=cols[i])}
+  # abline(h=0, col="grey")
+  # 
+  # axis(2, cex.axis=2); box(); 
+  # #mtext(paste("Cumulative NEE (gC m-2)",sep=""), side=2, line=3, cex=2)
+  # mtext(expression("Cumulative NEE (gC m"^"-2"*")",sep=""), side=2, line=3, cex=2)
+  # mtext("NEE Shrubland", side=3, line=1 ,cex=3)
+  # mtext ("d)", side=3, adj=0, line=1, cex=3)
+  # 
+  # #legend("top", nees[tp2], ncol=2, col=cols[tp2], pch=16, cex=2)
+  # #legend("bottomleft", c(legend_s, "Precip"), ncol=2, col=c(cols[tp1],"cyan"), pch=16, cex=1.5)
+  # axis.Date(1, at=seq(min(datdd[,"dt"]), max(datdd[,"dt"]), by="months"), cex.axis=2, las=2, format="%b-%y"); 
+  # if(add_prec){  par(new=T)
+  #   plot(dmat[,"dt"], dmat[,"P_sm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
+  #   axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
+  # }
+  # 
+  # dev.off()
   
   
   ### ggplot version
@@ -4768,7 +4728,7 @@ if(T){
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 45)) +
       theme(legend.title = element_blank(), legend.position = c(0.15, 0.50)) +    # legend position
-      theme( axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
+      theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
       scale_colour_manual(values = colours)
       
     
@@ -4785,7 +4745,7 @@ if(T){
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 45)) +
       theme(legend.position="none") +  
-      theme( axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
+      theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
       scale_colour_manual(values = colours)
       
     
@@ -4803,12 +4763,12 @@ if(T){
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 45)) +
       theme(legend.position="none") +  
-      theme( axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
+      theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
       scale_colour_manual(values = colours)
     
     
     p4 <- ggplot(dmat, aes(x=dt_2)) +
-      labs(x = "", y = expression("Cumulative NEE (g C m"^"-2"*")",sep=""), title = "NEE Grassland") +
+      labs(x = "", y = expression("Cumulative NEE (g C m"^"-2"*")",sep=""), title = "NEE Shrubland") +
       geom_line(aes(y = NEE_uStar_f_s1, colour = "EC1")) + 
       geom_line(aes(y = NEE_uStar_f_s2, colour = "EC2")) + 
       geom_line(aes(y = NEE_uStar_f_s3, colour = "EC3")) + 
@@ -4821,16 +4781,13 @@ if(T){
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
       theme(axis.text.x = element_text(angle = 45)) +
       theme(legend.position="none") +
-      theme( axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
+      theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
       scale_colour_manual(values = colours)
-    
     
     
     ## combine plots using Patchwork
     pall <- (p1 + p2) / (p3 + p4) +
       plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97)) 
-    
-    
     
     
     # Save raster
