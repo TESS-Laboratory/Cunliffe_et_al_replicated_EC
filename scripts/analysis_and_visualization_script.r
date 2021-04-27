@@ -2252,24 +2252,20 @@ if(F){
   
 } # Kljun climatology for 2 clusters (monthly avg days)
 
-### actual script for footprint generation / analysis
+### Script for footprint generation / analysis
 
 if(F){  
   
   
-  # ========================================================================================== #
-  ###### 6.3 hourly footprint for clusters / probability sum for clusters (/5) and towers ######
-  # ========================================================================================== #
+  # ===================================================================================== #
+  ###### 6.3 hourly footprint for clusters / probability sum for clusters and towers ######
+  # ===================================================================================== #
   
 
-  
   mon_ys <- unique(datfoot0[,c("yyyy", "mon")])
   datfoot_t <- datfoot0
   abort_plot <- F
-  
-   
-   
-  
+
   
   for(k in 1:nrow(mon_ys)){  # loops over different months
     
@@ -2345,7 +2341,7 @@ if(F){
             if(length(FFP$fclim_2d)==1){abort_plot <- T; break}
             
             
-            #### traslate SEG 1:4 and lines with respect to US-SEX (distances from arcGIS)
+            #### traslate SEG 1:4 and lines with respect to US-SEX (distances from ArcGIS)
             if(mt3=="SEG_REC1"){xt <- (-15); yt <-   15 }
             if(mt3=="SEG_REC2"){xt <-  (-6); yt <-   81 }
             if(mt3=="SEG_REC3"){xt <-  (72); yt <- (-38)}
@@ -2359,9 +2355,7 @@ if(F){
             FFP$x_2d <- FFP$x_2d+xt; FFP$y_2d <- FFP$y_2d+yt; 
             for(j in 1:length(FFP$xr)){FFP$xr[[j]] <- FFP$xr[[j]]+xt; FFP$yr[[j]] <- FFP$yr[[j]]+yt}
             
-            
           }
-          
           
           
           
@@ -2388,7 +2382,6 @@ if(F){
           
           
           
-          
           # Single tower land cover probabilities
           
           neofoot <- matrix(0, ncol=2*xl+1, nrow=2*xl+1)
@@ -2405,12 +2398,11 @@ if(F){
           neofoot[(xmin0:xmax0)+xl+1, (ymin0:ymax0)+xl+1] <- cutfoot
           
           
-          # calculate probabilities of entire footprint (probably not very useful)
+          # calculate probabilities of entire footprint (not used in analysis)
           pt <- sum(neofoot)
           p1 <- sum(neofoot[sel1], na.rm=T); p2 <- sum(neofoot[sel2], na.rm=T); p3 <- sum(neofoot[sel3], na.rm=T)
           ps <- sum(p1+p2+p3)
           pmat[i , paste(c("pt", "p1", "p2", "p3", "ps"), adatasets[dt], sep="_")] <- c(pt, p1, p2, p3, ps)
-          
           
           
           
@@ -2512,7 +2504,6 @@ if(F){
           }
           
         }
-        
         
         
         
@@ -4188,6 +4179,7 @@ if(T){
 if(T){
   
   # daily land cover probabilities
+  # average the proportion of land cover sampled in each time step
   
   for(k in 1:12){   # loops over months
     #k <- 12
