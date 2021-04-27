@@ -25,13 +25,9 @@ df_2001_2005 <- read_csv("data/meteorological_data/sev1_meteorology_2001-2005.tx
 
 df_2006_2010 <- read_csv("data/meteorological_data/sev1_meteorology_2006-2010.txt")
 
-# NB. This file contains no data in the 'Bar_Pressure column'?!
-df_2011_2015 <- read_csv("data/meteorological_data/sev1_meteorology_2011-2015.txt")
+# NB. The header of this file has been shifted off by one place', so I've skipped the header row and recycled column headers
+df_2011_2015 <- read_csv("data/meteorological_data/sev1_meteorology_2011-2015.txt", skip = 1, col_names = col_names)
 
-
-# Remove the 'RecordID' column from the 2011-2015 file to facilitate merging with the other files.
-df_2011_2015 <- df_2011_2015 %>% 
-  select(-RecordID)
 
 # Combine data
 df <- rbind(df_1988_1995, df_1996_2000, df_2001_2005, df_2006_2010, df_2011_2015)
@@ -66,7 +62,10 @@ df2 <- df %>%
 # -------------- 3. Analyze Data --------------
 
 # The longest running station is StationID = 40, which has been running since mid 1987.
+# Station 40 is still pretty close to our study site and is representative for annual totals. 
 
+
+### Extract annual statistics ###
 AnnualPrecip_Station40 <- df2 %>% 
   filter(StationID == 40) %>% 
   group_by(Year) %>% 
@@ -90,18 +89,18 @@ AnnualTemp_Station49 <- df2 %>%
   summarise(Temp_C = mean(Temp_C, na.rm = TRUE))
 
 
-### summarise Mean Annual Precipitation
+
+### Extract mean annual statistics ###
+
+## Mean Annual Precipitation
 (mean_precip_ID40 <- mean(AnnualPrecip_Station40$Precipitation))
 (mean_precip_ID49 <- mean(AnnualPrecip_Station49$Precipitation))
 
-### summarise Mean Annual Temperature 
+## Mean Annual Temperature 
 (mean_temp_ID40 <- mean(AnnualTemp_Station40$Temp_C))
 (mean_temp_ID49 <- mean(AnnualTemp_Station49$Temp_C))
 
-### Station 49 is ~0.8 degrees warmer and receives ~15 mm more precipitation than Station 40... (over different periods though!)
-
-
-# calculate IQR
+## Calculate IQR
 (iqr_ID40 <- IQR(AnnualPrecip_Station40$Precipitation))
 (iqr_ID49 <- IQR(AnnualPrecip_Station49$Precipitation))
 
@@ -116,30 +115,10 @@ AnnualTemp_Station49 <- df2 %>%
     geom_line(aes(y = mean_precip_ID40)) +
     geom_line(aes(y = (mean_precip_ID40-(iqr_ID40/2))), linetype = "dashed") +
     geom_line(aes(y = (mean_precip_ID40+(iqr_ID40/2))), linetype = "dashed") +
-    coord_cartesian(ylim=c(0, 550)) +
-    theme_bw() +
+   coord_cartesian(xlim=c(1987,2020), ylim=c(0, 550)) +
+   theme_bw() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
   )
   
 
-(precip_ID49 <- ggplot(AnnualPrecip_Station49, aes(x=Year, y=Precipitation)) +
-    labs(x = "Year", y = "Annual Precipitation (mm)", title = "Station 49") +
-    geom_point(aes(x=Year, y=Precipitation)) +
-    geom_line(aes(y = mean_precip_ID49)) +
-    geom_line(aes(y = (mean_precip_ID49-(iqr_ID49/2))), linetype = "dashed") +
-    geom_line(aes(y = (mean_precip_ID49+(iqr_ID49/2))), linetype = "dashed") +
-    coord_cartesian(ylim=c(0, 550)) +
-    theme_bw() +
-    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-  )
 
-#### Outstanding Questions ####
-# missing years of data? I should have 2010-2015-
-
-# Where exactly is station 40
-
-
-# Possible to align years with our years?
-
-
-# Add most recent data missing from 2016-2020 - ask Kris Hall Information Manager - and also share about missing header on other met file.
