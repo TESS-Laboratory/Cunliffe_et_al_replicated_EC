@@ -4583,103 +4583,7 @@ if(T){
   if(day_only | night_only){ylim_c <- c(-60, 80)}
   
   
-  gpath <- "E:/REC_7_Data/10_Plots/7_cumsum/"
-  # png(paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_corr_00.png", sep=""), width=1200, height=1200)
-  # 
-  # #par(mfrow=c(2,2), mar = c(3, 3, 3, 2), oma = c(3, 3, 5, 1), mgp=c(2, 0.5, 0))
-  # if(!add_prec)par(mfrow=c(2,2), mar = c(7, 6, 5, 2), mgp=c(2, 0.5, 0), tck=0.01)  # mar = c(5, 6, 5, 2)
-  # if(add_prec)par(mfrow=c(2,2), mar = c(7, 6, 5, 5), mgp=c(2, 0.5, 0), tck=0.01)
-  # 
-  # 
-  # 
-  # 
-  # ## plot 1
-  # plot(dmat[,1]~dmat[,"dt"], type='n', xlim=xlim, ylim=ylim_l, axes=F, xlab="", ylab="") 
-  # for(i in tp1){lines(dmat[,les[i]]~dmat[,"dt"], col=cols[i])}
-  # 
-  # 
-  # axis(2, cex.axis=2); box(); 
-  # #mtext(paste("Cumulative LE (MW m-2)",sep=""), side=2, line=3, cex=2)
-  # mtext(expression("Cumulative LE (MW m"^"-2"*")",sep=""), side=2, line=3, cex=2)
-  # mtext("LE Grassland", side=3, line=1, cex=3)
-  # mtext ("a)", side=3, adj=0, line=1, cex=3)
-  # 
-  # #legend("top", les[tp1], ncol=2, col=cols[tp1], pch=16, cex=2)
-  # legend("left", c(legend_g, "Precip"), ncol=2, col=c(cols[tp1],"cyan"), pch=16, cex=1.5)
-  # axis.Date(1, at=seq(min(datdd[,"dt"]), max(datdd[,"dt"]), by="months"), cex.axis=2, las=2, format="%b-%y"); 
-  # if(add_prec){  par(new=T)
-  #   plot(dmat[,"dt"], dmat[,"P_gm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
-  #   axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
-  # }
-  # 
-  # 
-  # 
-  # ## plot 2
-  # plot(dmat[,1]~dmat[,"dt"], type='n', xlim=xlim, ylim=ylim_l, axes=F, xlab="", ylab="") 
-  # for(i in tp2){lines(dmat[,les[i]]~dmat[,"dt"], col=cols[i])}
-  # 
-  # axis(2, cex.axis=2); box(); 
-  # #mtext(paste("Cumulative LE (MW m-2)",sep=""), side=2, line=3, cex=2)
-  # mtext(expression("Cumulative LE (MW m"^"-2"*")",sep=""), side=2, line=3, cex=2)
-  # mtext("LE Shrubland", side=3, line=1 ,cex=3)
-  # mtext ("b)", side=3, adj=0, line=1, cex=3)
-  # 
-  # #legend("top", les[tp2], ncol=2, col=cols[tp2], pch=16, cex=2)
-  # #legend("left", c(legend_s, "Precip"), ncol=2, col=c(cols[tp1],"cyan"), pch=16, cex=1.5)
-  # axis.Date(1, at=seq(min(datdd[,"dt"]), max(datdd[,"dt"]), by="months"), cex.axis=2, las=2, format="%b-%y"); 
-  # if(add_prec){  par(new=T)
-  #   plot(dmat[,"dt"], dmat[,"P_sm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
-  #   axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
-  # }
-  # 
-  # 
-  # 
-  # ## plot 3
-  # plot(dmat[,1]~dmat[,"dt"], type='n', xlim=xlim, ylim=ylim_c, axes=F, xlab="", ylab="") 
-  # for(i in tp1){lines(dmat[,nees[i]]~dmat[,"dt"], col=cols[i])}
-  # abline(h=0, col="grey")
-  # 
-  # axis(2, cex.axis=2); box(); 
-  # mtext(expression("Cumulative NEE (gC m"^"-2"*")",sep=""), side=2, line=3, cex=2)
-  # 
-  # #mtext(expression("Cumulative LE (MW m"^"-2"*")",sep=""), side=2, line=3, cex=2)
-  # 
-  # mtext("NEE Grassland", side=3, line=1, cex=3)
-  # mtext ("c)", side=3, adj=0, line=1, cex=3)
-  # 
-  # #legend("top", nees[tp1], ncol=2, col=cols[tp1], pch=16, cex=2)
-  # #legend("bottomleft", c(legend_g, "Precip"), ncol=2, col=c(cols[tp1],"cyan"), pch=16, cex=1.5)
-  # axis.Date(1, at=seq(min(datdd[,"dt"]), max(datdd[,"dt"]), by="months"), cex.axis=2, las=2, format="%b-%y"); 
-  # if(add_prec){  par(new=T)
-  #   plot(dmat[,"dt"], dmat[,"P_gm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
-  #   axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
-  # }
-  # 
-  # 
-  # 
-  # ## plot 4 
-  # plot(dmat[,1]~dmat[,"dt"], type='n', xlim=xlim, ylim=ylim_c, axes=F, xlab="", ylab="") 
-  # for(i in tp2){lines(dmat[,nees[i]]~dmat[,"dt"], col=cols[i])}
-  # abline(h=0, col="grey")
-  # 
-  # axis(2, cex.axis=2); box(); 
-  # #mtext(paste("Cumulative NEE (gC m-2)",sep=""), side=2, line=3, cex=2)
-  # mtext(expression("Cumulative NEE (gC m"^"-2"*")",sep=""), side=2, line=3, cex=2)
-  # mtext("NEE Shrubland", side=3, line=1 ,cex=3)
-  # mtext ("d)", side=3, adj=0, line=1, cex=3)
-  # 
-  # #legend("top", nees[tp2], ncol=2, col=cols[tp2], pch=16, cex=2)
-  # #legend("bottomleft", c(legend_s, "Precip"), ncol=2, col=c(cols[tp1],"cyan"), pch=16, cex=1.5)
-  # axis.Date(1, at=seq(min(datdd[,"dt"]), max(datdd[,"dt"]), by="months"), cex.axis=2, las=2, format="%b-%y"); 
-  # if(add_prec){  par(new=T)
-  #   plot(dmat[,"dt"], dmat[,"P_sm"], col='cyan', ylim=rev(ylim_p), type="l", axes=F, xlab="", ylab="")
-  #   axis(4, cex.axis=2, mgp=c(4, 1, 0)); mtext("Precip (mm / h)", side=4, line=3, cex=2)
-  # }
-  # 
-  # dev.off()
-  
-  
-  ### ggplot version
+
     # time stamp
     mthetimes <-  as.POSIXct(dmat[,"dt"], format="%d/%m/%y %H:%M:%S") 
     dmat$dt_2 <- mthetimes
@@ -4718,8 +4622,8 @@ if(T){
       scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = ya2)) +
       theme_bw() +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-      theme(axis.text.x = element_text(angle = 45)) +
-      theme(legend.title = element_blank(), legend.position = c(0.15, 0.50)) +    # legend position
+      theme(axis.text.x = element_text(angle = 45, vjust=0.3)) +
+      theme(legend.title = element_blank(), legend.text = element_text(size = 8), legend.position = c(0.18, 0.52)) +    # legend position
       theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
       scale_colour_manual(values = colours)
       
@@ -4735,7 +4639,7 @@ if(T){
       scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-      theme(axis.text.x = element_text(angle = 45)) +
+      theme(axis.text.x = element_text(angle = 45, vjust=0.3)) +
       theme(legend.position="none") +  
       theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
       scale_colour_manual(values = colours)
@@ -4753,7 +4657,7 @@ if(T){
       scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) - min(ylim_c*(-ylim_p[2]/diff(ylim_c))), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-      theme(axis.text.x = element_text(angle = 45)) +
+      theme(axis.text.x = element_text(angle = 45, vjust=0.3)) +
       theme(legend.position="none") +  
       theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
       scale_colour_manual(values = colours)
@@ -4771,7 +4675,7 @@ if(T){
       scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) - min(ylim_c*(-ylim_p[2]/diff(ylim_c))), name = ya2)) +
       theme_bw() + 
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-      theme(axis.text.x = element_text(angle = 45)) +
+      theme(axis.text.x = element_text(angle = 45, vjust=0.3)) +
       theme(legend.position="none") +
       theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
       scale_colour_manual(values = colours)
