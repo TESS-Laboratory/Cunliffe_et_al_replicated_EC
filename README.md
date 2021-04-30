@@ -8,8 +8,7 @@ This repository contains R code for processing, analysing and visualizing the da
 
 
 ## This repo contains analysis_and_visualization.r
-   main script with analysis and visualization of conventional and REC fluxes
+   main script with analysis and visualization of conventional and REC fluxes and also a climate analysis script
 
-And also a climate analysis script, using data from 
-Meteorology Data from the Sevilleta National Wildlife Refuge, New Mexico (1988- present)
-(https://sevlter.unm.edu/content/meteorology-data-sevilleta-national-wildlife-refuge-new-mexico-1988-present) 
+## A static version of this repo is archived on Zenodo
+At https://doi.org/10.5281/zenodo.4730586
