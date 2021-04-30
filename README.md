@@ -7,11 +7,9 @@ This repository contains R code for processing, analysing and visualizing the da
 ## The processed half hourly EC flux data is archived with the UK Envrionmental Information Data Centre (https://eidc.ac.uk/) and AmeriFlux (https://ameriflux.lbl.gov/). DOI TBC.
 
 
-## This repo contains one large script
-analysis_and_visualization.r
+## This repo contains analysis_and_visualization.r
    main script with analysis and visualization of conventional and REC fluxes
 
-
-## Also a climate script, using data from 
+And also a climate analysis script, using data from 
 Meteorology Data from the Sevilleta National Wildlife Refuge, New Mexico (1988- present)
 (https://sevlter.unm.edu/content/meteorology-data-sevilleta-national-wildlife-refuge-new-mexico-1988-present) 
