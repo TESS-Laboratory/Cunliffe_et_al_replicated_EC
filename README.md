@@ -9,13 +9,14 @@ Schlumpf, Marcy Litvak, Richard Brazier, Timothy Hill.
 
 ## The manuscript is in review
 
-*The processed half hourly EC flux data is archived with the UK Envrionmental Information Data Centre (https://eidc.ac.uk/) and AmeriFlux (https://ameriflux.lbl.gov/). DOI TBC.*
+*The processed half hourly EC flux data is archived with the UK Environmental Information Data Center (https://eidc.ac.uk/) and AmeriFlux (https://ameriflux.lbl.gov/). DOI TBC.*
 
 
 ## This repo contains the following scripts
 *analysis_and_visualization.r*
 Main script with analysis and visualization of half-hourly fluxes from the 
-conventional and low-cost systems.
+conventional and low-cost systems, including gapfilling time series in 
+REdddyProc.
 
 *climate_analysis.R script*
 Main script for analysing the climate data (missing PET calculations).
