@@ -128,6 +128,7 @@ sub_last <- function(x){x <- x-x[length(x)]}
 
 
 
+
 #-------------- 1 Read REC csv data --------------
 
 for(i in 1:8){
@@ -183,7 +184,7 @@ for(i in 1:8){
   if(i %in% c(1:8)){
     if(T){  # add dt to dat2
       
-      ## sometimes, empty fator columns that are not visible in excel are added
+      ## sometimes, empty factor columns that are not visible in Excel are added
       dat2 <- dat2[, !grepl("X", colnames(dat2))     ]
       
       dtimes2 <- as.character(dat2[,1])
@@ -229,9 +230,9 @@ for(i in 1:8){
   # remove outliers/despike before ustar/gapfilling as in FLUXNET_2015 data processing protocol
   
   # remove outliers according to Tukey's Fence: 
-  # 1.5 times the interquartile difference (3 times iqd, it is "far out") 
+  # 1.5 times the interquartile difference (3 times IQD is "far out") 
   
-  for(fx in fluxesc){ # iqd*30 is 10 times what is considered "far out"
+  for(fx in fluxesc){ # #IQD*30 is 10 times what is considered "far out"
     #fx <- "Fcc"
     vec <- as.numeric(as.character(dat[,fx]))
     #vec <- dat[,fx]
@@ -243,7 +244,7 @@ for(i in 1:8){
     dat[,fx] <- vec
   }
   
-   dat[, fluxesc] <- despike(dat[, fluxesc])    # despike from oce package
+   dat[, fluxesc] <- oce::despike(dat[, fluxesc])    # Remove spiked from time series
   
   
   

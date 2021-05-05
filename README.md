@@ -14,10 +14,11 @@ Schlumpf, Marcy Litvak, Richard Brazier, Timothy Hill.
 
 ## This repo contains the following scripts
 *analysis_and_visualization.r*
-   main script with analysis and visualization of conventional and REC fluxes
+Main script with analysis and visualization of half-hourly fluxes from the 
+conventional and low-cost systems.
 
 *climate_analysis.R script*
-For analysing the climate data (incomplete)
+Main script for analysing the climate data (missing PET calculations).
 
 
 ## A static version of this repo is archived on Zenodo
