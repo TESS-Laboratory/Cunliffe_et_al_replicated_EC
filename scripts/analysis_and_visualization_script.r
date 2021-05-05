@@ -9,7 +9,9 @@
 # machines.
 
 
-#### Load packages
+# ------ 0.0 Setup Environment ----------
+## Load packages
+library(tidyverse)
 library(chron)
 library(oce)
 library(lubridate)
@@ -23,31 +25,27 @@ library(viridis)                                                                
 library(SPEI)
 
 
-###
-### Paths for sourcing data ####
-###
 
-## Fabio's machine
+#-------------- 0.1 Define paths --------------
+
+## Paths on Fabio's machine
 path  <-  "E:/REC_7_Data/8_datasets/"
 rpath  <-  "E:/REC_7_Data/11_ReddyProc/"
 mpath  <-  "E:/REC_7_Data/12_Marcys_data/"
 
-## Andy's machine
+## Paths Andy's machine
 # path  <-  "/REC_7_Data/8_datasets/"
 # rpath  <-  "/REC_7_Data/11_ReddyProc/"
 # mpath  <-  "/REC_7_Data/12_Marcys_data/"
 
 
-## P drive
+## Paths on P drive
 #path  <-  "P:/REC_7_Data/8_datasets/"
 #rpath  <-  "P:/REC_7_Data/11_ReddyProc/"
 #mpath  <-  "P:/REC_7_Data/12_Marcys_data/"
 
 
-
-###
-### Initialize lists ####
-###
+#-------------- 0.2 Initialize lists --------------
 sites  <-  c("SEG", "SES")
 recs  <-  1:4
 towers  <-  paste(rep(sites, each=4), rep(recs,2), sep="_REC")
@@ -104,42 +102,35 @@ run_reddy_proc  <-  F            # run gap filling code
 
 
 
+#-------------- 0.3 Create Custom Functions --------------
 
-### 
-### 0.0 customized functions   =====================
-### 
-if(T){
-  
-  ### flux-specific uncertainty from Hollinger 2005 
-  # https://stats.stackexchange.com/questions/281682/how-to-fit-a-data-against-a-laplace-double-exponential-distribution-and-check
-  laplace_err <- function(x){sqrt(2) * mean(abs(x - median(x, na.rm=T)), na.rm=T) / sqrt(sum(!is.na(x)))}
-  
-  ### find how many empty rows/cols there are here
-  sum_na <- function(x){sum(is.na(x))}
-  
-  # consider data up to X days before/after a certain time
-  day3_fun <- function(x){x <- x:(x+144)}   # consider data up to 3 days (144 h)after a certain time
-  pm_days_fun <- function(x, pm_days){x <- (x-(pm_days*48)):(x+(pm_days*48))}   # consider data up to ndays before and after a certain time
-  pm_days_be_fun <- function(x, pm_days){x <- (x[[1]]-(pm_days*48)):(x[[2]]+(pm_days*48))}   # consider data up to ndays before and after a time span
-  
-  
-  # calculate the standard deviation of the cumulative sum
-  cumsum_unc <- function(x){x <- sqrt( cumsum( x^2 ) )}    
-  
-  
-  # remove last element from an entire vector
-  sub_last <- function(x){x <- x-x[length(x)]}
+## flux-specific uncertainty from Hollinger 2005 
+# https://stats.stackexchange.com/questions/281682/how-to-fit-a-data-against-a-laplace-double-exponential-distribution-and-check
+laplace_err <- function(x){sqrt(2) * mean(abs(x - median(x, na.rm=T)), na.rm=T) / sqrt(sum(!is.na(x)))}
 
-}
+
+## count the number of NA rows/cols
+sum_na <- function(x){sum(is.na(x))}
+
+
+## consider data up to X days before/after a certain time
+day3_fun <- function(x){x <- x:(x+144)}   # consider data up to 3 days (144 h)after a certain time
+pm_days_fun <- function(x, pm_days){x <- (x-(pm_days*48)):(x+(pm_days*48))}   # consider data up to ndays before and after a certain time
+pm_days_be_fun <- function(x, pm_days){x <- (x[[1]]-(pm_days*48)):(x[[2]]+(pm_days*48))}   # consider data up to ndays before and after a time span
+
+
+## calculate the standard deviation of the cumulative sum
+cumsum_unc <- function(x){x <- sqrt( cumsum( x^2 ) )}    
+
+
+## remove last element from an entire vector
+sub_last <- function(x){x <- x-x[length(x)]}
 
 
 
+#-------------- 1 Read REC csv data --------------
 
-### 
-### 1.0 read REC csv datasets   ####
-### 
 for(i in 1:8){
-  
   
   dat  <- read.csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")
   dat2 <- read.csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")
@@ -1060,7 +1051,7 @@ if(F){
     #iris %>% head() is equivalent to head(iris).
     #iris %>% head() %>% summary() is equivalent to summary(head(iris))
     # moving average:
-    #ma  <-  function(x, n = 5){filter(x, rep(1 / n, n), sides = 2)}
+    #ma  <-  function(x, n = 5){stats::filter(x, rep(1 / n, n), sides = 2)}
     # aa <- stats::filter(dggp[,2], 1, sides=1) applies coeff to slot of values
     #If you use dplyr, be careful to specify stats::filter in the function above.
     
