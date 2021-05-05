@@ -9,16 +9,16 @@ Schlumpf, Marcy Litvak, Richard Brazier, Timothy Hill.
 
 ## The manuscript is in review
 
-## The processed half hourly EC flux data is archived with the UK Envrionmental Information Data Centre (https://eidc.ac.uk/) and AmeriFlux (https://ameriflux.lbl.gov/). DOI TBC.
+*The processed half hourly EC flux data is archived with the UK Envrionmental Information Data Centre (https://eidc.ac.uk/) and AmeriFlux (https://ameriflux.lbl.gov/). DOI TBC.*
 
 
 ## This repo contains the following scripts
-### analysis_and_visualization.r
+*analysis_and_visualization.r*
    main script with analysis and visualization of conventional and REC fluxes
-*climate_analysis.R script*
 
-###  climate_analysis.R script
+*climate_analysis.R script*
 For analysing the climate data (incomplete)
+
 
 ## A static version of this repo is archived on Zenodo
 https://doi.org/10.5281/zenodo.4730586
