@@ -2,17 +2,17 @@
 ## merges them into a single file
 ## performs visualization and data analysis
 
-# Tested and working with R version 4.0.3
+# Tested with R v4.0.3
 
 # Note that this script currently includes many static file paths for outputs 
-# as well as buried setwd commands, which prevent execution on different
+# as well as buried setwd commands, preventing execution on different
 # machines.
 
 
 #### Load packages
 library(chron)
 library(oce)
-library(lubridate)                                                              # only for 'month()' function
+library(lubridate)
 library(scales)                                                                 # for alpha in base r plots
 library(plotrix)                                                                # for std.error() function
 library(ggplot2)
