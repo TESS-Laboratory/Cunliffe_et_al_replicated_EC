@@ -4903,9 +4903,7 @@ if(T){
   #par(mar=c(5,5,4,8), oma=c(1,1,1,2), tck=-0.01)
   par(mfrow=c(1, 2), mar=c(0,0,0,0), oma=c(5,5,5,15), tck=-0.01)
   
-  
-  #par(xpd=TRUE)   # allows legend outside of the plot
-  par(xpd=NA)      # even better !
+  par(xpd=NA)
   
   labels=c(-440, seq(-400, 400, 100), 440)
   ats <- c(0, seq(0.04, 0.96, 0.115), 1)
