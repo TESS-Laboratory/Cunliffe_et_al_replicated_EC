@@ -16,7 +16,8 @@ Schlumpf, Marcy Litvak, Richard Brazier, Timothy Hill.
 *analysis_and_visualization.r*
 Main script with analysis and visualization of half-hourly fluxes from the 
 conventional and low-cost systems, including gapfilling time series in 
-REdddyProc.
+REdddyProc. NB. Ideally this large script would be separated out into its 
+constituent parts.
 
 *climate_analysis.R script*
 Main script for analysing the climate data (missing PET calculations).
@@ -24,3 +25,4 @@ Main script for analysing the climate data (missing PET calculations).
 
 ## A static version of this repo is archived on Zenodo
 https://doi.org/10.5281/zenodo.4730586
+
