@@ -55,9 +55,10 @@ df2 <- df %>%
          Julian_Day,
          Hour,
          Temp_C, 
-         Precipitation)
+         Precipitation,
+         Bar_Pressure)
 
-
+plot(df2$Bar_Pressure)
 
 
 # -------------- 3. Analyze Data --------------
@@ -67,6 +68,12 @@ df2 <- df %>%
 
 
 ### Extract annual statistics ###
+AnnualAirPressure_Station40 <- df2 %>% 
+  filter(StationID == 40) %>%
+  group_by(Year) %>% 
+  summarise(Bar_Pressure = mean(Bar_Pressure, na.rm = TRUE))
+
+
 AnnualPrecip_Station40 <- df2 %>% 
   filter(StationID == 40) %>% 
   group_by(Year) %>% 

@@ -28,30 +28,35 @@ library(SPEI)
 
 #-------------- 0.1 Define paths --------------
 
+# NB. these datasets are ca. 110 GB
+
 ## Paths on Fabio's machine
-path  <-  "E:/REC_7_Data/8_datasets/"
-rpath  <-  "E:/REC_7_Data/11_ReddyProc/"
-mpath  <-  "E:/REC_7_Data/12_Marcys_data/"
+# path  <-  "E:/REC_7_Data/8_datasets/"
+# rpath  <-  "E:/REC_7_Data/11_ReddyProc/"
+# mpath  <-  "E:/REC_7_Data/12_Marcys_data/"
 
 ## Paths Andy's machine
-# path  <-  "/REC_7_Data/8_datasets/"
-# rpath  <-  "/REC_7_Data/11_ReddyProc/"
-# mpath  <-  "/REC_7_Data/12_Marcys_data/"
+path  <-  "C:/workspace/REC_7_Data/8_datasets/"
+rpath  <-  "C:/workspace/REC_7_Data/11_ReddyProc/"
+mpath  <-  "C:/workspace/REC_7_Data/12_Marcys_data/"
 
 
-## Paths on P drive
-#path  <-  "P:/REC_7_Data/8_datasets/"
-#rpath  <-  "P:/REC_7_Data/11_ReddyProc/"
-#mpath  <-  "P:/REC_7_Data/12_Marcys_data/"
 
 
 #-------------- 0.2 Initialize lists --------------
+
 sites  <-  c("SEG", "SES")
+
 recs  <-  1:4
+
 towers  <-  paste(rep(sites, each=4), rep(recs,2), sep="_REC")
+
 systems  <-  c(towers, sites)
+
 mlabs  <-  c("Seg", "Ses")
+
 soildatasets  <-  c("soilg", "soils")
+
 asystems  <-  c(systems, 
                 "SEG_AVG4",
                 "SES_AVG4",
@@ -64,40 +69,49 @@ asystems  <-  c(systems,
                 "SES_AVG_34",
                 "SES_AVG_42")
 fluxes  <-  c("H", "cLE", "rLE", "Fc", "Hc", "cLEc", "rLEc", "Fcc") 
+
 fluxes_reddy  <-  c("NEE", "LE", "H_r", "NEE_uStar_f", "LE_f", "H_f", "Reco_DT_uStar", "GPP_DT_uStar")
+
 all_fluxes  <-  c(fluxes, fluxes_reddy)
+
 pfluxes  <-  c("H", "Fc", "LE", "Hc", "LEc", "Fcc", "WPL_LE", "WPL_Fc", "LEcw", "Fccw")
 
 colours <- c("orange", "purple", "green", "darkgreen", "brown", "cyan")         # Define colour scheme for visualization.
 
 
 last_date    <-  "2020_01_01_from_flash_Txcor_"
+
 last_date_2  <-  "2020_02_19_from_flash_Txcor_"
 
 last_date_reddy  <-  "_2019_365"          # used for files ID    ----- from point 2.2 ! 
+
 last_date_use  <-  "01/11/2019"           # used for chron filtering
 
 date_start  <-  "01/11/2018"              # default: "01/11/2018"
+
 date_end  <-    "01/11/2019"              # default: "01/11/2019"
 
+xct  <-  ""
+xch  <-  ""
 
-
-xch  <-  xct  <-  ""
 if(grepl("Txcor", last_date)){xch  <-  "_Txcor"; xct  <-  "Txcor_"}
 
 mdatasets  <-  c("gm", "sm") 
+
 pdatasets  <-  c("gp", "sp")
+
 datasets  <-  c("g1", "g2", "g3", "g4", "s1", "s2", "s3", "s4")
+
 adatasets  <-  c(datasets, mdatasets, "ga4", "sa4", "ga3", "sa3", 
              "ga23", "ga34", "ga42", "sa23", "sa34", "sa42")
 
-
 datasets_f  <-  paste(datasets, "f", sep="_")
+
 datasets_fa  <-  c(datasets_f, "gm_f", "sm_f", "ga4_f", "sa4_f", "ga3_f", "sa3_f",
                "ga23_f", "ga34_f", "ga42_f", "sa23_f", "sa34_f", "sa42_f")
 
-
 make_txt_for_reddy  <-  F        # prepare datasets for gap filling
+
 run_reddy_proc  <-  F            # run gap filling code
 
 
@@ -114,7 +128,7 @@ sum_na <- function(x){sum(is.na(x))}
 
 
 ## consider data up to X days before/after a certain time
-day3_fun <- function(x){x <- x:(x+144)}   # consider data up to 3 days (144 h)after a certain time
+day3_fun <- function(x){x <- x:(x+144)}   # consider data up to 3 days (144 h) after a certain time
 pm_days_fun <- function(x, pm_days){x <- (x-(pm_days*48)):(x+(pm_days*48))}   # consider data up to ndays before and after a certain time
 pm_days_be_fun <- function(x, pm_days){x <- (x[[1]]-(pm_days*48)):(x[[2]]+(pm_days*48))}   # consider data up to ndays before and after a time span
 
@@ -133,38 +147,38 @@ sub_last <- function(x){x <- x-x[length(x)]}
 
 for(i in 1:8){
   
-  dat  <- read.csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")
-  dat2 <- read.csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")
+  dat  <- read_csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""))
+  # dat  <- read.csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")  # original
+
+  dat2 <- read_csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""))
+  # dat2 <- read.csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")  # original
+
   fluxesc <- fluxes
   
-  
-  # check for double dt raws
-  # a
-  # 1 2 3 4 5 6 7 8 9 
-  # 3 1 2 1 1 1 1 1 1 
-  # > which(table(a)==2)
-  
-  
+
+    
   if(T){  # add dt to dat
     
-    ## sometimes, empty factor columns that are not visible in Excel are added
-    dat <- dat[, !grepl("X", colnames(dat))     ]
-    
+    dat <- dat[, !grepl("X", colnames(dat))     ]  # Remove possible empty factor columns
+
     dtimes <- as.character(dat[,1])
     
     dtparts  <-  t(as.data.frame(strsplit(dtimes,' ')))
+    
     row.names(dtparts) = NULL
+    
     if(unique(nchar(dtparts[,2]))==5)dtparts[,2] <- paste(dtparts[,2], ":00", sep="")
+    
     thetimes0  <-  chron(dates=dtparts[,1],times=dtparts[,2],format=c("d/m/y","h:m:s"))
+    
     #thetimes <-  as.POSIXct(paste(as.Date(dates(thetimes0)),times(thetimes0)%%1), tz="GMT") # Mountain Standard Time (New Mexico)
     
-    
     # remove 1 hour (timestamp issue)
-    #thetimes0[thetimes0 < "24/02/19"] <- thetimes0[thetimes0 < "24/02/19"]-1/24
+    # thetimes0[thetimes0 < "24/02/19"] <- thetimes0[thetimes0 < "24/02/19"]-1/24
     if(i %in% c(1:8))thetimes0 <- thetimes0-1/24     
     
     
-    # This solves a problem with rounding of chrom date-times after subtracting  1/24---------
+    # This solves a problem with rounding of chrom date-times after subtracting  1/24
     dt_char <- as.character(thetimes0)                                 # without, dat and datm will not merge and lines with same name will be created
     dt_char_c <- substring(dt_char,2,nchar(dt_char)-1)
     
@@ -173,10 +187,10 @@ for(i in 1:8){
     if(unique(nchar(dtparts2[,2]))==5)dtparts2[,2] <- paste(dtparts2[,2], ":00", sep="")
     thetimes0  <-  chron(dates=dtparts2[,1],times=dtparts2[,2],format=c("d/m/y","h:m:s"))  
     dat$dt <- thetimes0
-    ###
+
   }  # end - add dt to dat
   
-  # dat1 and dat2 has different time format (only SEG1)!  
+  # dat1 and dat2 have different time formats (only SEG1)!  
   # dat2: 1/1/20 00:15:00
   # dat1: 01/11/2018 00:15
   
@@ -184,19 +198,22 @@ for(i in 1:8){
   if(i %in% c(1:8)){
     if(T){  # add dt to dat2
       
-      ## sometimes, empty factor columns that are not visible in Excel are added
-      dat2 <- dat2[, !grepl("X", colnames(dat2))     ]
+      dat2 <- dat2[, !grepl("X", colnames(dat2)) ]  # Remove possible empty factor columns
       
       dtimes2 <- as.character(dat2[,1])
       
       dtparts2  <-  t(as.data.frame(strsplit(dtimes2,' ')))
+      
       row.names(dtparts2) = NULL
+      
       if(unique(nchar(dtparts2[,2]))==5)dtparts2[,2] <- paste(dtparts2[,2], ":00", sep="")
+      
       thetimes0_2  <-  chron(dates=dtparts2[,1],times=dtparts2[,2],format=c("d/m/y","h:m:s"))
+      
       #thetimes <-  as.POSIXct(paste(as.Date(dates(thetimes0)),times(thetimes0)%%1), tz="GMT") # Mountain Standard Time (New Mexico)
       
       dat2$dt <- thetimes0_2
-      ###
+
     }  # end - add dt to dat2
     
     dat <- rbind(dat, dat2)     # join dat and dat2
@@ -211,20 +228,10 @@ for(i in 1:8){
   dat <- dat[dat[,"dt"] >= thetimes0[1], ]
   dat <- dat[dat[,"dt"] <= thetimes0_2[length(thetimes0_2)], ]
   
-  
-  
-  # be sure that there is no factor in the datasets
-  #for(j in 2:ncol(dat)){
-  #  dat[,j] <- as.numeric(as.character(dat[,j]))
-  #}
-  
-  
-  
+
   ####### NAs introduced by coercion!
   
-  
-  
-  
+
   
   
   # remove outliers/despike before ustar/gapfilling as in FLUXNET_2015 data processing protocol
@@ -235,7 +242,6 @@ for(i in 1:8){
   for(fx in fluxesc){ # #IQD*30 is 10 times what is considered "far out"
     #fx <- "Fcc"
     vec <- as.numeric(as.character(dat[,fx]))
-    #vec <- dat[,fx]
     med_p <- median(vec[vec>=0], na.rm=T)
     top_p <- med_p*30 
     med_n <- median(vec[vec<0], na.rm=T)
@@ -244,8 +250,7 @@ for(i in 1:8){
     dat[,fx] <- vec
   }
   
-   dat[, fluxesc] <- oce::despike(dat[, fluxesc])    # Remove spiked from time series
-  
+   dat[, fluxesc] <- oce::despike(dat[, fluxesc])    # Remove spikes from time series
   
   
   
@@ -271,19 +276,22 @@ for(i in 1:8){
 #### 
 for(im in 1:2){
     
-   
-    d18 <- read.csv(file=paste(mpath, "US-", mlabs[im], 
-           "_HH_201801010000_201901010000.csv", sep=""), header=TRUE, sep=",")
-    d19 <- read.csv(file=paste(mpath, "US-", mlabs[im], 
-           "_HH_201901010000_202001010000.csv", sep=""), header=TRUE, sep=",")
-                              #"_HH_201901010000_202001010000_xtr2.csv", sep=""), header=TRUE, sep=",")
-    
+  d18 <- read_csv(file=paste(mpath, "US-", mlabs[im], 
+                             "_HH_201801010000_201901010000.csv", sep=""))
+  d19 <- read_csv(file=paste(mpath, "US-", mlabs[im], 
+                             "_HH_201901010000_202001010000.csv", sep=""))
+     
+    # d18 <- read.csv(file=paste(mpath, "US-", mlabs[im], 
+    #        "_HH_201801010000_201901010000.csv", sep=""), header=TRUE, sep=",")
+    # d19 <- read.csv(file=paste(mpath, "US-", mlabs[im], 
+    #        "_HH_201901010000_202001010000.csv", sep=""), header=TRUE, sep=",")
+
     #d18 <- rbind(d18, c(201812312330, 201901010000, rep(-9999, ncol(d18)-2)))   # last line is missing
     datm <- rbind(d18, d19)
     
     
     
-    # invert AmeriFlux wind directions (CSAT vs Windmaster)
+    # invert AmeriFlux wind directions (CSAT vs WindMaster)
     datm[,"WD"] <- datm[,"WD"]+180
     datm[ datm[,"WD"]>360 ,"WD"] <-  datm[datm[,"WD"]>360  ,"WD"]-360
     
@@ -313,7 +321,7 @@ for(im in 1:2){
     # 1.5 times the interquartile difference (3 times iqd, it is "far out")
     
     if(F){
-    for(fx in c("H", "LE", "FC")){ # iqd*30 is 10 times what is considered "far out"
+    for(fx in c("H", "LE", "FC")){ # IQD*30 is 10 times what is considered "far out"
       #dc <- "Fcc_g1"
       #vec <- as.numeric(datf[,dc])
       vec <- datm[,fx]
@@ -325,10 +333,10 @@ for(im in 1:2){
       datm[,fx] <- vec
     }
     
-    datm[,c("H", "LE", "FC")] <- despike(datm[,c("H", "LE", "FC")])    # despike from oce package
+    datm[,c("H", "LE", "FC")] <- oce::despike(datm[,c("H", "LE", "FC")])
     }
     
-    colnames(datm)[3:4] <- c("Fc", "cLE") # same colnames as REC datasets
+    colnames(datm)[3:4] <- c("Fc", "cLE") # Set same column names as REC datasets
     colnames(datm) <- paste(colnames(datm), mdatasets[im], sep="_")
     datm$dt <- mthetimes0
     
@@ -356,7 +364,7 @@ for(is in 1:2){
   mdatesg <- paste(gdat[,"day"],  gdat[,"month"], gdat[,"year"], sep="/")
   mtimesg <- paste(gdat[,"hour"], gdat[,"min"],   "00", sep=":")
   gdt0 <-  chron(dates=mdatesg, times=mtimesg, format=c("d/m/y","h:m:s"))
-  gdt <- gdt0+1/(24*4)   # move dt forward by 15 min to match dt of the other datasets
+  gdt <- gdt0+1/(24*4)   # move datetime forward by 15 min to match datetime of the other datasets
   
   
   
@@ -419,12 +427,12 @@ if(make_txt_for_reddy){
     H <- dti[,paste("Hc", datasets[i], sep="_")]
     
     Ustar <- dti[,paste("friction_velocity", datasets[i], sep="_")]
-    rH <- dti[,paste("RH_F", mdata_vec[i], sep="_")]    # these are filled with Reddy altrady (see 3.0)
+    rH <- dti[,paste("RH_F", mdata_vec[i], sep="_")]    # these are filled with Reddy already (see 3.0)
     
     
     # from AmeriFlux's data
     Tair <- dti[,paste("TA_F", mdata_vec[i], sep="_") ] 
-    Rg <- dti[,paste("SW_IN", mdata_vec[i], sep="_")]     # Rg = global radiation = total short wave rediation from the sun
+    Rg <- dti[,paste("SW_IN", mdata_vec[i], sep="_")]     # Rg = global radiation = total short wave radiation from the sun
     VPD <- dti[,paste("VPD_F", mdata_vec[i], sep="_")]    # VPD = vapor pressure deficit  
     
     Tsoil <-  -9999
@@ -478,7 +486,7 @@ if(make_txt_for_reddy){
     
     # from AmeriFlux's data
     Tair <- dm_tr[,paste("TA_F",  mdatasets[im], sep="_")]   # filled with reddy (see 3.0)
-    Rg   <- dm_tr[,paste("SW_IN", mdatasets[im], sep="_")]   # Rg = global radiation = total short wave rediation from the sun
+    Rg   <- dm_tr[,paste("SW_IN", mdatasets[im], sep="_")]   # Rg = global radiation = total short wave radiation from the sun
     VPD  <- dm_tr[,paste("VPD_F", mdatasets[im], sep="_")]   # VPD = vapor pressure deficit  
     
     Tsoil <-  -9999
@@ -520,7 +528,7 @@ if(make_txt_for_reddy){
     
     
     
-    #### get 5 datasets, and merge them all by dt
+    #### get 5 datasets, and merge them all by datetime
     
     dat5 <- Reduce(function(x,y) merge(x=x, y=y, by="dt", all=T), list(g1, g2, g3, g4, gm))
     sts <- rep("_g", each=4)
@@ -668,9 +676,9 @@ if(run_reddy_proc){
     
     
     ### ATTENTION !!!!
-    ### the US-SES datasets returns a weird error when trying to do some of the plots
-    ### (error: ep function not found). If you skip those plots, the rest of the script
-    ### and the produced dataset have nothing wrong
+    ### the US-SES data returns a weird error when trying to do some of the plots
+    ### (error: ep function not found). If you skip those plots, the rest of the script runs
+    ### and the produced data have nothing wrong
     
     if(F){
       #+++ Generate plots of all data in directory \plots (of current R working dir)
@@ -1274,7 +1282,7 @@ if(T){
 #### 
 
 if(F){
-  ## Natascha kljun 
+  ## Natascha Kljun 
   
   source("E:/REC_7_Data/9_R/FFP_R/calc_footprint_FFP.R")
   source("E:/REC_7_Data/9_R/FFP_R/calc_footprint_FFP_climatology.R")
@@ -1285,7 +1293,7 @@ if(F){
   #library(RcolourBrewer)   # max n:9; need combine with colourRampPalette
   
   
-  ### AmeriFlux's footprint are currently done with some data from REC1
+  ### AmeriFlux's footprint are currently calculated with some data from REC1
   
   datfoot0 <- datdd
   lb <- ""
