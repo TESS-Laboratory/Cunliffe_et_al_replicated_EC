@@ -42,9 +42,9 @@ df <- rbind(df_1988_1994, df_1995_1999, df_2000_2004, df_2005_2009, df_2010_2014
 rm(df_1988_1994, df_1995_1999, df_2000_2004, df_2005_2009, df_2010_2014, df_2015_2019, df_2020)  # Remove unnecessary objects 
 
 
-## Review dataset summary
+## Review data summary
 # summary(df)
-names(df)
+# names(df)
 
 # -------------- 2. Tidy Data --------------
 ## Select variables of interest
@@ -55,10 +55,9 @@ df2 <- df %>%
          Julian_Day,
          Hour,
          Temp_C, 
-         Precipitation,
-         Bar_Pressure)
+         Precipitation
+         )
 
-plot(df2$Bar_Pressure)
 
 
 # -------------- 3. Analyze Data --------------
@@ -68,12 +67,6 @@ plot(df2$Bar_Pressure)
 
 
 ### Extract annual statistics ###
-AnnualAirPressure_Station40 <- df2 %>% 
-  filter(StationID == 40) %>%
-  group_by(Year) %>% 
-  summarise(Bar_Pressure = mean(Bar_Pressure, na.rm = TRUE))
-
-
 AnnualPrecip_Station40 <- df2 %>% 
   filter(StationID == 40) %>% 
   group_by(Year) %>% 
@@ -229,4 +222,7 @@ ggsave("plots/Annual precipitation.png",
        width=16,
        height=12,
        units="cm")
+
+
+# -------------- 5. Analysis of Potential Evapotranspiration --------------
 
