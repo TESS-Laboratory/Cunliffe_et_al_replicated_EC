@@ -14,10 +14,8 @@
 library(tidyverse)
 library(chron)
 library(oce)
-library(lubridate)
 library(scales)                                                                 # for alpha in base r plots
 library(plotrix)                                                                # for std.error() function
-library(ggplot2)
 library(patchwork)                                                              # to arrange plots
 library(fields)                                                                 # to plot footprint
 library(spatialfil)
