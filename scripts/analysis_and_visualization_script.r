@@ -12,21 +12,21 @@
 # ------ 0.0 Setup Environment ----------
 ## Load packages
 library(tidyverse)
+library(viridis)                                                                # colour palette
+library(patchwork)                                                              # to arrange plots
 library(chron)
 library(oce)
 library(scales)                                                                 # for alpha in base r plots
 library(plotrix)                                                                # for std.error() function
-library(patchwork)                                                              # to arrange plots
 library(fields)                                                                 # to plot footprint
 library(spatialfil)
-library(viridis)                                                                # colour palette
 library(SPEI)
 
 
 
 #-------------- 0.1 Define paths --------------
 
-# NB. these datasets are ca. 110 GB
+# NB. These data are ca. 110 GB
 
 ## Paths on Fabio's machine
 # path  <-  "E:/REC_7_Data/8_datasets/"
