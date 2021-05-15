@@ -3858,11 +3858,11 @@ if(T){
   
   # MAT and TAP
   
-  sum(gm[,"P_F_gm"], na.rm=T)    # 516.874
-  sum(sm[,"P_F_sm"], na.rm=T)    # 457.656
+  sum(datdd[,"P_F_gm"], na.rm=T)    # 196.596
+  sum(datdd[,"P_F_sm"], na.rm=T)    # 171.1
   
-  mean(gm[,"TA_F_gm"], na.rm=T)   # 13.7384
-  mean(sm[,"TA_F_sm"], na.rm=T)   # 14.35934
+  mean(datdd[,"TA_F_gm"], na.rm=T)   # 13.7384
+  mean(datdd[,"TA_F_sm"], na.rm=T)   # 14.35934
   
   range(datdd[,"TA_F_gm"], na.rm=T)   # -15.42842  35.04188
   range(datdd[,"TA_F_sm"], na.rm=T)   # -15.42842  35.15790
@@ -3945,6 +3945,22 @@ if(T){
   
   
 }  # daily land cover probabilities
+#
+if(T){
+  
+  # overall mean NEE (5 sites)
+  
+  nees <- paste("NEE_uStar_f", adatasets[1:10], sep="_")
+  
+  nee5g <- apply(datdd[, nees[c(1:4,9)]], 1, mean)
+  nee5s <- apply(datdd[, nees[c(5:8,10)]], 1, mean)
+  
+  mneeg<-mean(nee5g)  # -0.05062228
+  mnees<-mean(nee5s)  # -0.01863394
+  
+}  # overall mean NEE (5 sites)
+
+
 
 ###
 ### growing / senescent periods fluxes matrix / barchart ####
