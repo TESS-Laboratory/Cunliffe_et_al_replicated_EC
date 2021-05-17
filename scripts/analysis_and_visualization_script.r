@@ -167,8 +167,7 @@ for(i in 1:8){
     
     thetimes0  <-  chron(dates=dtparts[,1],times=dtparts[,2],format=c("d/m/y","h:m:s"))
     
-    #thetimes <-  as.POSIXct(paste(as.Date(dates(thetimes0)),times(thetimes0)%%1), tz="GMT") # Mountain Standard Time (New Mexico)
-    
+
     # remove 1 hour (timestamp issue)
     # thetimes0[thetimes0 < "24/02/19"] <- thetimes0[thetimes0 < "24/02/19"]-1/24
     if(i %in% c(1:8))thetimes0 <- thetimes0-1/24     
@@ -186,7 +185,7 @@ for(i in 1:8){
 
   }  # end - add dt to dat
   
-  # dat1 and dat2 have different time formats (only SEG1)!  
+  # dat1 and dat2 have different time formats!  
   # dat2: 1/1/20 00:15:00
   # dat1: 01/11/2018 00:15
   
@@ -277,13 +276,7 @@ for(im in 1:2){
   d19 <- read_csv(file=paste(mpath, "US-", mlabs[im], 
                              "_HH_201901010000_202001010000.csv", sep=""))
      
-    # d18 <- read.csv(file=paste(mpath, "US-", mlabs[im], 
-    #        "_HH_201801010000_201901010000.csv", sep=""), header=TRUE, sep=",")
-    # d19 <- read.csv(file=paste(mpath, "US-", mlabs[im], 
-    #        "_HH_201901010000_202001010000.csv", sep=""), header=TRUE, sep=",")
-
-    #d18 <- rbind(d18, c(201812312330, 201901010000, rep(-9999, ncol(d18)-2)))   # last line is missing
-    datm <- rbind(d18, d19)
+  datm <- rbind(d18, d19)
     
     
     
