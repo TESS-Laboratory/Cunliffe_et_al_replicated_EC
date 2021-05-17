@@ -146,10 +146,8 @@ sub_last <- function(x){x <- x-x[length(x)]}
 for(i in 1:8){
   
   dat  <- read_csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""))
-  # dat  <- read.csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")  # original
 
   dat2 <- read_csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""))
-  # dat2 <- read.csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")  # original
 
   fluxesc <- fluxes
   
