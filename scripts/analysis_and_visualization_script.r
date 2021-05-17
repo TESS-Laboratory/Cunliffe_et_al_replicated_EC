@@ -824,7 +824,7 @@ if(T){
                     soilg, soils))      
 
   
-  # convert everything in numeric (sometimes there are issues from the .csv files)
+  # convert everything in numeric
   dcols <- paste(rep(fluxes,  length(datasets)),  rep(datasets,  each=length(fluxes)),  sep="_")
 
   
@@ -833,9 +833,7 @@ if(T){
   }
 
   
-  
-  
-  # remove data preceding DRIVING-C
+  # remove data preceding study period
   data <- data[data[,"dt"]>=date_start,]   
   data <- data[data[,"dt"]<=date_end,]   
   
@@ -1051,9 +1049,7 @@ if(F){
     # moving average:
     #ma  <-  function(x, n = 5){stats::filter(x, rep(1 / n, n), sides = 2)}
     # aa <- stats::filter(dggp[,2], 1, sides=1) applies coeff to slot of values
-    #If you use dplyr, be careful to specify stats::filter in the function above.
-    
-    
+
     # count consecutive days (cd) that satisfy conditions
     # start of growing season
     dggp <- dggp %>%
@@ -3948,8 +3944,11 @@ if(T){
   nee5g <- apply(datdd[, nees[c(1:4,9)]], 1, mean)
   nee5s <- apply(datdd[, nees[c(5:8,10)]], 1, mean)
   
-  mneeg<-mean(nee5g)  # -0.05062228
-  mnees<-mean(nee5s)  # -0.01863394
+  mneeg <- mean(nee5g)  # -0.05062228 umolC m-2 s-1
+  mnees <- mean(nee5s)  # -0.01863394 umolC m-2 s-1
+  
+  mneeg_in_gCm2yr <- mneeg* (12 / 10^6) * 1800 * 48 * 365  # g C m-2 yr-1 
+  mnees_in_gCm2yr <- mnees* (12 / 10^6) * 1800 * 48 * 365  # g C m-2 yr-1 
   
 }  # overall mean NEE (5 sites)
 
