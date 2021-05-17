@@ -1567,7 +1567,7 @@ if(F){
         
         
         
-        ## save plots as png ===============================================================
+        ## save plots as png
         if(do_plot){
           mt3 <- towers[dt]
           if(dt %in% c(9,10)){mt3 <- sites[dt-8]}
@@ -3854,24 +3854,26 @@ if(T){
 
 ## S3 Extra plots ================================
 
+
+### Summarize Temperature and Precipitation during Study ###
 if(T){
   
-  # MAT and TAP
+  round(sum(datdd[,"P_F_gm"], na.rm=T), digits=0)    # 197
+  round(sum(datdd[,"P_F_sm"], na.rm=T), digits=0)     # 171
   
-  sum(datdd[,"P_F_gm"], na.rm=T)    # 196.596
-  sum(datdd[,"P_F_sm"], na.rm=T)    # 171.1
+  round(mean(datdd[,"TA_F_gm"], na.rm=T), digits=1)   # 13.7
+  round(mean(datdd[,"TA_F_sm"], na.rm=T), digits=1)   # 14.4
   
-  mean(datdd[,"TA_F_gm"], na.rm=T)   # 13.7384
-  mean(datdd[,"TA_F_sm"], na.rm=T)   # 14.35934
-  
-  range(datdd[,"TA_F_gm"], na.rm=T)   # -15.42842  35.04188
-  range(datdd[,"TA_F_sm"], na.rm=T)   # -15.42842  35.15790
+  range(datdd[,"TA_F_gm"], na.rm=T)   # -15.42842  35.0
+  range(datdd[,"TA_F_sm"], na.rm=T)   # -15.42842  35.2
   
   quantile(datdd[,"TA_F_gm"], probs=seq(0,1,0.1), na.rm=T)
   quantile(datdd[,"TA_F_sm"], probs=seq(0,1,0.1), na.rm=T)
   
-}  # MAT and TAP
-#
+}  
+
+
+
 if(T){
   
   # daily land cover probabilities
