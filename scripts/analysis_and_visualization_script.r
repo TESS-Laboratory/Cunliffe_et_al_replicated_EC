@@ -4991,7 +4991,12 @@ if(T){
   
   
 }  # RECs agreement xy plots with major axis - two plots
-#
+
+
+
+
+
+### Calculating PET (Potential Evapotranspiration) ----
 if(T){
   
   # calculate potential evapotranspiration
@@ -5135,6 +5140,13 @@ if(T){
   
 }  # Precipitation from July to September 2019
 #
+
+
+
+
+
+
+# confusion matrix
 if(T){
   
   # confusion matrix

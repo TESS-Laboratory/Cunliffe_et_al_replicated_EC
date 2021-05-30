@@ -159,7 +159,7 @@ DF_EC_study <-DF_EC %>%
 
 #-------------- 2.1 Co-location comparison data --------------
 # analyze EC0 versus EC1
-# - inc. group by day
+# - inc. group by day and also by month
 
 
 
