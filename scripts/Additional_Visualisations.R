@@ -20,8 +20,7 @@ mpath  <-  "C:/workspace/REC_7_Data/12_Marcys_data/"
 
 #-------------- 1. Read data --------------
 {
-# Including parsing datetimes. 
-# Note that the year format differs (yyyy vs yy) between REC systems.
+# Note datetime  format differs (yyyy vs yy) between data files.
 
 DF_SEG_EC0a  <- read_csv(file=paste(mpath, "US-Seg_HH_201801010000_201901010000.csv", sep=""),
                       col_types = cols(TIMESTAMP_START = col_datetime("%Y %m %d %H %M"),
