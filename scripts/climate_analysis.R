@@ -51,7 +51,6 @@ df_2010_2014 <- read_csv("data/meteorological_data/Sevilleta_LTER_Hourly_Meteoro
                                           Evaporation = col_double(),
                                           Evap_Pan_Temperature  = col_double()))
 
-
 df_2015_2019 <- read_csv("data/meteorological_data/Sevilleta_LTER_Hourly_Meteorological_Data_2015_2019.csv",
                          col_types = cols(Moisture_10_cm = col_double(),
                                           Moisture_30_cm  = col_double(),
@@ -88,7 +87,8 @@ df2 <- df %>%
          Julian_Day,
          Hour,
          Temp_C, 
-         Precipitation
+         Precipitation,
+         Relative_Humidity
   )
 
 
@@ -109,10 +109,6 @@ AnnualTemp_Station40 <- df2 %>%
   filter(StationID == 40) %>%
   group_by(year) %>% 
   summarise(Temp_C = mean(Temp_C, na.rm = TRUE))
-
-
-
-
 
 
 # StationID = 49 (Five Points Meteorological Station) is closer to the Ses site but only started in 1999.
@@ -310,3 +306,33 @@ ggsave("plots/precipitation seasonality_average.png",
 
 # -------------- 5. Analysis of Potential Evapotranspiration --------------
 
+
+# 6. Relative humidity ----
+# Summarize relative humidity
+RH_Station40 <- df2 %>% 
+  filter(StationID == 40) %>%
+  select(Date_Time,
+         Relative_Humidity)
+
+(mean_RH_ID40 <- mean(RH_Station40$Relative_Humidity, na.rm = T))
+(median_RH_ID40 <- median(RH_Station40$Relative_Humidity, na.rm = T))
+(iqr_RH_ID40 <- IQR(RH_Station40$Relative_Humidity, na.rm = T))
+
+(RH_plots <- ggplot(RH_Station40, aes(x=Date_Time, y=Relative_Humidity)) +
+    labs(title = "Relative Humidity at station 40") +
+    # geom_point(aes(x=Date_Time, y=Relative_Humidity, shape =1)) +
+    # geom_point(aes(x=Date_Time, y=Relative_Humidity, alpha=0.4, na.rm=T)) +
+    # geom_point(aes(alpha=0.1, na.rm=T) +
+    geom_point(alpha=0.1, na.rm=T) +
+    geom_hline(yintercept = mean_RH_ID40, colour="red") +
+    geom_hline(yintercept = median_RH_ID40, colour="blue") +
+    geom_hline(yintercept = (mean_RH_ID40+(iqr_RH_ID40/2)), linetype = "dotted", colour="#5DC863FF") +
+    geom_hline(yintercept = (mean_RH_ID40-(iqr_RH_ID40/2)), linetype = "dotted", colour="#5DC863FF") +
+    # scale_x_continuous(name="Year", breaks=seq(1990,2020,10), limits=c(1988,2021)) +
+    scale_y_continuous(name="Relative Humidity (%)", breaks=seq(0,100,25), limits=c(0, 120)) +
+    theme_bw() +
+    theme(plot.margin = unit(c(1, 4, 1, 1), "lines")) +
+    coord_cartesian(clip = "off") +
+    theme(legend.position = "bottom") +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+)
