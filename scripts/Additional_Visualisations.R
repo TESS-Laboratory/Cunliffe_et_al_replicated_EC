@@ -20,187 +20,159 @@ mpath  <-  "C:/workspace/REC_7_Data/12_Marcys_data/"
 
 #-------------- 1. Read data --------------
 {
-# Including parsing datetimes. 
-# Note that the year format differs (yyyy vs yy) between REC systems.
+# Note datetime  format differs (yyyy vs yy) between data files.
 
-SEG_EC0a  <- read_csv(file=paste(mpath, "US-Seg_HH_201801010000_201901010000.csv", sep=""),
+DF_SEG_EC0a  <- read_csv(file=paste(mpath, "US-Seg_HH_201801010000_201901010000.csv", sep=""),
                       col_types = cols(TIMESTAMP_START = col_datetime("%Y %m %d %H %M"),
                                        TIMESTAMP_END = col_datetime("%Y %m %d %H %M")))
 
-SEG_EC0b  <- read_csv(file=paste(mpath, "US-Seg_HH_201901010000_202001010000.csv", sep=""),
+DF_SEG_EC0b  <- read_csv(file=paste(mpath, "US-Seg_HH_201901010000_202001010000.csv", sep=""),
                       col_types = cols(TIMESTAMP_START = col_datetime("%Y %m %d %H %M"),
                                        TIMESTAMP_END = col_datetime("%Y %m %d %H %M")))
 
-SES_EC0a  <- read_csv(file=paste(mpath, "US-Ses_HH_201801010000_201901010000.csv", sep=""),
+DF_SES_EC0a  <- read_csv(file=paste(mpath, "US-Ses_HH_201801010000_201901010000.csv", sep=""),
                       col_types = cols(TIMESTAMP_START = col_datetime("%Y %m %d %H %M"),
                                        TIMESTAMP_END = col_datetime("%Y %m %d %H %M")))
 
-SES_EC0b  <- read_csv(file=paste(mpath, "US-Ses_HH_201901010000_202001010000.csv", sep=""),
+DF_SES_EC0b  <- read_csv(file=paste(mpath, "US-Ses_HH_201901010000_202001010000.csv", sep=""),
                       col_types = cols(TIMESTAMP_START = col_datetime("%Y %m %d %H %M"),
                                        TIMESTAMP_END = col_datetime("%Y %m %d %H %M")))
 
-
-
-
-# SEG_EC1  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SEG_REC1_flux.csv", sep=""))
-# head(SEG_EC1$'Date/Time')
-
-SEG_EC1  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SEG_REC1_flux.csv", sep=""),
-                     col_types = cols('Date/Time' = col_datetime("%d/%m/%Y %H:%M")))
-# head(SEG_EC1$'Date/Time')
-
-#### ISSUE ####
-# This is really strange - the date parsing seems intermittent! not sure why.
-# different REC fields have different year formats
-
-SEG_EC2  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SEG_REC2_flux.csv", sep=""))
-head(SEG_EC2$'Date/Time')
-
-SEG_EC2  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SEG_REC2_flux.csv", sep=""),
-                     col_types = cols('Date/Time' = col_datetime("%d/%m/%y %H:%M")))
-head(SEG_EC2$'Date/Time')
-
-
-
-SEG_EC3  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SEG_REC3_flux.csv", sep=""),
+DF_SEG_EC1  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SEG_REC1_flux.csv", sep=""),
                      col_types = cols('Date/Time' = col_datetime("%d/%m/%Y %H:%M")))
 
-SEG_EC4  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SEG_REC4_flux.csv", sep=""),
+DF_SEG_EC2  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SEG_REC2_flux.csv", sep=""),
+                     col_types = cols('Date/Time' = col_datetime("%d/%m/%y %H:%M:%S")))
+
+DF_SEG_EC3  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SEG_REC3_flux.csv", sep=""),
+                     col_types = cols('Date/Time' = col_datetime("%d/%m/%y %H:%M:%S")))
+
+DF_SEG_EC4  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SEG_REC4_flux.csv", sep=""),
+                     col_types = cols('Date/Time' = col_datetime("%d/%m/%y %H:%M:%S")))
+
+DF_SES_EC1  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SES_REC1_flux.csv", sep=""),
+                     col_types = cols('Date/Time' = col_datetime("%d/%m/%y %H:%M:%S")))
+
+DF_SES_EC2  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SES_REC2_flux.csv", sep=""),
                      col_types = cols('Date/Time' = col_datetime("%d/%m/%Y %H:%M")))
 
-SES_EC1  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SES_REC1_flux.csv", sep=""),
-                     col_types = cols('Date/Time' = col_datetime("%d/%m/%Y %H:%M")))
+DF_SES_EC3  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SES_REC3_flux.csv", sep=""),
+                     col_types = cols('Date/Time' = col_datetime("%d/%m/%y %H:%M:%S")))
 
-SES_EC2  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SES_REC2_flux.csv", sep=""),
-                     col_types = cols('Date/Time' = col_datetime("%d/%m/%Y %H:%M")))
-
-SES_EC3  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SES_REC3_flux.csv", sep=""),
-                     col_types = cols('Date/Time' = col_datetime("%d/%m/%Y %H:%M")))
-
-SES_EC4  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SES_REC4_flux.csv", sep=""),
-                     col_types = cols('Date/Time' = col_datetime("%d/%m/%Y %H:%M")))
+DF_SES_EC4  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SES_REC4_flux.csv", sep=""),
+                     col_types = cols('Date/Time' = col_datetime("%d/%m/%y %H:%M:%S")))
 }  # Read data
-
 
 
 
 #-------------- 2. Tidy data --------------
 
 ## Compile Marcy's files
-SEG_EC0 <- dplyr::bind_rows(SEG_EC0a, SEG_EC0b); rm(SEG_EC0a, SEG_EC0b)
-SES_EC0 <- dplyr::bind_rows(SES_EC0a, SES_EC0b); rm(SES_EC0a, SES_EC0b)
+DF_SEG_EC0 <- dplyr::bind_rows(DF_SEG_EC0a, DF_SEG_EC0b); rm(DF_SEG_EC0a, DF_SEG_EC0b)
+DF_SES_EC0 <- dplyr::bind_rows(DF_SES_EC0a, DF_SES_EC0b); rm(DF_SES_EC0a, DF_SES_EC0b)
 
 
+## create lists for processing
+list1a <- list(DF_SEG_EC0, DF_SES_EC0) 
+list1b <- c("SEG_EC0", "SES_EC0") 
 
-## Select variables of interest
+list2a <- list(DF_SEG_EC1, DF_SEG_EC2, DF_SEG_EC3, DF_SEG_EC4, DF_SES_EC1, DF_SES_EC2, DF_SES_EC3, DF_SES_EC4) 
+list2b <- c("SEG_EC1", "SEG_EC2", "SEG_EC3", "SEG_EC4", "SES_EC1", "SES_EC2", "SES_EC3", "SES_EC4") 
+
+
+## Create custom function to select variables of interest and rename variables
 ## Marcy's data
-
-# basic pipe. Works, but needs tuning in three places for each case, so would be better as a function
-SEG_EC0_clean <- SEG_EC0 %>%
-    select(TIMESTAMP_START,
-           FC,
-           LE,
-           H,
-           P_F, 
-           SW_IN
-           ) %>% 
-  mutate(Station = "SEG_EC0") %>% 
-  rename(Precipitation = P_F,
-         Datetime_Start = TIMESTAMP_START)
-
-
-# TO DO ----
-# Functional programming
-# In order to implement this as a function, I would like to return the df name, to use this to:
-# (i) name the station, and (ii) name the output object
-tidy_marcy <- function(df) {
+tidy_marcy <- function(df, station) {
   df %>%
-    select(TIMESTAMP_START,
+    rename(Precipitation = P_F,
+           Datetime_Start = TIMESTAMP_START) %>% 
+    select(Datetime_Start,
            FC,
            LE,
            H,
-           P_F, 
+           Precipitation, 
            SW_IN
     ) %>% 
-    mutate(Station = "SEG_EC0") %>%
-    # mutate(Station = df) %>% 
-    rename(Precipitation = P_F,
-           Datetime_Start = TIMESTAMP_START)
+    mutate(Station = station)
   }
 
-SEG_EC0_temp <- tidy_marcy(SEG_EC0)
+## REC data
+tidy_RECs <- function(df, station) {
+  df %>%
+    rename(Datetime = 'Date/Time',
+           FC = Fc,
+           LE = rLE) %>% 
+    mutate(Station = station,
+           Datetime_Start = Datetime - lubridate::minutes(15)) %>%  # Align time stamps
+    select(Datetime_Start,
+           FC,
+           LE,
+           H,
+           Station)
+  }
 
-# perhaps using assign?
-# https://stackoverflow.com/questions/57593514/dynamic-naming-for-the-output-of-pipe-with-group-by-mutate-select?rq=1
-
-
-
-
-
- 
-
-
-
-# Align datetime with Lubridat::
-# format(SEG_EC4$Date/Time[1], scientific = FALSE)
-SEG_EC0_temp$Datetime_Start[3]
-SEG_EC0_temp$Datetime_Start[4]
-
-
-
-## Tidy REC data
-SEG_EC1_clean <- SEG_EC1 %>%
-  select("Date/Time",
-         Fc,
-         # Need to identify the correct LE!
-         H
-  ) %>% 
-  mutate(Station = "SEG_EC1") %>% 
-  rename(FC = Fc,
-         Datetime_Start = "Date/Time") %>% 
-  transmute(Datetime_Start = Datetime_Start - minutes(15))
-
-head(SEG_EC1)
-SEG_EC1$'Date/Time'[3]
-SEG_EC1_clean$Datetime_Start[4]
-
-SEG_EC1_clean$Datetime_Start[3]
-SEG_EC1_clean$Datetime_Start[4]
+# TO DO  Need to confirm the correct LE!!!!!!! ----
+# TO DO  Need to confirm the correct FC!!!!!!! ----
 
 
+## Use purrr::map2 to process multiple tibbles through pipe and return a single merged dataframe
+DF_EC_Marcy <- list1a %>%
+  purrr::map2(.x =., .y=list1b, ~tidy_marcy(.x, .y)) %>%
+  bind_rows()
+
+DF_EC_REC <- list2a %>%
+  purrr::map2(.x =., .y=list2b, ~tidy_RECs(.x, .y)) %>%
+  bind_rows()
+
+## NB. If we need to handle more than two lists, use purrr::pmap
+# my_list <- list(df_list, name_list, other_varlist)
+# purrr::pmap(my_list, ~myfunction(..1, ..2, ..3))
+
+# merge data from all station
+DF_EC <- dplyr::bind_rows(DF_EC_Marcy, DF_EC_REC) 
+
+# remove all unnecessary objects
+rm(list1a, list1b, list2a, list2b,
+   DF_SEG_EC0, DF_SES_EC0,
+   DF_SEG_EC1, DF_SEG_EC2, DF_SEG_EC3, DF_SEG_EC4, DF_SES_EC1, DF_SES_EC2, DF_SES_EC3, DF_SES_EC4,
+   DF_EC_Marcy, DF_EC_REC)
 
 
-# REC data
-# Need to confirm whether I've selected the correct variables=
-# rLE or cLR?
-# what is 'cLEc'?
+# Subset time series to study period dates
 
-names(SEG_EC1)
+names(DF_EC)
 
-str(SEG_EC0)
-str(SEG_EC1)
+str(DF_EC)
 
+DF_EC_study <-DF_EC %>% 
+  Filter(Datetime_Start >= X,
+         Datetime_Start <= X)
 
+### 
 
-
-# Need to subset time series to study period dates
-
+# TO DO - confirm whether I should apply any filtering to the flux data (U* etc.) ----
 
 
+
+#-------------- 2. Analyze data --------------
+
+
+#-------------- 2.1 Co-location comparison data --------------
 # analyze EC0 versus EC1
-# - inc. group by day
-
-
-# combine data frames for plotting dplyr::bind_rows
+# - inc. group by day and also by month
 
 
 
+# Reproduce hourly plots by month
 
-## remove objects to clean environment
-rm(SES_EC0, SEG_EC0a, SEG_EC0b,
-   SEG_EC1, SEG_EC2, SEG_EC3, SEG_EC4,
-   SES_EC0, SES_EC0a, SES_EC0b, 
-   SES_EC1, SES_EC2, SES_EC3, SES_EC4
-   )  
+
+
+
+
+
+
+
+
+
 
 

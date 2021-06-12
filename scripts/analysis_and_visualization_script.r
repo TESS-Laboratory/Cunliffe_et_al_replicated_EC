@@ -148,11 +148,17 @@ sub_last <- function(x){x <- x-x[length(x)]}
 
 for(i in 1:8){
   
+<<<<<<< HEAD
   #dat  <- read.csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""))
   dat  <- read.csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")  # original
 
   #dat2 <- read_csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""))
   dat2 <- read.csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")  # original
+=======
+  dat  <- read_csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""))
+
+  dat2 <- read_csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""))
+>>>>>>> 6b3122c1d4ccde3ff7c8774e71390665b4ea6019
 
   fluxesc <- fluxes
   
@@ -172,8 +178,7 @@ for(i in 1:8){
     
     thetimes0  <-  chron(dates=dtparts[,1],times=dtparts[,2],format=c("d/m/y","h:m:s"))
     
-    #thetimes <-  as.POSIXct(paste(as.Date(dates(thetimes0)),times(thetimes0)%%1), tz="GMT") # Mountain Standard Time (New Mexico)
-    
+
     # remove 1 hour (timestamp issue)
     # thetimes0[thetimes0 < "24/02/19"] <- thetimes0[thetimes0 < "24/02/19"]-1/24
     if(i %in% c(1:8))thetimes0 <- thetimes0-1/24     
@@ -191,7 +196,7 @@ for(i in 1:8){
 
   }  # end - add dt to dat
   
-  # dat1 and dat2 have different time formats (only SEG1)!  
+  # dat1 and dat2 have different time formats!  
   # dat2: 1/1/20 00:15:00
   # dat1: 01/11/2018 00:15
   
@@ -282,6 +287,7 @@ for(im in 1:2){
   #d19 <- read_csv(file=paste(mpath, "US-", mlabs[im], 
    #                          "_HH_201901010000_202001010000.csv", sep=""))
      
+<<<<<<< HEAD
     d18 <- read.csv(file=paste(mpath, "US-", mlabs[im],
            "_HH_201801010000_201901010000.csv", sep=""), header=TRUE, sep=",")
     d19 <- read.csv(file=paste(mpath, "US-", mlabs[im],
@@ -289,6 +295,9 @@ for(im in 1:2){
 
     #d18 <- rbind(d18, c(201812312330, 201901010000, rep(-9999, ncol(d18)-2)))   # last line is missing
     datm <- rbind(d18, d19)
+=======
+  datm <- rbind(d18, d19)
+>>>>>>> 6b3122c1d4ccde3ff7c8774e71390665b4ea6019
     
     
     
@@ -836,7 +845,7 @@ if(T){
                     soilg, soils))      
 
   
-  # convert everything in numeric (sometimes there are issues from the .csv files)
+  # convert everything in numeric
   dcols <- paste(rep(fluxes,  length(datasets)),  rep(datasets,  each=length(fluxes)),  sep="_")
 
   
@@ -845,9 +854,7 @@ if(T){
   }
 
   
-  
-  
-  # remove data preceding DRIVING-C
+  # remove data preceding study period
   data <- data[data[,"dt"]>=date_start,]   
   data <- data[data[,"dt"]<=date_end,]   
   
@@ -1063,9 +1070,7 @@ if(F){
     # moving average:
     #ma  <-  function(x, n = 5){stats::filter(x, rep(1 / n, n), sides = 2)}
     # aa <- stats::filter(dggp[,2], 1, sides=1) applies coeff to slot of values
-    #If you use dplyr, be careful to specify stats::filter in the function above.
-    
-    
+
     # count consecutive days (cd) that satisfy conditions
     # start of growing season
     dggp <- dggp %>%
@@ -1570,7 +1575,7 @@ if(F){
         
         
         
-        ## save plots as png ===============================================================
+        ## save plots as png
         if(do_plot){
           mt3 <- towers[dt]
           if(dt %in% c(9,10)){mt3 <- sites[dt-8]}
@@ -3919,24 +3924,26 @@ if(T){
 
 ## S3 Extra plots ================================
 
+
+### Summarize Temperature and Precipitation during Study ###
 if(T){
   
-  # MAT and TAP
+  round(sum(datdd[,"P_F_gm"], na.rm=T), digits=0)    # 197
+  round(sum(datdd[,"P_F_sm"], na.rm=T), digits=0)     # 171
   
-  sum(datdd[,"P_F_gm"], na.rm=T)    # 196.596
-  sum(datdd[,"P_F_sm"], na.rm=T)    # 171.1
+  round(mean(datdd[,"TA_F_gm"], na.rm=T), digits=1)   # 13.7
+  round(mean(datdd[,"TA_F_sm"], na.rm=T), digits=1)   # 14.4
   
-  mean(datdd[,"TA_F_gm"], na.rm=T)   # 13.7384
-  mean(datdd[,"TA_F_sm"], na.rm=T)   # 14.35934
-  
-  range(datdd[,"TA_F_gm"], na.rm=T)   # -15.42842  35.04188
-  range(datdd[,"TA_F_sm"], na.rm=T)   # -15.42842  35.15790
+  range(datdd[,"TA_F_gm"], na.rm=T)   # -15.42842  35.0
+  range(datdd[,"TA_F_sm"], na.rm=T)   # -15.42842  35.2
   
   quantile(datdd[,"TA_F_gm"], probs=seq(0,1,0.1), na.rm=T)
   quantile(datdd[,"TA_F_sm"], probs=seq(0,1,0.1), na.rm=T)
   
-}  # MAT and TAP
-#
+}  
+
+
+
 if(T){
   
   # daily land cover probabilities
@@ -4020,8 +4027,11 @@ if(T){
   nee5g <- apply(datdd[, nees[c(1:4,9)]], 1, mean)
   nee5s <- apply(datdd[, nees[c(5:8,10)]], 1, mean)
   
-  mneeg<-mean(nee5g)  # -0.05062228
-  mnees<-mean(nee5s)  # -0.01863394
+  mneeg <- mean(nee5g)  # -0.05062228 umolC m-2 s-1
+  mnees <- mean(nee5s)  # -0.01863394 umolC m-2 s-1
+  
+  mneeg_in_gCm2yr <- mneeg* (12 / 10^6) * 1800 * 48 * 365  # g C m-2 yr-1 
+  mnees_in_gCm2yr <- mnees* (12 / 10^6) * 1800 * 48 * 365  # g C m-2 yr-1 
   
 }  # overall mean NEE (5 sites)
 
@@ -5064,7 +5074,12 @@ if(T){
   
   
 }  # RECs agreement xy plots with major axis - two plots
-#
+
+
+
+
+
+### Calculating PET (Potential Evapotranspiration) ----
 if(T){
   
   # calculate potential evapotranspiration
@@ -5208,6 +5223,13 @@ if(T){
   
 }  # Precipitation from July to September 2019
 #
+
+
+
+
+
+
+# confusion matrix
 if(T){
   
   # confusion matrix
