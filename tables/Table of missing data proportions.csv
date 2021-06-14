@@ -1,11 +1,15 @@
-Site	System	Percent missing due to system maintenance	Percent missing due to quality filtering
-Seg	EC0	TBC	TBC
-Seg	EC1	0.39	TBC
-Seg	EC2	0.08	TBC
-Seg	EC3	0.1	TBC
-Seg	EC4	0.1	TBC
-Ses	EC0	TBC	TBC
-Ses	EC1	0.27	TBC
-Ses	EC2	0.12	TBC
-Ses	EC3	0.11	TBC
-Ses	EC4	0.09	TBC
+Site,System,NEE data availability before u* filtering [%],NEE data availability after u* filtering [%],,,,,,,,,,
+Seg,EC0,88.76,75.68,,,,,,,,,,
+Seg,EC1,99.55,92.94,,,,,,,,,,
+Seg,EC2,99.91,90.13,,,,,,,,,,
+Seg,EC3,99.91,89.91,,,,,,,,,,
+Seg,EC4,99.89,88.23,,,,,,,,,,
+Ses,EC0,90.51,82.06,,,,,,,,,,
+Ses,EC1,99.72,91.3,,,,,,,,,,
+Ses,EC2,99.88,84.75,,,,,,,,,,
+Ses,EC3,99.9,83.03,,,,,,,,,,
+Ses,EC4,99.91,89.83,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,

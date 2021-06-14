@@ -942,7 +942,7 @@ if(T){
 #### 
 if(T){
   
-  ### uncertainty following a Laplace distribution rather than guassian distribution
+  ### uncertainty following a Laplace distribution rather than Guassian distribution
   
   
   dat48 <- datdd[49:nrow(datdd),]
@@ -1038,7 +1038,7 @@ if(F){
     dc[,ccm] <- dc[ccm]*  (12 / 10^6) * 1800     # 12 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
     
     
-    # aggregate to gC m-2 d-1
+    # aggregate to g C m-2 d-1
     dggp <- aggregate(dc[,c(2,3)],by=list(date(dc[,"dt"])), sum, na.rm=T)
     colnames(dggp)[1] <- "Date"
     dggp0 <- dggp  
@@ -1127,7 +1127,7 @@ if(F){
   
   
   
-  ### try make a plot GPP vs DOY and compare with Petrie et al (2015), fig 4
+  ### Make a plot GPP vs DOY ( for comparison with Petrie et al., 2015 Fig. 4)
   ptest <- dggp0
   ptest$doy <- yday(dggp0[,1])
   ptest_o <- ptest[order(ptest[,"doy"]),]

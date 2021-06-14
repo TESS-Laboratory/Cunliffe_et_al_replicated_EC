@@ -111,6 +111,10 @@ tidy_RECs <- function(df, station) {
            Station)
   }
 
+
+# names(DF_SEG_EC1)
+# names(DF_SEG_EC1$)
+
 # TO DO  Need to confirm the correct LE!!!!!!! ----
 # TO DO  Need to confirm the correct FC!!!!!!! ----
 
