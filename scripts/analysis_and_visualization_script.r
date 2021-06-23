@@ -9,16 +9,19 @@
 # machines.
 
 
+rm(list=ls())
+
+
 # ------ 0.0 Setup Environment ----------
 ## Load packages
 library(tidyverse)
-library(viridis)                                                                # colour palette
-library(patchwork)                                                              # to arrange plots
+library(viridis)                                                  # colour palette
+library(patchwork)                                                # to arrange plots
 library(chron)
 library(oce)
-library(scales)                                                                 # for alpha in base r plots
-library(plotrix)                                                                # for std.error() function
-library(fields)                                                                 # to plot footprint
+library(scales)                                                   # for alpha in base r plots
+library(plotrix)                                                  # for std.error() function
+library(fields)                                                   # to plot footprint
 library(spatialfil)
 library(SPEI)
 
@@ -29,14 +32,14 @@ library(SPEI)
 # NB. These data are ca. 110 GB
 
 ## Paths on Fabio's machine
-# path  <-  "E:/REC_7_Data/8_datasets/"
-# rpath  <-  "E:/REC_7_Data/11_ReddyProc/"
-# mpath  <-  "E:/REC_7_Data/12_Marcys_data/"
+path  <-  "E:/REC_7_Data/8_datasets/"
+rpath  <-  "E:/REC_7_Data/11_ReddyProc/"
+mpath  <-  "E:/REC_7_Data/12_Marcys_data/"
 
 ## Paths Andy's machine
-path  <-  "C:/workspace/REC_7_Data/8_datasets/"
-rpath  <-  "C:/workspace/REC_7_Data/11_ReddyProc/"
-mpath  <-  "C:/workspace/REC_7_Data/12_Marcys_data/"
+# path  <-  "C:/workspace/REC_7_Data/8_datasets/"
+# rpath  <-  "C:/workspace/REC_7_Data/11_ReddyProc/"
+# mpath  <-  "C:/workspace/REC_7_Data/12_Marcys_data/"
 
 
 
@@ -145,9 +148,17 @@ sub_last <- function(x){x <- x-x[length(x)]}
 
 for(i in 1:8){
   
+<<<<<<< HEAD
+  #dat  <- read.csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""))
+  dat  <- read.csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")  # original
+
+  #dat2 <- read_csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""))
+  dat2 <- read.csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")  # original
+=======
   dat  <- read_csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""))
 
   dat2 <- read_csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""))
+>>>>>>> 6b3122c1d4ccde3ff7c8774e71390665b4ea6019
 
   fluxesc <- fluxes
   
@@ -271,12 +282,22 @@ for(i in 1:8){
 #### 
 for(im in 1:2){
     
-  d18 <- read_csv(file=paste(mpath, "US-", mlabs[im], 
-                             "_HH_201801010000_201901010000.csv", sep=""))
-  d19 <- read_csv(file=paste(mpath, "US-", mlabs[im], 
-                             "_HH_201901010000_202001010000.csv", sep=""))
+  #d18 <- read_csv(file=paste(mpath, "US-", mlabs[im], 
+   #                          "_HH_201801010000_201901010000.csv", sep=""))
+  #d19 <- read_csv(file=paste(mpath, "US-", mlabs[im], 
+   #                          "_HH_201901010000_202001010000.csv", sep=""))
      
+<<<<<<< HEAD
+    d18 <- read.csv(file=paste(mpath, "US-", mlabs[im],
+           "_HH_201801010000_201901010000.csv", sep=""), header=TRUE, sep=",")
+    d19 <- read.csv(file=paste(mpath, "US-", mlabs[im],
+           "_HH_201901010000_202001010000.csv", sep=""), header=TRUE, sep=",")
+
+    #d18 <- rbind(d18, c(201812312330, 201901010000, rep(-9999, ncol(d18)-2)))   # last line is missing
+    datm <- rbind(d18, d19)
+=======
   datm <- rbind(d18, d19)
+>>>>>>> 6b3122c1d4ccde3ff7c8774e71390665b4ea6019
     
     
     
@@ -894,11 +915,11 @@ if(T){
   
   
   # add month, year and hour columns
-  yyyy <- year(data[,"dt"])
-  mon <- month(data[,"dt"])
-  dd <- day(data[,"dt"]); 
+  yyyy <- lubridate::year(data[,"dt"])
+  mon <- lubridate::month(data[,"dt"])
+  dd <- lubridate::day(data[,"dt"]); 
   hh <- chron::hours(data[,"dt"])
-  min <- minute(data[,"dt"])
+  min <- lubridate::minute(data[,"dt"])
   
   seas <- rep(1, nrow(data))
   seas[mon %in% c(5, 6, 7)] <- 2
@@ -3834,6 +3855,68 @@ if(T){
   
   
 }  # REC-EC residuals vs WSpeed
+#
+if(T){
+  
+  # % data filtered NEE
+  
+  ### before u* filtering
+  
+  cn0<-c(rep("Fcc", 8), rep("Fc", 2))
+  cn<-paste(cn0, adatasets[1:10], sep="_")
+  
+  for(i in 1:10){
+    
+    print(   paste( adatasets[i], ":", 
+               100 * (    1 - round(sum(is.na(datdd[,  cn[i] ]))/nrow(datdd) , 4)  )
+    )   )
+    
+  }
+  
+  
+  ### after u* filtering
+  
+  cna<-paste("NEE_uStar_orig", adatasets[1:10], sep="_")
+  
+  for(i in 1:10){
+    
+    print(   paste( adatasets[i], ":", 
+        100 * (    1 - round(sum(is.na(datdd[,  cna[i] ]))/nrow(datdd) , 4)  )
+    )   )
+    
+  }
+  
+  
+  
+  
+  
+  # NEE data availability before u* filtering
+  # "g1 : 99.55"
+  # "g2 : 99.91"
+  # "g3 : 99.91"
+  # "g4 : 99.89"
+  # "s1 : 99.72"
+  # "s2 : 99.88"
+  # "s3 : 99.9"
+  # "s4 : 99.91"
+  # "gm : 88.76"
+  # "sm : 90.51"
+  
+  
+  # NEE data availability after u* filtering
+  # "g1 : 92.94"
+  # "g2 : 90.13"
+  # "g3 : 89.91"
+  # "g4 : 88.23"
+  # "s1 : 91.37"
+  # "s2 : 84.75"
+  # "s3 : 83.03"
+  # "s4 : 89.83"
+  # "gm : 75.68"
+  # "sm : 82.06"
+  
+  
+}  # % data filtered NEE
 
 
 
