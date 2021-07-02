@@ -19,6 +19,9 @@ conventional and low-cost systems. NB. Ideally this large script would be
 separated out into its constituent parts (esp. the time series gap filling in 
 REdddyProc and the footprint analysis).
 
+*Additional_Visualisation.r*
+This script contains code for producing the revised analysis of fluxes following further corrections.
+
 *climate_analysis.R script*
 Main script for analysing the climate data (missing PET calculations).
 
