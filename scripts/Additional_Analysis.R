@@ -11,7 +11,7 @@ library(tls)
 
 
 ## Define paths
-## NB. these data are ca. 110 GB
+## NB. these data are ca. 150 GB
 
 ## Paths Andy's machine
 # path  <-  "C:/workspace/REC_7_Data/8_datasets/"  # Unfilled EdiRe output
@@ -19,7 +19,7 @@ fpath  <-  "C:/workspace/REC_7_Data/11_ReddyProc/"  # Gap filled ReddyProc outpu
 mpath  <-  "C:/workspace/REC_7_Data/12_Marcys_data/"
 
 
-# Plotting theme
+## Plotting theme
 theme_fancy <- function() {
   theme_bw() +
     theme(
@@ -182,6 +182,7 @@ tidy_marcy <- function(df, station) {
     ) %>% 
     mutate(Station = station)
   }  # Tidy Marcy's data
+
 
 ## REC data
 tidy_RECs <- function(df, station) {
@@ -485,66 +486,109 @@ ggsave(
 {
   ## Resample time series to desired temporal resolution
     ## Resample H
-     DF_EC_study_H_daily <- DF_EC_study_H %>%
+     DF_EC_study_H_SEG_daily <- DF_EC_study_H %>%
        mutate(Datetime_Start_res = as.Date(Datetime_Start, format = "%Y-%m-%d")) %>% 
        group_by(Datetime_Start_res) %>%
+       select(SEG_EC0,
+              SEG_EC1) %>% 
+       na.omit %>%  # drop incomplete half hours
        summarise(
          SEG_EC0 = sum(SEG_EC0),
-         SEG_EC1 = sum(SEG_EC1),
-         SES_EC0 = sum(SES_EC0),
-         SES_EC1 = sum(SES_EC1)
+         SEG_EC1 = sum(SEG_EC1)
          )
 
-     ## Resample LE
-     DF_EC_study_LE_daily <- DF_EC_study_LE %>%
+     DF_EC_study_H_SES_daily <- DF_EC_study_H %>%
        mutate(Datetime_Start_res = as.Date(Datetime_Start, format = "%Y-%m-%d")) %>% 
        group_by(Datetime_Start_res) %>%
+       select(SES_EC0,
+              SES_EC1) %>% 
+       na.omit %>%  # drop incomplete half hours
+       summarise(
+         SES_EC0 = sum(SES_EC0),
+         SES_EC1 = sum(SES_EC1)
+       )
+     
+     
+     ## Resample LE
+     DF_EC_study_LE_SEG_daily <- DF_EC_study_LE %>%
+       mutate(Datetime_Start_res = as.Date(Datetime_Start, format = "%Y-%m-%d")) %>% 
+       group_by(Datetime_Start_res) %>%
+       select(SEG_EC0,
+              SEG_EC1) %>% 
+       na.omit %>%  # drop incomplete half hours
        summarise(
          SEG_EC0 = sum(SEG_EC0),
-         SEG_EC1 = sum(SEG_EC1),
+         SEG_EC1 = sum(SEG_EC1)
+       )   
+   
+     DF_EC_study_LE_SES_daily <- DF_EC_study_LE %>%
+       mutate(Datetime_Start_res = as.Date(Datetime_Start, format = "%Y-%m-%d")) %>% 
+       group_by(Datetime_Start_res) %>%
+       select(SES_EC0,
+              SES_EC1) %>% 
+       na.omit %>%  # drop incomplete half hours
+       summarise(
          SES_EC0 = sum(SES_EC0),
          SES_EC1 = sum(SES_EC1)
        )   
-   
+     
+     
      ## Resample NEE 
-     DF_EC_study_FC_daily <- DF_EC_study_FC %>%
+     DF_EC_study_FC_SEG_daily <- DF_EC_study_FC %>%
        mutate(Datetime_Start_res = as.Date(Datetime_Start, format = "%Y-%m-%d")) %>% 
        group_by(Datetime_Start_res) %>%
+       select(SEG_EC0,
+              SEG_EC1) %>% 
+       na.omit %>%  # drop incomplete half hours
        summarise(
          SEG_EC0 = mean(SEG_EC0),
-         SEG_EC1 = mean(SEG_EC1),
-         SES_EC0 = mean(SES_EC0),
-         SES_EC1 = mean(SES_EC1)
+         SEG_EC1 = mean(SEG_EC1)
+         # SEG_EC0 = sum(SEG_EC0),
+         # SEG_EC1 = sum(SEG_EC1)
+         
        )
     
+     DF_EC_study_FC_SES_daily <- DF_EC_study_FC %>%
+       mutate(Datetime_Start_res = as.Date(Datetime_Start, format = "%Y-%m-%d")) %>% 
+       group_by(Datetime_Start_res) %>%
+       select(SES_EC0,
+              SES_EC1) %>% 
+       na.omit %>%  # drop incomplete half hours
+       summarise(
+         SES_EC0 = mean(SES_EC0),
+         SES_EC1 = mean(SES_EC1)
+         # SES_EC0 = sum(SES_EC0),
+         # SES_EC1 = sum(SES_EC1)
+       )
+     
    
   ## Determine axis limits
-  lims_h  <- range(DF_EC_study_H_daily[, c("SEG_EC0",  "SEG_EC1",  "SES_EC0",  "SES_EC1")],  na.rm=T)
-  lims_le  <- range(DF_EC_study_LE_daily[, c("SEG_EC0",  "SEG_EC1",  "SES_EC0",  "SES_EC1")],  na.rm=T)
-  lims_fc  <- range(DF_EC_study_FC_daily[, c("SEG_EC0",  "SEG_EC1",  "SES_EC0",  "SES_EC1")],  na.rm=T)
-
-
+  lims_h  <- range(range(DF_EC_study_H_SEG_daily[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_H_SES_daily[, c("SES_EC0",  "SES_EC1")]))
+  lims_le  <- range(range(DF_EC_study_LE_SEG_daily[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_LE_SES_daily[, c("SES_EC0",  "SES_EC1")]))
+  lims_fc  <- range(range(DF_EC_study_FC_SEG_daily[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_FC_SES_daily[, c("SES_EC0",  "SES_EC1")]))
+ 
+    
   ## H / US-Seg
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_H_daily)
+    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_H_SEG_daily)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_H_daily$SEG_EC0, DF_EC_study_H_daily$SEG_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_H_SEG_daily$SEG_EC0, DF_EC_study_H_SEG_daily$SEG_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    seg_h <- ggplot(DF_EC_study_H_daily, aes(x=SEG_EC0, y=SEG_EC1)) +
+    seg_h <- ggplot(DF_EC_study_H_SEG_daily, aes(x=SEG_EC0, y=SEG_EC1)) +
       labs(x = expression("Seg EC0 - H (W m"^"-2"*")"),
            y = expression("Seg EC1 - H (W m"^"-2"*")"),
            title = "Sensible Heat Flux - Seg") +
-      geom_point(shape=1) +
-      # geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
-      # scale_fill_continuous(type = "viridis") +     # colour palette
+      # geom_point(shape=1) +
+      geom_bin2d(bins = 50, show.legend=T) +   # Bin size control
+      scale_fill_continuous(type = "viridis") +     # colour palette
       xlim(lims_h) +
       ylim(lims_h) +
       theme_fancy() +
@@ -552,33 +596,33 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 1200, y = 6500, label = equation, size=4) +
-      annotate("text", x = -290, y = 5600, label = r, size=4)
-    
+      annotate("text", x = 1200, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
+      annotate("text", x = -720, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
+
   } # H / US-Seg
   
   
   # H / US-Ses
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_H_daily)
+    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_H_SES_daily)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_H_daily$SES_EC0, DF_EC_study_H_daily$SES_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_H_SES_daily$SES_EC0, DF_EC_study_H_SES_daily$SES_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    ses_h <- ggplot(DF_EC_study_H_daily, aes(x=SES_EC0, y=SES_EC1)) +
+    ses_h <- ggplot(DF_EC_study_H_SES_daily, aes(x=SES_EC0, y=SES_EC1)) +
       labs(x = expression("Ses EC0 - H (W m"^"-2"*")"),
            y = expression("Ses EC1 - H (W m"^"-2"*")"),
            title = "Sensible Heat Flux - Ses") +
-      geom_point(shape=1) +
-      # geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
-      # scale_fill_continuous(type = "viridis") +     # colour palette
+      # geom_point(shape=1) +
+      geom_bin2d(bins = 50, show.legend=T) +   # Bin size control
+      scale_fill_continuous(type = "viridis") +     # colour palette
       xlim(lims_h) +
       ylim(lims_h) +
       theme_fancy() +
@@ -586,8 +630,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 1200, y = 6500, label = equation, size=4) +
-      annotate("text", x = -290, y = 5700, label = r, size=4)
+      annotate("text", x = 1200, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
+      annotate("text", x = -720, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
     
   } # H / US-Ses
   
@@ -595,24 +639,24 @@ ggsave(
   # LE / US-Seg
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_LE_daily)
+    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_LE_SEG_daily)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_LE_daily$SEG_EC0, DF_EC_study_LE_daily$SEG_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_LE_SEG_daily$SEG_EC0, DF_EC_study_LE_SEG_daily$SEG_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    seg_le <- ggplot(DF_EC_study_LE_daily, aes(x=SEG_EC0, y=SEG_EC1)) +
+    seg_le <- ggplot(DF_EC_study_LE_SEG_daily, aes(x=SEG_EC0, y=SEG_EC1)) +
       labs(x = expression("Seg EC0 - LE (W m"^"-2"*")"),
            y = expression("Seg EC1 - LE (W m"^"-2"*")"),
            title = "Latent Heat Flux - Seg") +
-      geom_point(shape=1) +
-      # geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
-      # scale_fill_continuous(type = "viridis") +     # colour palette
+      # geom_point(shape=1) +
+      geom_bin2d(bins = 50, show.legend=T) +   # Bin size control
+      scale_fill_continuous(type = "viridis") +     # colour palette
       xlim(lims_le) +
       ylim(lims_le) +
       theme_fancy() +
@@ -620,8 +664,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 1000, y = 3130, label = equation, size=4) +
-      annotate("text", x = 60, y = 2750, label = r, size=4)
+      annotate("text", x = 1250, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
+      annotate("text", x = 400, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
     
   } # LE / US-Seg
   
@@ -629,24 +673,24 @@ ggsave(
   # LE / US-Ses
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_LE_daily)
+    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_LE_SES_daily)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_LE_daily$SES_EC0, DF_EC_study_LE_daily$SES_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_LE_SES_daily$SES_EC0, DF_EC_study_LE_SES_daily$SES_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    ses_le <- ggplot(DF_EC_study_LE_daily, aes(x=SES_EC0, y=SES_EC1)) +
+    ses_le <- ggplot(DF_EC_study_LE_SES_daily, aes(x=SES_EC0, y=SES_EC1)) +
       labs(x = expression("Ses EC0 - LE (W m"^"-2"*")"),
            y = expression("Ses EC1 - LE (W m"^"-2"*")"),
            title = "Latent Heat Flux - Ses") +
-      geom_point(shape=1) +
-      # geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
-      # scale_fill_continuous(type = "viridis") +     # colour palette
+      # geom_point(shape=1) +
+      geom_bin2d(bins = 50, show.legend=T) +   # Bin size control
+      scale_fill_continuous(type = "viridis") +     # colour palette
       xlim(lims_le) +
       ylim(lims_le) +
       theme_fancy() +
@@ -654,8 +698,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 1070, y = 3130, label = equation, size=4) +
-      annotate("text", x = 60, y = 2750, label = r, size=4)
+      annotate("text", x = 1250, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
+      annotate("text", x = 400, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
     
   } # LE / US-Ses
   
@@ -663,24 +707,24 @@ ggsave(
   # NEE / US-Seg
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_FC_daily)
+    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_FC_SEG_daily)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_FC_daily$SEG_EC0, DF_EC_study_FC_daily$SEG_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_FC_SEG_daily$SEG_EC0, DF_EC_study_FC_SEG_daily$SEG_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    seg_fc <- ggplot(DF_EC_study_FC_daily, aes(x=SEG_EC0, y=SEG_EC1)) +
+    seg_fc <- ggplot(DF_EC_study_FC_SEG_daily, aes(x=SEG_EC0, y=SEG_EC1)) +
       labs(x = expression("Seg EC0 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
            y = expression("Seg EC1 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
            title = "Net Ecosys. Exchange - Ses") +
-      geom_point(shape=1) +
-      # geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
-      # scale_fill_continuous(type = "viridis") +     # colour palette
+      # geom_point(shape=1) +
+      geom_bin2d(bins = 50, show.legend=T) +   # Bin size control
+      scale_fill_continuous(type = "viridis") +     # colour palette
       xlim(lims_fc) +
       ylim(lims_fc) +
       theme_fancy() +
@@ -688,8 +732,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = -0.4, y = 1.5, label = equation, size=4) +
-      annotate("text", x = -1, y = 1.2, label = r, size=4)
+      annotate("text", x = 0, y = (lims_fc[1] + 0.99 * abs(lims_fc[1] - lims_fc[2])), label = equation, size=4) +
+      annotate("text", x = -1.05, y = (lims_fc[1] + 0.90 * abs(lims_fc[1] - lims_fc[2])), label = r, size=4)
     
   } # NEE / US-Seg
   
@@ -697,24 +741,24 @@ ggsave(
   # NEE / US-Ses
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_FC_daily)
+    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_FC_SES_daily)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_FC_daily$SES_EC0, DF_EC_study_FC_daily$SES_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_FC_SES_daily$SES_EC0, DF_EC_study_FC_SES_daily$SES_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    ses_fc <- ggplot(DF_EC_study_FC_daily, aes(x=SES_EC0, y=SES_EC1)) +
+    ses_fc <- ggplot(DF_EC_study_FC_SES_daily, aes(x=SES_EC0, y=SES_EC1)) +
       labs(x = expression("Ses EC0 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
            y = expression("Ses EC1 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
            title = "Net Ecosys. Exchange - Ses") +
-      geom_point(shape=1) +
-      # geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
-      # scale_fill_continuous(type = "viridis") +     # colour palette
+      # geom_point(shape=1) +
+      geom_bin2d(bins = 50, show.legend=T) +   # Bin size control
+      scale_fill_continuous(type = "viridis") +     # colour palette
       xlim(lims_fc) +
       ylim(lims_fc) +
       theme_fancy() +
@@ -722,8 +766,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = -0.4, y = 1.5, label = equation, size=4) +
-      annotate("text", x = -1, y = 1.2, label = r, size=4)
+      annotate("text", x = 0, y = (lims_fc[1] + 0.99 * abs(lims_fc[1] - lims_fc[2])), label = equation, size=4) +
+      annotate("text", x = -1.05, y = (lims_fc[1] + 0.90 * abs(lims_fc[1] - lims_fc[2])), label = r, size=4)
     
   } # NEE / US-Ses
   
@@ -747,74 +791,119 @@ ggsave(
 
 ### Monthly comparison (EC0 versus EC1) ----
 # NB. monthly comparison doesn't work because every month contains gaps in the EC0
-if(F){
+{
   ## Resample time series to desired temporal resolution
   ## Resample H
-  DF_EC_study_H_monthly <- DF_EC_study_H %>%
+  DF_EC_study_H_SEG_monthly <- DF_EC_study_H %>%
     mutate(year = format(Datetime_Start, format = "%Y"),
            month = format(Datetime_Start, format = "%m"),
            day = format(Datetime_Start, format = "%d")
            ) %>% 
-  group_by(year, month) %>% 
+    group_by(year, month) %>% 
+    select(SEG_EC0,
+           SEG_EC1) %>% 
+    na.omit %>%  # drop incomplete half hours
     summarize(
       SEG_EC0 = sum(SEG_EC0),
-      SEG_EC1 = sum(SEG_EC1),
-      SES_EC0 = sum(SES_EC0),
-      SES_EC1 = sum(SES_EC1)
+      SEG_EC1 = sum(SEG_EC1)
     )
 
-
-  ## Resample LE
-  DF_EC_study_LE_monthly <- DF_EC_study_LE %>%
+  DF_EC_study_H_SES_monthly <- DF_EC_study_H %>%
     mutate(year = format(Datetime_Start, format = "%Y"),
            month = format(Datetime_Start, format = "%m"),
            day = format(Datetime_Start, format = "%d")
     ) %>% 
     group_by(year, month) %>% 
+    select(SES_EC0,
+           SES_EC1) %>% 
+    na.omit %>%  # drop incomplete half hours
+    summarize(
+      SES_EC0 = sum(SES_EC0),
+      SES_EC1 = sum(SES_EC1)
+      )
+  
+  
+  ## Resample LE
+  DF_EC_study_LE_SEG_monthly <- DF_EC_study_LE %>%
+    mutate(year = format(Datetime_Start, format = "%Y"),
+           month = format(Datetime_Start, format = "%m"),
+           day = format(Datetime_Start, format = "%d")
+    ) %>% 
+    group_by(year, month) %>% 
+    select(SEG_EC0,
+           SEG_EC1) %>% 
+    na.omit %>%  # drop incomplete half hours
     summarize(
       SEG_EC0 = sum(SEG_EC0),
-      SEG_EC1 = sum(SEG_EC1),
+      SEG_EC1 = sum(SEG_EC1)
+    )
+  
+  DF_EC_study_LE_SES_monthly <- DF_EC_study_LE %>%
+    mutate(year = format(Datetime_Start, format = "%Y"),
+           month = format(Datetime_Start, format = "%m"),
+           day = format(Datetime_Start, format = "%d")
+    ) %>% 
+    group_by(year, month) %>% 
+    select(SES_EC0,
+           SES_EC1) %>% 
+    na.omit %>%  # drop incomplete half hours
+    summarize(
       SES_EC0 = sum(SES_EC0),
       SES_EC1 = sum(SES_EC1)
     )
- 
+
   
   ## Resample NEE
-  DF_EC_study_FC_monthly <- DF_EC_study_FC %>%
+  DF_EC_study_FC_SEG_monthly <- DF_EC_study_FC %>%
     mutate(year = format(Datetime_Start, format = "%Y"),
            month = format(Datetime_Start, format = "%m"),
            day = format(Datetime_Start, format = "%d")
     ) %>% 
     group_by(year, month) %>% 
+    select(SEG_EC0,
+           SEG_EC1) %>% 
+    na.omit %>%  # drop incomplete half hours
     summarize(
-      SEG_EC0 = sum(SEG_EC0),
-      SEG_EC1 = sum(SEG_EC1),
-      SES_EC0 = sum(SES_EC0),
-      SES_EC1 = sum(SES_EC1)
+      SEG_EC0 = mean(SEG_EC0),
+      SEG_EC1 = mean(SEG_EC1)
     )
   
+  DF_EC_study_FC_SES_monthly <- DF_EC_study_FC %>%
+    mutate(year = format(Datetime_Start, format = "%Y"),
+           month = format(Datetime_Start, format = "%m"),
+           day = format(Datetime_Start, format = "%d")
+    ) %>% 
+    group_by(year, month) %>% 
+    select(SES_EC0,
+           SES_EC1) %>% 
+    na.omit %>%  # drop incomplete half hours
+    summarize(
+      SES_EC0 = mean(SES_EC0),
+      SES_EC1 = mean(SES_EC1)
+    )
  
   ## Determine axis limits
-  lims_h  <- range(DF_EC_study_H_monthly[, c("SEG_EC0",  "SEG_EC1",  "SES_EC0",  "SES_EC1")],  na.rm=T)
-  lims_le  <- range(DF_EC_study_LE_monthly[, c("SEG_EC0",  "SEG_EC1",  "SES_EC0",  "SES_EC1")],  na.rm=T)
-  lims_fc  <- range(DF_EC_study_FC_monthly[, c("SEG_EC0",  "SEG_EC1",  "SES_EC0",  "SES_EC1")],  na.rm=T)
+  lims_h  <- range(range(DF_EC_study_H_SEG_monthly[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_H_SES_monthly[, c("SES_EC0",  "SES_EC1")]))
+  lims_le  <- range(range(DF_EC_study_LE_SEG_monthly[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_LE_SES_monthly[, c("SES_EC0",  "SES_EC1")]))
+  lims_fc  <- range(range(DF_EC_study_FC_SEG_monthly[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_FC_SES_monthly[, c("SES_EC0",  "SES_EC1")]))
+  
   
   
   ## H / US-Seg
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_H_monthly)
+    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_H_SEG_monthly)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_H_monthly$SEG_EC0, DF_EC_study_H_monthly$SEG_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_H_SEG_monthly$SEG_EC0, DF_EC_study_H_SEG_monthly$SEG_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    seg_h <- ggplot(DF_EC_study_H_monthly, aes(x=SEG_EC0, y=SEG_EC1)) +
+    seg_h <- ggplot(DF_EC_study_H_SEG_monthly, aes(x=SEG_EC0, y=SEG_EC1)) +
       labs(x = expression("Seg EC0 - H (W m"^"-2"*")"),
            y = expression("Seg EC1 - H (W m"^"-2"*")"),
            title = "Sensible Heat Flux - Seg") +
@@ -828,8 +917,8 @@ if(F){
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 1200, y = 6500, label = equation, size=4) +
-      annotate("text", x = -290, y = 5600, label = r, size=4)
+      annotate("text", x = 68000, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
+      annotate("text", x = 39000, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
     
   } # H / US-Seg
   
@@ -837,18 +926,18 @@ if(F){
   # H / US-Ses
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_H_monthly)
+    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_H_SES_monthly)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_H_monthly$SES_EC0, DF_EC_study_H_monthly$SES_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_H_SES_monthly$SES_EC0, DF_EC_study_H_SES_monthly$SES_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    ses_h <- ggplot(DF_EC_study_H_monthly, aes(x=SES_EC0, y=SES_EC1)) +
+    ses_h <- ggplot(DF_EC_study_H_SES_monthly, aes(x=SES_EC0, y=SES_EC1)) +
       labs(x = expression("Ses EC0 - H (W m"^"-2"*")"),
            y = expression("Ses EC1 - H (W m"^"-2"*")"),
            title = "Sensible Heat Flux - Ses") +
@@ -862,27 +951,27 @@ if(F){
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 1200, y = 6500, label = equation, size=4) +
-      annotate("text", x = -290, y = 5700, label = r, size=4)
-    
+      annotate("text", x = 68000, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
+      annotate("text", x = 39000, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
+
   } # H / US-Ses
   
   
   # LE / US-Seg
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_LE_monthly)
+    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_LE_SEG_monthly)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_LE_monthly$SEG_EC0, DF_EC_study_LE_monthly$SEG_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_LE_SEG_monthly$SEG_EC0, DF_EC_study_LE_SEG_monthly$SEG_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    seg_le <- ggplot(DF_EC_study_LE_monthly, aes(x=SEG_EC0, y=SEG_EC1)) +
+    seg_le <- ggplot(DF_EC_study_LE_SEG_monthly, aes(x=SEG_EC0, y=SEG_EC1)) +
       labs(x = expression("Seg EC0 - LE (W m"^"-2"*")"),
            y = expression("Seg EC1 - LE (W m"^"-2"*")"),
            title = "Latent Heat Flux - Seg") +
@@ -896,8 +985,8 @@ if(F){
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 1000, y = 3130, label = equation, size=4) +
-      annotate("text", x = 60, y = 2750, label = r, size=4)
+      annotate("text", x = 19000, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
+      annotate("text", x = 9000, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
     
   } # LE / US-Seg
   
@@ -905,18 +994,18 @@ if(F){
   # LE / US-Ses
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_LE_monthly)
+    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_LE_SES_monthly)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_LE_monthly$SES_EC0, DF_EC_study_LE_monthly$SES_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_LE_SES_monthly$SES_EC0, DF_EC_study_LE_SES_monthly$SES_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    ses_le <- ggplot(DF_EC_study_LE_monthly, aes(x=SES_EC0, y=SES_EC1)) +
+    ses_le <- ggplot(DF_EC_study_LE_SES_monthly, aes(x=SES_EC0, y=SES_EC1)) +
       labs(x = expression("Ses EC0 - LE (W m"^"-2"*")"),
            y = expression("Ses EC1 - LE (W m"^"-2"*")"),
            title = "Latent Heat Flux - Ses") +
@@ -930,27 +1019,26 @@ if(F){
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 1070, y = 3130, label = equation, size=4) +
-      annotate("text", x = 60, y = 2750, label = r, size=4)
-    
+      annotate("text", x = 19000, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
+      annotate("text", x = 9000, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
   } # LE / US-Ses
   
   
   # NEE / US-Seg
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_FC_monthly)
+    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_FC_SEG_monthly)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_FC_monthly$SEG_EC0, DF_EC_study_FC_monthly$SEG_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_FC_SEG_monthly$SEG_EC0, DF_EC_study_FC_SEG_monthly$SEG_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    seg_fc <- ggplot(DF_EC_study_FC_monthly, aes(x=SEG_EC0, y=SEG_EC1)) +
+    seg_fc <- ggplot(DF_EC_study_FC_SEG_monthly, aes(x=SEG_EC0, y=SEG_EC1)) +
       labs(x = expression("Seg EC0 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
            y = expression("Seg EC1 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
            title = "Net Ecosys. Exchange - Ses") +
@@ -964,8 +1052,8 @@ if(F){
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = -0.4, y = 1.5, label = equation, size=4) +
-      annotate("text", x = -1, y = 1.2, label = r, size=4)
+      annotate("text", x = -0.4, y = (lims_fc[1] + 0.99 * abs(lims_fc[1] - lims_fc[2])), label = equation, size=4) +
+      annotate("text", x = -0.6, y = (lims_fc[1] + 0.90 * abs(lims_fc[1] - lims_fc[2])), label = r, size=4)
     
   } # NEE / US-Seg
   
@@ -973,18 +1061,18 @@ if(F){
   # NEE / US-Ses
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_FC_monthly)
+    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_FC_SES_monthly)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_FC_monthly$SES_EC0, DF_EC_study_FC_monthly$SES_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_FC_SES_monthly$SES_EC0, DF_EC_study_FC_SES_monthly$SES_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    ses_fc <- ggplot(DF_EC_study_FC_monthly, aes(x=SES_EC0, y=SES_EC1)) +
+    ses_fc <- ggplot(DF_EC_study_FC_SES_monthly, aes(x=SES_EC0, y=SES_EC1)) +
       labs(x = expression("Ses EC0 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
            y = expression("Ses EC1 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
            title = "Net Ecosys. Exchange - Ses") +
@@ -998,8 +1086,8 @@ if(F){
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = -0.4, y = 1.5, label = equation, size=4) +
-      annotate("text", x = -1, y = 1.2, label = r, size=4)
+      annotate("text", x = -0.4, y = (lims_fc[1] + 0.99 * abs(lims_fc[1] - lims_fc[2])), label = equation, size=4) +
+      annotate("text", x = -0.6, y = (lims_fc[1] + 0.90 * abs(lims_fc[1] - lims_fc[2])), label = r, size=4)
     
   } # NEE / US-Ses
   
@@ -1025,7 +1113,7 @@ if(F){
 
 
 # NOT USED!!! function to facilitate versatile comparisons of EC0 with EC1
-if(F){# comparison_EC1_vs_EC0 <- function(beginning,
+# if(F){# comparison_EC1_vs_EC0 <- function(beginning,
   #                                   ending,
   #                                   resolution) {
   #   DF_EC %>%
