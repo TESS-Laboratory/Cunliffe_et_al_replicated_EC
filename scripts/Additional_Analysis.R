@@ -93,32 +93,6 @@ DF_SES_EC0c  <- read_csv(file=paste(mpath, "US-Ses_HH_202001010000_202101010000.
                          na = c("", "NA",-9999))
 
 
-## Unused Read unfilled EdiRe output
-# DF_SEG_EC1  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SEG_REC1_flux.csv", sep=""),
-#                         col_types = cols('Date/Time' = col_datetime("%d/%m/%Y %H:%M")))
-# 
-# DF_SEG_EC2  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SEG_REC2_flux.csv", sep=""),
-#                         col_types = cols('Date/Time' = col_datetime("%d/%m/%y %H:%M:%S")))
-# 
-# DF_SEG_EC3  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SEG_REC3_flux.csv", sep=""),
-#                         col_types = cols('Date/Time' = col_datetime("%d/%m/%y %H:%M:%S")))
-# 
-# DF_SEG_EC4  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SEG_REC4_flux.csv", sep=""),
-#                         col_types = cols('Date/Time' = col_datetime("%d/%m/%y %H:%M:%S")))
-# 
-# DF_SES_EC1  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SES_REC1_flux.csv", sep=""),
-#                         col_types = cols('Date/Time' = col_datetime("%d/%m/%y %H:%M:%S")))
-# 
-# DF_SES_EC2  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SES_REC2_flux.csv", sep=""),
-#                         col_types = cols('Date/Time' = col_datetime("%d/%m/%Y %H:%M")))
-# 
-# DF_SES_EC3  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SES_REC3_flux.csv", sep=""),
-#                         col_types = cols('Date/Time' = col_datetime("%d/%m/%y %H:%M:%S")))
-# 
-# DF_SES_EC4  <- read_csv(file=paste(path, "2020_01_01_from_flash_Txcor_SES_REC4_flux.csv", sep=""),
-#                         col_types = cols('Date/Time' = col_datetime("%d/%m/%y %H:%M:%S")))
-
-
 ## Read gap filled Reddy Proc output (tab delimited, read twice because the second row contains units)
 ## '_f' in variable names indicates gap filled.
 df_names <- read_tsv(file=paste(fpath, "SEG_REC1_2020_50_filled_Txcor.txt", sep=""), n_max = 1) %>% names()
@@ -179,7 +153,8 @@ tidy_marcy <- function(df, station) {
            H,
            Precipitation, 
            SW_IN
-    ) %>% 
+    ) %>%
+    rename(NEE = FC) %>% 
     mutate(Station = station)
   }  # Tidy Marcy's data
 
@@ -193,17 +168,14 @@ tidy_RECs <- function(df, station) {
       ) %>%
     select(
       Datetime_Start,
+      NEE,
       NEE_uStar_f,
+      LE,
       LE_f,
+      H,
       H_f,
-      Station) %>% 
-    rename(
-      FC = NEE_uStar_f,
-      LE = LE_f,
-      H = H_f
-      )
+      Station)
   }  # Tidy REC data
-
 
 
 
@@ -250,8 +222,9 @@ shape_wider <- function(df, variable) {
 {
   DF_EC_study_H <- shape_wider(DF_EC_study, "H")
   DF_EC_study_LE <- shape_wider(DF_EC_study, "LE")
-  DF_EC_study_FC <- shape_wider(DF_EC_study, "FC")
+  DF_EC_study_NEE <- shape_wider(DF_EC_study, "NEE")
 }
+
 
 
 #-------------- 2. Analyze data --------------
@@ -264,8 +237,10 @@ shape_wider <- function(df, variable) {
 ## Determine axis limits
 lims_h  <- range(DF_EC_study_H[, c("SEG_EC0",  "SEG_EC1",  "SES_EC0",  "SES_EC1")],  na.rm=T)
 lims_le  <- range(DF_EC_study_LE[, c("SEG_EC0",  "SEG_EC1",  "SES_EC0",  "SES_EC1")],  na.rm=T)
-lims_fc  <- range(DF_EC_study_FC[, c("SEG_EC0",  "SEG_EC1",  "SES_EC0",  "SES_EC1")],  na.rm=T)
+lims_nee  <- range(DF_EC_study_NEE[, c("SEG_EC0",  "SEG_EC1",  "SES_EC0",  "SES_EC1")],  na.rm=T)
 
+### H
+{
 ## H / US-Seg
 {
 
@@ -282,17 +257,17 @@ r <- paste("r: ", round(r,2))
 
 # create plot
 seg_h <- ggplot(DF_EC_study_H, aes(x=SEG_EC0, y=SEG_EC1)) +
-    labs(x = expression("Seg EC0 - H (W m"^"-2"*")"),
-         y = expression("Seg EC1 - H (W m"^"-2"*")"),
-         title = "Sensible Heat Flux - Seg") +
-    geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
-    scale_fill_continuous(type = "viridis") +     # colour palette
-    xlim(lims_h) +
-    ylim(lims_h) +
-    theme_fancy() +
-    theme(plot.title = element_text(size = 14, face = "bold")) +
-    theme(legend.position = c(0.85, 0.25)) + # legend position
-    geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
+  labs(x = expression("Seg EC0 - H (W m"^"-2"*")"),
+       y = expression("Seg EC1 - H (W m"^"-2"*")"),
+       title = "Sensible Heat Flux - Seg") +
+  geom_hex(bins = 100, show.legend=T) +
+  # scale_fill_continuous(type = "viridis")) +     # colour palette
+  xlim(lims_h) +
+  ylim(lims_h) +
+  theme_fancy() +
+  theme(plot.title = element_text(size = 14, face = "bold")) +
+  theme(legend.position = c(0.85, 0.25)) + # legend position
+  geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
   geom_abline(intercept = tls_int, slope = tls_slp) +
   annotate("text", x = 65, y = 500, label = equation, size=4) +
   annotate("text", x = -100, y = 420, label = r, size=4)
@@ -318,8 +293,8 @@ seg_h <- ggplot(DF_EC_study_H, aes(x=SEG_EC0, y=SEG_EC1)) +
     labs(x = expression("Ses EC0 - H (W m"^"-2"*")"),
          y = expression("Ses EC1 - H (W m"^"-2"*")"),
          title = "Sensible Heat Flux - Ses") +
-    geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
-    scale_fill_continuous(type = "viridis") +     # colour palette
+    geom_hex(bins = 100, show.legend=T) +
+    # scale_fill_continuous(type = "viridis") +     # colour palette
     xlim(lims_h) +
     ylim(lims_h) +
     theme_fancy() +
@@ -329,10 +304,17 @@ seg_h <- ggplot(DF_EC_study_H, aes(x=SEG_EC0, y=SEG_EC1)) +
     geom_abline(intercept = tls_int, slope = tls_slp) +
     annotate("text", x = 65, y = 500, label = equation, size=4) +
     annotate("text", x = -100, y = 420, label = r, size=4)
-  
-} # H / US-Ses
+  } # H / US-Ses
 
+# Calculate the range of values in both plots for consistent scalars
+count.range = range(lapply(list(seg_h, ses_h), function(p){ ggplot_build(p)$data[[1]]$count}))
+seg_h <- seg_h +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
+ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
 
+}
+
+### LE
+{
 ## LE / US-Seg
 {
   # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
@@ -351,8 +333,8 @@ seg_h <- ggplot(DF_EC_study_H, aes(x=SEG_EC0, y=SEG_EC1)) +
     labs(x = expression("Seg EC0 - LE (W m"^"-2"*")"),
          y = expression("Seg EC1 - LE (W m"^"-2"*")"),
          title = "Latent Heat Flux - Seg") +
-    geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
-    scale_fill_continuous(type = "viridis") +     # colour palette
+    geom_hex(bins = 100, show.legend=T) +
+    # scale_fill_continuous(type = "viridis") +     # colour palette
     xlim(lims_le) +
     ylim(lims_le) +
     theme_fancy() +
@@ -384,8 +366,8 @@ seg_h <- ggplot(DF_EC_study_H, aes(x=SEG_EC0, y=SEG_EC1)) +
     labs(x = expression("Ses EC0 - LE (W m"^"-2"*")"),
          y = expression("Ses EC1 - LE (W m"^"-2"*")"),
          title = "Latent Heat Flux - Ses") +
-    geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
-    scale_fill_continuous(type = "viridis") +     # colour palette
+    geom_hex(bins = 100, show.legend=T) +
+    # scale_fill_continuous(type = "viridis") +     # colour palette
     xlim(lims_le) +
     ylim(lims_le) +
     theme_fancy() +
@@ -398,29 +380,39 @@ seg_h <- ggplot(DF_EC_study_H, aes(x=SEG_EC0, y=SEG_EC1)) +
   
 } # LE / US-Ses
 
+# Calculate the range of values in both plots for consistent scalars
+count.range = range(lapply(list(seg_le, ses_le), function(p){ ggplot_build(p)$data[[1]]$count}))
+seg_le <- seg_le +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
+ses_le <- ses_le +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
+  
+}
 
+  
+### NEE
+{
 ## NEE / US-Seg
 {
   # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-  pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_FC)
+  pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_NEE)
   tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
   tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
   
   equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
   
   # Compute Pearson correlation coefficient
-  r <- cor(DF_EC_study_FC$SEG_EC0, DF_EC_study_FC$SEG_EC1, method="pearson", use = "complete.obs")
+  r <- cor(DF_EC_study_NEE$SEG_EC0, DF_EC_study_NEE$SEG_EC1, method="pearson", use = "complete.obs")
   r <- paste("r: ", round(r,2))
   
   # create plot
-  seg_fc <- ggplot(DF_EC_study_FC, aes(x=SEG_EC0, y=SEG_EC1)) +
-    labs(x = expression("Seg EC0 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
-         y = expression("Seg EC1 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
-         title = "Net Ecosys. Exchange - Ses") +
-    geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
+  seg_nee <- ggplot(DF_EC_study_NEE, aes(x=SEG_EC0, y=SEG_EC1)) +
+    labs(
+      x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+      y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+      title = "Net Ecosys. Exchange - Ses") +
+    geom_hex(bins = 100, show.legend=T) +
     scale_fill_continuous(type = "viridis") +     # colour palette
-    xlim(lims_fc) +
-    ylim(lims_fc) +
+    xlim(lims_nee) +
+    ylim(lims_nee) +
     theme_fancy() +
     theme(plot.title = element_text(size = 14, face = "bold")) +
     theme(legend.position = c(0.85, 0.25)) + # legend position
@@ -435,25 +427,26 @@ seg_h <- ggplot(DF_EC_study_H, aes(x=SEG_EC0, y=SEG_EC1)) +
 ## NEE / US-Ses
 {
   # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-  pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_FC)
+  pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_NEE)
   tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
   tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
   
   equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
   
   # Compute Pearson correlation coefficient
-  r <- cor(DF_EC_study_FC$SES_EC0, DF_EC_study_FC$SES_EC1, method="pearson", use = "complete.obs")
+  r <- cor(DF_EC_study_NEE$SES_EC0, DF_EC_study_NEE$SES_EC1, method="pearson", use = "complete.obs")
   r <- paste("r: ", round(r,2))
   
   # create plot
-  ses_fc <- ggplot(DF_EC_study_FC, aes(x=SES_EC0, y=SES_EC1)) +
-    labs(x = expression("Ses EC0 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
-         y = expression("Ses EC1 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
-         title = "Net Ecosys. Exchange - Ses") +
-    geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
+  ses_nee <- ggplot(DF_EC_study_NEE, aes(x=SES_EC0, y=SES_EC1)) +
+    labs(
+      x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+      y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+      title = "Net Ecosys. Exchange - Ses") +
+    geom_hex(bins = 100, show.legend=T) +
     scale_fill_continuous(type = "viridis") +     # colour palette
-    xlim(lims_fc) +
-    ylim(lims_fc) +
+    xlim(lims_nee) +
+    ylim(lims_nee) +
     theme_fancy() +
     theme(plot.title = element_text(size = 14, face = "bold")) +
     theme(legend.position = c(0.85, 0.25)) + # legend position
@@ -464,10 +457,17 @@ seg_h <- ggplot(DF_EC_study_H, aes(x=SEG_EC0, y=SEG_EC1)) +
   
 } # NEE / US-Ses
 
+# Calculate the range of values in both plots for consistent scalars
+count.range = range(lapply(list(seg_nee, ses_nee), function(p){ ggplot_build(p)$data[[1]]$count}))
+seg_nee <- seg_nee +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
+ses_nee <- ses_nee +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
+  
+}
+
 
 
 ### combine plot objects with Patchwork
-pall <- (seg_h + ses_h) / (seg_le + ses_le) / (seg_fc + ses_fc) +
+pall <- (seg_h + ses_h) / (seg_le + ses_le) / (seg_nee + ses_nee) +
   plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97))
 
 filename = "plots/EC0 vs EC1 comparison - half hourly.png"
@@ -493,8 +493,8 @@ ggsave(
               SEG_EC1) %>% 
        na.omit %>%  # drop incomplete half hours
        summarise(
-         SEG_EC0 = sum(SEG_EC0),
-         SEG_EC1 = sum(SEG_EC1)
+         SEG_EC0 = mean(SEG_EC0),
+         SEG_EC1 = mean(SEG_EC1)
          )
 
      DF_EC_study_H_SES_daily <- DF_EC_study_H %>%
@@ -504,8 +504,8 @@ ggsave(
               SES_EC1) %>% 
        na.omit %>%  # drop incomplete half hours
        summarise(
-         SES_EC0 = sum(SES_EC0),
-         SES_EC1 = sum(SES_EC1)
+         SES_EC0 = mean(SES_EC0),
+         SES_EC1 = mean(SES_EC1)
        )
      
      
@@ -517,8 +517,8 @@ ggsave(
               SEG_EC1) %>% 
        na.omit %>%  # drop incomplete half hours
        summarise(
-         SEG_EC0 = sum(SEG_EC0),
-         SEG_EC1 = sum(SEG_EC1)
+         SEG_EC0 = mean(SEG_EC0),
+         SEG_EC1 = mean(SEG_EC1)
        )   
    
      DF_EC_study_LE_SES_daily <- DF_EC_study_LE %>%
@@ -528,13 +528,13 @@ ggsave(
               SES_EC1) %>% 
        na.omit %>%  # drop incomplete half hours
        summarise(
-         SES_EC0 = sum(SES_EC0),
-         SES_EC1 = sum(SES_EC1)
+         SES_EC0 = mean(SES_EC0),
+         SES_EC1 = mean(SES_EC1)
        )   
      
      
      ## Resample NEE 
-     DF_EC_study_FC_SEG_daily <- DF_EC_study_FC %>%
+     DF_EC_study_NEE_SEG_daily <- DF_EC_study_NEE %>%
        mutate(Datetime_Start_res = as.Date(Datetime_Start, format = "%Y-%m-%d")) %>% 
        group_by(Datetime_Start_res) %>%
        select(SEG_EC0,
@@ -543,12 +543,9 @@ ggsave(
        summarise(
          SEG_EC0 = mean(SEG_EC0),
          SEG_EC1 = mean(SEG_EC1)
-         # SEG_EC0 = sum(SEG_EC0),
-         # SEG_EC1 = sum(SEG_EC1)
-         
        )
     
-     DF_EC_study_FC_SES_daily <- DF_EC_study_FC %>%
+     DF_EC_study_NEE_SES_daily <- DF_EC_study_NEE %>%
        mutate(Datetime_Start_res = as.Date(Datetime_Start, format = "%Y-%m-%d")) %>% 
        group_by(Datetime_Start_res) %>%
        select(SES_EC0,
@@ -557,17 +554,16 @@ ggsave(
        summarise(
          SES_EC0 = mean(SES_EC0),
          SES_EC1 = mean(SES_EC1)
-         # SES_EC0 = sum(SES_EC0),
-         # SES_EC1 = sum(SES_EC1)
        )
      
    
   ## Determine axis limits
   lims_h  <- range(range(DF_EC_study_H_SEG_daily[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_H_SES_daily[, c("SES_EC0",  "SES_EC1")]))
   lims_le  <- range(range(DF_EC_study_LE_SEG_daily[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_LE_SES_daily[, c("SES_EC0",  "SES_EC1")]))
-  lims_fc  <- range(range(DF_EC_study_FC_SEG_daily[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_FC_SES_daily[, c("SES_EC0",  "SES_EC1")]))
- 
-    
+  lims_nee  <- range(range(DF_EC_study_NEE_SEG_daily[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_NEE_SES_daily[, c("SES_EC0",  "SES_EC1")]))
+
+  ### H
+  {
   ## H / US-Seg
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
@@ -587,8 +583,8 @@ ggsave(
            y = expression("Seg EC1 - H (W m"^"-2"*")"),
            title = "Sensible Heat Flux - Seg") +
       # geom_point(shape=1) +
-      geom_bin2d(bins = 50, show.legend=T) +   # Bin size control
-      scale_fill_continuous(type = "viridis") +     # colour palette
+      geom_hex(bins = 50, show.legend=T) +
+      # scale_fill_continuous(type = "viridis") +     # colour palette
       xlim(lims_h) +
       ylim(lims_h) +
       theme_fancy() +
@@ -596,8 +592,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 1200, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
-      annotate("text", x = -720, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
+      annotate("text", x = 77, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
+      annotate("text", x = -14, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
 
   } # H / US-Seg
   
@@ -621,8 +617,8 @@ ggsave(
            y = expression("Ses EC1 - H (W m"^"-2"*")"),
            title = "Sensible Heat Flux - Ses") +
       # geom_point(shape=1) +
-      geom_bin2d(bins = 50, show.legend=T) +   # Bin size control
-      scale_fill_continuous(type = "viridis") +     # colour palette
+      geom_hex(bins = 50, show.legend=T) +
+      # scale_fill_continuous(type = "viridis") +     # colour palette
       xlim(lims_h) +
       ylim(lims_h) +
       theme_fancy() +
@@ -630,11 +626,21 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 1200, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
-      annotate("text", x = -720, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
+      annotate("text", x = 77, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
+      annotate("text", x = -14, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
     
   } # H / US-Ses
   
+    # Calculate the range of values in both plots for consistent scalars
+    count.range = range(lapply(list(seg_h, ses_h), function(p){ ggplot_build(p)$data[[1]]$count}))
+    seg_h <- seg_h +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
+    ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
+    
+  }
+  
+ 
+ ### LE
+  {
   
   # LE / US-Seg
   {
@@ -655,8 +661,8 @@ ggsave(
            y = expression("Seg EC1 - LE (W m"^"-2"*")"),
            title = "Latent Heat Flux - Seg") +
       # geom_point(shape=1) +
-      geom_bin2d(bins = 50, show.legend=T) +   # Bin size control
-      scale_fill_continuous(type = "viridis") +     # colour palette
+      geom_hex(bins = 50, show.legend=T) +
+      # scale_fill_continuous(type = "viridis") +     # colour palette
       xlim(lims_le) +
       ylim(lims_le) +
       theme_fancy() +
@@ -664,8 +670,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 1250, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
-      annotate("text", x = 400, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
+      annotate("text", x = 36, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
+      annotate("text", x = 10, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
     
   } # LE / US-Seg
   
@@ -689,8 +695,8 @@ ggsave(
            y = expression("Ses EC1 - LE (W m"^"-2"*")"),
            title = "Latent Heat Flux - Ses") +
       # geom_point(shape=1) +
-      geom_bin2d(bins = 50, show.legend=T) +   # Bin size control
-      scale_fill_continuous(type = "viridis") +     # colour palette
+      geom_hex(bins = 50, show.legend=T) +
+      # scale_fill_continuous(type = "viridis") +     # colour palette
       xlim(lims_le) +
       ylim(lims_le) +
       theme_fancy() +
@@ -698,42 +704,53 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 1250, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
-      annotate("text", x = 400, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
+      annotate("text", x = 36, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
+      annotate("text", x = 10, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
     
   } # LE / US-Ses
   
+    # Calculate the range of values in both plots for consistent scalars
+    count.range = range(lapply(list(seg_le, ses_le), function(p){ ggplot_build(p)$data[[1]]$count}))
+    seg_le <- seg_le +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
+    ses_le <- ses_le +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
+    
+  }
   
+ 
+    
+    ### NEE
+  {
   # NEE / US-Seg
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_FC_SEG_daily)
+    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_NEE_SEG_daily)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_FC_SEG_daily$SEG_EC0, DF_EC_study_FC_SEG_daily$SEG_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_NEE_SEG_daily$SEG_EC0, DF_EC_study_NEE_SEG_daily$SEG_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    seg_fc <- ggplot(DF_EC_study_FC_SEG_daily, aes(x=SEG_EC0, y=SEG_EC1)) +
-      labs(x = expression("Seg EC0 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
-           y = expression("Seg EC1 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
-           title = "Net Ecosys. Exchange - Ses") +
+    seg_nee <- ggplot(DF_EC_study_NEE_SEG_daily, aes(x=SEG_EC0, y=SEG_EC1)) +
+      labs(
+        x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        title = "Net Ecosys. Exchange - Ses") +
       # geom_point(shape=1) +
-      geom_bin2d(bins = 50, show.legend=T) +   # Bin size control
-      scale_fill_continuous(type = "viridis") +     # colour palette
-      xlim(lims_fc) +
-      ylim(lims_fc) +
+      geom_hex(bins = 50, show.legend=T) +
+      # scale_fill_continuous(type = "viridis") +     # colour palette
+      xlim(lims_nee) +
+      ylim(lims_nee) +
       theme_fancy() +
       theme(plot.title = element_text(size = 14, face = "bold")) +
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 0, y = (lims_fc[1] + 0.99 * abs(lims_fc[1] - lims_fc[2])), label = equation, size=4) +
-      annotate("text", x = -1.05, y = (lims_fc[1] + 0.90 * abs(lims_fc[1] - lims_fc[2])), label = r, size=4)
+      annotate("text", x = 0, y = (lims_nee[1] + 0.99 * abs(lims_nee[1] - lims_nee[2])), label = equation, size=4) +
+      annotate("text", x = -1.05, y = (lims_nee[1] + 0.90 * abs(lims_nee[1] - lims_nee[2])), label = r, size=4)
     
   } # NEE / US-Seg
   
@@ -741,40 +758,46 @@ ggsave(
   # NEE / US-Ses
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_FC_SES_daily)
+    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_NEE_SES_daily)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_FC_SES_daily$SES_EC0, DF_EC_study_FC_SES_daily$SES_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_NEE_SES_daily$SES_EC0, DF_EC_study_NEE_SES_daily$SES_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    ses_fc <- ggplot(DF_EC_study_FC_SES_daily, aes(x=SES_EC0, y=SES_EC1)) +
-      labs(x = expression("Ses EC0 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
-           y = expression("Ses EC1 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
-           title = "Net Ecosys. Exchange - Ses") +
+    ses_nee <- ggplot(DF_EC_study_NEE_SES_daily, aes(x=SES_EC0, y=SES_EC1)) +
+      labs(
+        x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        title = "Net Ecosys. Exchange - Ses") +
       # geom_point(shape=1) +
-      geom_bin2d(bins = 50, show.legend=T) +   # Bin size control
-      scale_fill_continuous(type = "viridis") +     # colour palette
-      xlim(lims_fc) +
-      ylim(lims_fc) +
+      geom_hex(bins = 50, show.legend=T) +
+      # scale_fill_continuous(type = "viridis") +     # colour palette
+      xlim(lims_nee) +
+      ylim(lims_nee) +
       theme_fancy() +
       theme(plot.title = element_text(size = 14, face = "bold")) +
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 0, y = (lims_fc[1] + 0.99 * abs(lims_fc[1] - lims_fc[2])), label = equation, size=4) +
-      annotate("text", x = -1.05, y = (lims_fc[1] + 0.90 * abs(lims_fc[1] - lims_fc[2])), label = r, size=4)
+      annotate("text", x = 0, y = (lims_nee[1] + 0.99 * abs(lims_nee[1] - lims_nee[2])), label = equation, size=4) +
+      annotate("text", x = -1.05, y = (lims_nee[1] + 0.90 * abs(lims_nee[1] - lims_nee[2])), label = r, size=4)
     
   } # NEE / US-Ses
   
-  
+    # Calculate the range of values in both plots for consistent scalars
+    count.range = range(lapply(list(seg_nee, ses_nee), function(p){ ggplot_build(p)$data[[1]]$count}))
+    seg_nee <- seg_nee +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
+    ses_nee <- ses_nee +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
+    
+  }
   
   ### combine plot objects with Patchwork
-  pall <- (seg_h + ses_h) / (seg_le + ses_le) / (seg_fc + ses_fc) +
+  pall <- (seg_h + ses_h) / (seg_le + ses_le) / (seg_nee + ses_nee) +
     plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97))
   
   filename = "plots/EC0 vs EC1 comparison - daily.png"
@@ -787,6 +810,9 @@ ggsave(
     units = "cm"
   )
 } # Generate daily comparative plots (EC0 versus EC1)
+
+
+
 
 
 ### Monthly comparison (EC0 versus EC1) ----
@@ -804,8 +830,8 @@ ggsave(
            SEG_EC1) %>% 
     na.omit %>%  # drop incomplete half hours
     summarize(
-      SEG_EC0 = sum(SEG_EC0),
-      SEG_EC1 = sum(SEG_EC1)
+      SEG_EC0 = mean(SEG_EC0),
+      SEG_EC1 = mean(SEG_EC1)
     )
 
   DF_EC_study_H_SES_monthly <- DF_EC_study_H %>%
@@ -818,8 +844,8 @@ ggsave(
            SES_EC1) %>% 
     na.omit %>%  # drop incomplete half hours
     summarize(
-      SES_EC0 = sum(SES_EC0),
-      SES_EC1 = sum(SES_EC1)
+      SES_EC0 = mean(SES_EC0),
+      SES_EC1 = mean(SES_EC1)
       )
   
   
@@ -834,8 +860,8 @@ ggsave(
            SEG_EC1) %>% 
     na.omit %>%  # drop incomplete half hours
     summarize(
-      SEG_EC0 = sum(SEG_EC0),
-      SEG_EC1 = sum(SEG_EC1)
+      SEG_EC0 = mean(SEG_EC0),
+      SEG_EC1 = mean(SEG_EC1)
     )
   
   DF_EC_study_LE_SES_monthly <- DF_EC_study_LE %>%
@@ -848,13 +874,13 @@ ggsave(
            SES_EC1) %>% 
     na.omit %>%  # drop incomplete half hours
     summarize(
-      SES_EC0 = sum(SES_EC0),
-      SES_EC1 = sum(SES_EC1)
+      SES_EC0 = mean(SES_EC0),
+      SES_EC1 = mean(SES_EC1)
     )
 
   
   ## Resample NEE
-  DF_EC_study_FC_SEG_monthly <- DF_EC_study_FC %>%
+  DF_EC_study_NEE_SEG_monthly <- DF_EC_study_NEE %>%
     mutate(year = format(Datetime_Start, format = "%Y"),
            month = format(Datetime_Start, format = "%m"),
            day = format(Datetime_Start, format = "%d")
@@ -868,7 +894,7 @@ ggsave(
       SEG_EC1 = mean(SEG_EC1)
     )
   
-  DF_EC_study_FC_SES_monthly <- DF_EC_study_FC %>%
+  DF_EC_study_NEE_SES_monthly <- DF_EC_study_NEE %>%
     mutate(year = format(Datetime_Start, format = "%Y"),
            month = format(Datetime_Start, format = "%m"),
            day = format(Datetime_Start, format = "%d")
@@ -885,7 +911,7 @@ ggsave(
   ## Determine axis limits
   lims_h  <- range(range(DF_EC_study_H_SEG_monthly[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_H_SES_monthly[, c("SES_EC0",  "SES_EC1")]))
   lims_le  <- range(range(DF_EC_study_LE_SEG_monthly[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_LE_SES_monthly[, c("SES_EC0",  "SES_EC1")]))
-  lims_fc  <- range(range(DF_EC_study_FC_SEG_monthly[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_FC_SES_monthly[, c("SES_EC0",  "SES_EC1")]))
+  lims_nee  <- range(range(DF_EC_study_NEE_SEG_monthly[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_NEE_SES_monthly[, c("SES_EC0",  "SES_EC1")]))
   
   
   
@@ -917,8 +943,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 68000, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
-      annotate("text", x = 39000, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
+      annotate("text", x = 45, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
+      annotate("text", x = 25, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
     
   } # H / US-Seg
   
@@ -951,8 +977,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 68000, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
-      annotate("text", x = 39000, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
+      annotate("text", x =45, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
+      annotate("text", x = 25, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
 
   } # H / US-Ses
   
@@ -985,8 +1011,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 19000, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
-      annotate("text", x = 9000, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
+      annotate("text", x = 15, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
+      annotate("text", x = 9, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
     
   } # LE / US-Seg
   
@@ -1019,41 +1045,42 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 19000, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
-      annotate("text", x = 9000, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
+      annotate("text", x = 15, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
+      annotate("text", x = 9, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
   } # LE / US-Ses
   
   
   # NEE / US-Seg
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_FC_SEG_monthly)
+    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_NEE_SEG_monthly)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_FC_SEG_monthly$SEG_EC0, DF_EC_study_FC_SEG_monthly$SEG_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_NEE_SEG_monthly$SEG_EC0, DF_EC_study_NEE_SEG_monthly$SEG_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    seg_fc <- ggplot(DF_EC_study_FC_SEG_monthly, aes(x=SEG_EC0, y=SEG_EC1)) +
-      labs(x = expression("Seg EC0 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
-           y = expression("Seg EC1 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
-           title = "Net Ecosys. Exchange - Ses") +
+    seg_nee <- ggplot(DF_EC_study_NEE_SEG_monthly, aes(x=SEG_EC0, y=SEG_EC1)) +
+      labs(
+        x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        title = "Net Ecosys. Exchange - Ses") +
       geom_point(shape=1) +
       # geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
       # scale_fill_continuous(type = "viridis") +     # colour palette
-      xlim(lims_fc) +
-      ylim(lims_fc) +
+      xlim(lims_nee) +
+      ylim(lims_nee) +
       theme_fancy() +
       theme(plot.title = element_text(size = 14, face = "bold")) +
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = -0.4, y = (lims_fc[1] + 0.99 * abs(lims_fc[1] - lims_fc[2])), label = equation, size=4) +
-      annotate("text", x = -0.6, y = (lims_fc[1] + 0.90 * abs(lims_fc[1] - lims_fc[2])), label = r, size=4)
+      annotate("text", x = -0.4, y = (lims_nee[1] + 0.99 * abs(lims_nee[1] - lims_nee[2])), label = equation, size=4) +
+      annotate("text", x = -0.6, y = (lims_nee[1] + 0.90 * abs(lims_nee[1] - lims_nee[2])), label = r, size=4)
     
   } # NEE / US-Seg
   
@@ -1061,40 +1088,41 @@ ggsave(
   # NEE / US-Ses
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_FC_SES_monthly)
+    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_NEE_SES_monthly)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_FC_SES_monthly$SES_EC0, DF_EC_study_FC_SES_monthly$SES_EC1, method="pearson", use = "complete.obs")
+    r <- cor(DF_EC_study_NEE_SES_monthly$SES_EC0, DF_EC_study_NEE_SES_monthly$SES_EC1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    ses_fc <- ggplot(DF_EC_study_FC_SES_monthly, aes(x=SES_EC0, y=SES_EC1)) +
-      labs(x = expression("Ses EC0 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
-           y = expression("Ses EC1 - NEE (umol CO"[2]*" m"^"-2"*"s"^"-1"*")"),
-           title = "Net Ecosys. Exchange - Ses") +
+    ses_nee <- ggplot(DF_EC_study_NEE_SES_monthly, aes(x=SES_EC0, y=SES_EC1)) +
+      labs(
+        x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        title = "Net Ecosys. Exchange - Ses") +
       geom_point(shape=1) +
       # geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
       # scale_fill_continuous(type = "viridis") +     # colour palette
-      xlim(lims_fc) +
-      ylim(lims_fc) +
+      xlim(lims_nee) +
+      ylim(lims_nee) +
       theme_fancy() +
       theme(plot.title = element_text(size = 14, face = "bold")) +
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = -0.4, y = (lims_fc[1] + 0.99 * abs(lims_fc[1] - lims_fc[2])), label = equation, size=4) +
-      annotate("text", x = -0.6, y = (lims_fc[1] + 0.90 * abs(lims_fc[1] - lims_fc[2])), label = r, size=4)
+      annotate("text", x = -0.4, y = (lims_nee[1] + 0.99 * abs(lims_nee[1] - lims_nee[2])), label = equation, size=4) +
+      annotate("text", x = -0.6, y = (lims_nee[1] + 0.90 * abs(lims_nee[1] - lims_nee[2])), label = r, size=4)
     
   } # NEE / US-Ses
   
   
   
   ### combine plot objects with Patchwork
-  pall <- (seg_h + ses_h) / (seg_le + ses_le) / (seg_fc + ses_fc) +
+  pall <- (seg_h + ses_h) / (seg_le + ses_le) / (seg_nee + ses_nee) +
     plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97))
   
   filename = "plots/EC0 vs EC1 comparison - monthly.png"
@@ -1110,6 +1138,7 @@ ggsave(
 
 
 
+#-------------- 2.2 cumulative plots --------------
 
 
 # NOT USED!!! function to facilitate versatile comparisons of EC0 with EC1
@@ -1175,6 +1204,5 @@ ggsave(
   # 
   # 
   # 
-}
 
 
