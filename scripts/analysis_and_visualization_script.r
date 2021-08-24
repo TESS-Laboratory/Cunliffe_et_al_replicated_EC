@@ -9,8 +9,6 @@
 # machines.
 
 
-# rm(list=ls())
-
 
 # ------ 0.0 Setup Environment ----------
 ## Load packages

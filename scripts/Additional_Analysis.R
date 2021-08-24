@@ -410,7 +410,7 @@ ses_le <- ses_le +   scale_fill_continuous(type = "viridis", limits=c(count.rang
       y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
       title = "Net Ecosys. Exchange - Ses") +
     geom_hex(bins = 100, show.legend=T) +
-    scale_fill_continuous(type = "viridis") +     # colour palette
+    # scale_fill_continuous(type = "viridis") +     # colour palette
     xlim(lims_nee) +
     ylim(lims_nee) +
     theme_fancy() +
@@ -444,7 +444,7 @@ ses_le <- ses_le +   scale_fill_continuous(type = "viridis", limits=c(count.rang
       y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
       title = "Net Ecosys. Exchange - Ses") +
     geom_hex(bins = 100, show.legend=T) +
-    scale_fill_continuous(type = "viridis") +     # colour palette
+    # scale_fill_continuous(type = "viridis") +     # colour palette
     xlim(lims_nee) +
     ylim(lims_nee) +
     theme_fancy() +
@@ -470,16 +470,26 @@ ses_nee <- ses_nee +   scale_fill_continuous(type = "viridis", limits=c(count.ra
 pall <- (seg_h + ses_h) / (seg_le + ses_le) / (seg_nee + ses_nee) +
   plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97))
 
-filename = "plots/EC0 vs EC1 comparison - half hourly.png"
+filename = "plots/EC0 vs EC1 comparison - half hourly"
 
 ggsave(
   pall,
-  filename = filename,
+  filename = paste0(filename, ".png"),
   width = 17,
   height = 26,
   units = "cm"
-  )
+)
+
+ggsave(
+  pall,
+  filename = paste0(filename, ".pdf"),
+  width = 17,
+  height = 26,
+  units = "cm"
+)
+
 } # Generate half-hourly comparative plots (EC0 versus EC1)
+
 
 
 ### Daily comparison (EC0 versus EC1) ----
@@ -800,18 +810,25 @@ ggsave(
   pall <- (seg_h + ses_h) / (seg_le + ses_le) / (seg_nee + ses_nee) +
     plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97))
   
-  filename = "plots/EC0 vs EC1 comparison - daily.png"
+  filename = "plots/EC0 vs EC1 comparison - daily"
   
   ggsave(
     pall,
-    filename = filename,
+    filename = paste0(filename, ".png"),
     width = 17,
     height = 26,
     units = "cm"
   )
+  
+  ggsave(
+    pall,
+    filename = paste0(filename, ".pdf"),
+    width = 17,
+    height = 26,
+    units = "cm"
+  )
+  
 } # Generate daily comparative plots (EC0 versus EC1)
-
-
 
 
 
@@ -1125,11 +1142,19 @@ ggsave(
   pall <- (seg_h + ses_h) / (seg_le + ses_le) / (seg_nee + ses_nee) +
     plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97))
   
-  filename = "plots/EC0 vs EC1 comparison - monthly.png"
+  filename = "plots/EC0 vs EC1 comparison - monthly"
   
   ggsave(
     pall,
-    filename = filename,
+    filename = paste0(filename, ".png"),
+    width = 17,
+    height = 26,
+    units = "cm"
+  )
+  
+  ggsave(
+    pall,
+    filename = paste0(filename, ".pdf"),
     width = 17,
     height = 26,
     units = "cm"
@@ -1138,71 +1163,279 @@ ggsave(
 
 
 
-#-------------- 2.2 cumulative plots --------------
+#-------------- 2.2 cumulative sum of LE and NEE --------------
 
 
-# NOT USED!!! function to facilitate versatile comparisons of EC0 with EC1
-# if(F){# comparison_EC1_vs_EC0 <- function(beginning,
-  #                                   ending,
-  #                                   resolution) {
-  #   DF_EC %>%
-  #     ## Subset time series to study period dates
-  #     filter(between(Datetime_Start,
-  #                    as.POSIXct(beginning),
-  #                    as.POSIXct(ending))) %>% 
-  #     
-  #     ## pivot data from long to wide form
-  # 
-  #     ### For this work work, I need to create three objects for each 
-  #     # "H", "LE", "FC" that can be explicitly called later in the pipe
-  #     # can assign work for this?
-  #     
-  #     #    select(Datetime_Start, variable, Station) %>%
-  #     #     pivot_wider(names_from = Station,
-  #     #                 values_from = variable)
-  #   
-  # 
-  #     ### Resample time series to specified temporal resolution
-  #     ### WHERE TO PASS IN THE TIME REOSLUTION VARIABLE? 
-  #     ### COULD THIS BE AS THE FORMAT?? 
-  #     ### "YYYY-M", or "Y-m-d", or "y-m-d h" I think this would work
-  #     ### WHAT RANGE OF ARGUMENTS ARE allowed FOR RESOLUTION?
-  #     ### NOTE THIS ISN'T RIGHT! 
-  #     ### THIS SIMPLY RESAMPLES TO DAY. should use As.datetime!:(
-  #     
-  #     # create new datetime variable at the specified temporal resolution for resampling
-  #   # mutate(Datetime_Start_res = as.datetime(Datetime_Start, format = resolution)) 
-  #   
-  #   # AS DATETIME ISN@T QUITE RIGHT HERE...
-  #   
-  #   ### NB for summarise to work, we need to have already pivoted wider
-  #   #   # group by the resolution column
-  #   #   group_by(Datetime_Start_res) %>% 
-  #   #   # calculate the SUM of each flux per unit time
-  #   #   summarise(FC_res = sum(FC),
-  #   #             LE_res = sum(LE),
-  #   #             H_res = sum(H),
-  #   #             Precipitation_res = sum(Precipitation),
-  #   #             SW_IN_res = sum(SW_IN)
-  #   #             # Station = Station
-  #   #             )  
-  #   # ### BUT VITAL TO NEED TO KEEP STATION SOMEHOW Maybe this needs to come after pivot_wide... 
-  #   
-  # 
-  # }  # comparison_EC1_vs_EC0 function
-  # 
-  # 
-  # # names(DF_EC)
-  # # head(testing)
-  # 
-  # #  filters data creates plots and saves output. 
-  # 
-  # testing <- comparison_EC1_vs_EC0("2018-11-01 00:00:00",
-  #                                  "2019-11-01 23:30:00",
-  #                                  "%Y-%m-%d %H:%M:%S "  # Temporal resolution as POSIXct date format: e.g. "%Y-%m-%d"
-  #                                  )
-  # 
-  # 
-  # 
+# Make GGplot version of SEG LE (using gapfilled and U*filtered records)
+# NB, will need gapfilled version of Marcy's data to enable this!
+
+
+
+
+
+
+
+# if(T){
+#   
+#   cols <- rep(c("purple", "green", "darkgreen", "brown"), 2)
+#   add_AmeriFlux <- T
+#   add_AmeriFlux_edire <- F
+#   add_AmeriFlux_edire_no_WPL <- F
+#   add_prec <- T
+#   use_reddy <- T
+#   no_seg_nee <- F
+#   
+#   
+#   day_only <- F
+#   night_only <- F    
+#   pre_prec <- F
+#   post_prec <- F     
+#   
+#   #   
+#   plot_nm <- last_date; tp1 <- 1:4; tp2 <- 5:8; attr <- ""
+#   les <- paste("cLEc", datasets, sep="_")
+#   nees <- paste("Fcc", datasets, sep="_")
+#   
+#   legend_g <- c("EC1", "EC2", "EC3", "EC4")
+#   # u* filtered (NEE only) and gapfilled
+#   
+#   
+#   if(add_AmeriFlux){
+#     cols <- c(cols, "orange", "orange")
+#     les <- c(les, "cLE_gm", "cLE_sm")
+#     nees <- c(nees, "Fc_gm", "Fc_sm")
+#     legend_g <- c(legend_g, "EC0")
+#     plot_nm <- paste(plot_nm, "_plusm", sep=""); tp1 <- c(tp1, 9); tp2 <- c(tp2, 10)
+#   }
+#   
+#   if(add_prec){    plot_nm <- paste(plot_nm, "_prec", sep="")  }
+#   
+#   if(use_reddy){
+#     les <- paste("LE_f", adatasets[1:10], sep="_")
+#     nees <- paste("NEE_uStar_f", adatasets[1:10], sep="_")
+#     attr <- "_reddy"
+#   }
+#   
+#   if(add_AmeriFlux_edire){
+#     cols <- c(cols, "red", "red")
+#     les <- c(les, "LEcw_gp", "LEcw_sp")
+#     nees <- c(nees, "Fccw_gp", "Fccw_sp")
+#     legend_g <- c(legend_g, "US-SEG EdiRe")
+#     #legend_s <- c(legend_s, "US-SES EdiRe")
+#     plot_nm <- paste(plot_nm, "_m_edire", sep=""); tp1 <- c(tp1, 11); tp2 <- c(tp2, 12)
+#     attr <- "_m_edire"
+#   }
+#   
+#   
+#   if(add_AmeriFlux_edire_no_WPL){
+#     cols <- c(cols, "blue4", "blue4")
+#     les <- c(les, "LEc_gp", "LEc_sp")
+#     nees <- c(nees, "Fcc_gp", "Fcc_sp")
+#     legend_g <- c(legend_g, "SEG Edi no WPL")
+#     #legend_s <- c(legend_s, "SES Edi no WPL")
+#     plot_nm <- paste(plot_nm, "_no_WPL", sep=""); tp1 <- c(tp1, 13); tp2 <- c(tp2, 14)
+#     attr <- "_m_edire_no_WPL"
+#   }
+#   
+#   
+#   
+#   
+#   datp <- datdd   # temp datasets
+#   
+#   gcs <- c(les[grepl("_g", les)], nees[grepl("_g", nees)])
+#   scs <- c(les[grepl("_s", les)], nees[grepl("_s", nees)])
+#   
+#   # filter day/night (gm/sm specific filter for H)
+#   selh_gm <- datp[,"H_gm"]>0;    selh_gm[is.na(selh_gm)] <- T     # data.frame does not allow NAs in sel
+#   selh_sm <- datp[,"H_sm"]>0;    selh_sm[is.na(selh_sm)] <- T
+#   
+#   if(day_only){  datp[!selh_gm, gcs] <- NA; datp[!selh_sm, scs] <- NA; attr <- paste(attr, "_day_only", sep="")}
+#   if(night_only){datp[selh_gm, gcs] <- NA;  datp[selh_sm, scs] <- NA;  attr <- paste(attr, "_night_only", sep="")}
+#   
+#   
+#   
+#   
+#   
+#   #### filter before/after precipitation
+#   
+#   selp_gm <- selp_sm <- rep(F, nrow(datp))
+#   selp_gm[unique( unlist(   lapply( which( datp[,"P_hh_gm"]>0 ) , day3_fun)    ) )] <- T
+#   selp_sm[unique( unlist(   lapply( which( datp[,"P_hh_sm"]>0 ) , day3_fun)    ) )] <- T
+#   
+#   if(pre_prec){  datp[!selp_gm, gcs] <- NA; datp[!selp_sm, scs] <- NA; attr <- paste(attr, "_pre_prec", sep="")}
+#   if(post_prec){ datp[selp_gm, gcs] <- NA;  datp[selp_sm, scs] <- NA;  attr <- paste(attr, "_post_prec", sep="")}
+#   
+#   
+#   
+#   
+#   ## cumsum
+#   dmat <- datp[, c(nees, les)]; dmat[is.na(dmat)] <- 0; 
+#   dmat$dt <- datp[,"dt"]; dmat$P_gm <- datp[,"P_hh_gm"]; dmat$P_sm <- datp[,"P_hh_sm"]
+#   dmat <- dmat[dmat[,"dt"]>="20/10/18",]
+#   for(i in 1:(ncol(dmat)-3)){dmat[,i] <- cumsum(dmat[,i])}
+#   
+#   
+#   
+#   ## convert umol m-2 s-1 to gC m-2 30min-1
+#   ccm <- grep("Fc", colnames(dmat))
+#   if(use_reddy){ccm <- grep("NEE", colnames(dmat))}
+#   if(add_AmeriFlux_edire)ccm <- c(ccm, grep("Fc", colnames(dmat)))
+#   
+#   dmat[,ccm] <- dmat[ccm]*  (12 / 10^6) * 1800     # 12 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
+#   
+#   ## convert W m-2 into MW m-2 (30 min sum)
+#   lcm <- grep("LE", colnames(dmat))
+#   dmat[,lcm] <- dmat[lcm]*  (1 / 10^6) * 1800
+#   
+#   
+#   # exclude NEE of US-SEG
+#   if(no_seg_nee){ 
+#     ec <- grepl("_gm", colnames(dmat)) & 
+#       (grepl("NEE", colnames(dmat)) | grepl("Fcc", colnames(dmat)))
+#     dmat[, ec] <- NA
+#     attr <- paste("_no_seg_nee", attr, sep="")  
+#   } 
+#   
+#   
+#   
+#   
+#   
+#   xlim <- range(dmat[,"dt"])
+#   ylim_c <- range(dmat[,ccm], na.rm=T)*c(1, 1.5)
+#   if(ylim_c[1]<0)ylim_c <- ylim_c*c(1.05, 1)
+#   #ylim_c[1] <- (-40)
+#   if(add_AmeriFlux_edire_no_WPL)ylim_c[1] <- (-1100)
+#   ylim_l <- range(dmat[,lcm], na.rm=T)*c(1, 1.5)
+#   ylim_p <- range(datdd[,c("P_hh_gm", "P_hh_sm")], na.rm=T)*c(1, 2.2)
+#   
+#   if(pre_prec | post_prec){ylim_l <- c(0, 450); ylim_c <- c(-30, 70)}
+#   if(day_only | night_only){ylim_c <- c(-60, 80)}
+#   
+#   
+#   
+#   # time stamp
+#   mthetimes <-  as.POSIXct(dmat[,"dt"], format="%d/%m/%y %H:%M:%S") 
+#   dmat$dt_2 <- mthetimes
+#   
+#   ylim_l <- c(0, 800)
+#   
+#   ya2 <- expression("Precipitation (mm h"^"-1"*")",sep="")
+#   
+#   
+#   # ylim correction factor for precipitation
+#   
+#   # diff(ylim_l)/ylim_p[2]   = 20.41817
+#   # diff(ylim_l)/20.41817    = 36.32201    # desired ylim
+#   
+#   # diff(ylim_c)/ylim_p[2]   =  1.629766
+#   # diff(ylim_c)/ 1.629766   =  36.322     # desired ylim
+#   
+#   
+#   
+#   # add modified precipitation
+#   dmat$P_plot_le_gm <- (dmat$P_gm * (-diff(ylim_l)/ylim_p[2])) + ylim_l[2]
+#   dmat$P_plot_le_sm <- (dmat$P_sm * (-diff(ylim_l)/ylim_p[2])) + ylim_l[2]
+#   dmat$P_plot_nee_gm <- (dmat$P_gm * (-diff(ylim_c)/ylim_p[2])) + ylim_c[2]
+#   dmat$P_plot_nee_sm <- (dmat$P_sm * (-diff(ylim_c)/ylim_p[2])) + ylim_c[2]
+#   
+#   
+#   
+#   p1 <- ggplot(dmat, aes(x=dt_2)) +
+#     labs(x = "", y = expression("Cumulative LE (MW m"^"-2"*")",sep=""), title = "LE Grassland") +
+#     geom_line(aes(y = LE_f_g1, colour = "EC1")) + 
+#     geom_line(aes(y = LE_f_g2, colour = "EC2")) + 
+#     geom_line(aes(y = LE_f_g3, colour = "EC3")) + 
+#     geom_line(aes(y = LE_f_g4, colour = "EC4")) +
+#     geom_line(aes(y = LE_f_gm, colour = "EC0")) +
+#     geom_line(aes(y = P_plot_le_gm, colour = "prec")) +
+#     scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = ya2)) +
+#     theme_bw() +
+#     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
+#     theme(axis.text.x = element_text(angle = 45, vjust=0.3)) +
+#     theme(legend.title = element_blank(), legend.text = element_text(size = 8), legend.position = c(0.18, 0.52)) +    # legend position
+#     theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
+#     scale_colour_manual(values = colours)
+#   
+#   
+#   p2 <- ggplot(dmat, aes(x=dt_2)) +
+#     labs(x = "", y = expression("Cumulative LE (MW m"^"-2"*")",sep=""), title = "LE Shrubland") +
+#     geom_line(aes(y = LE_f_s1, colour = "EC1")) + 
+#     geom_line(aes(y = LE_f_s2, colour = "EC2")) + 
+#     geom_line(aes(y = LE_f_s3, colour = "EC3")) + 
+#     geom_line(aes(y = LE_f_s4, colour = "EC4")) +
+#     geom_line(aes(y = LE_f_sm, colour = "EC0")) +
+#     geom_line(aes(y = P_plot_le_sm, colour = "prec")) +
+#     scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = ya2)) +
+#     theme_bw() + 
+#     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
+#     theme(axis.text.x = element_text(angle = 45, vjust=0.3)) +
+#     theme(legend.position="none") +  
+#     theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
+#     scale_colour_manual(values = colours)
+#   
+#   
+#   p3 <- ggplot(dmat, aes(x=dt_2)) +
+#     labs(x = "", y = expression("Cumulative NEE (g C m"^"-2"*")",sep=""), title = "NEE Grassland") +
+#     geom_line(aes(y = NEE_uStar_f_g1, colour = "EC1")) + 
+#     geom_line(aes(y = NEE_uStar_f_g2, colour = "EC2")) + 
+#     geom_line(aes(y = NEE_uStar_f_g3, colour = "EC3")) + 
+#     geom_line(aes(y = NEE_uStar_f_g4, colour = "EC4")) +
+#     geom_line(aes(y = NEE_uStar_f_gm, colour = "EC0")) +
+#     geom_line(aes(y = P_plot_nee_gm, colour = "prec")) +
+#     geom_point(aes(x=dt_2[1], y=ylim_c[1]), colour="white") + # only to specify lower end
+#     scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) - min(ylim_c*(-ylim_p[2]/diff(ylim_c))), name = ya2)) +
+#     theme_bw() + 
+#     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
+#     theme(axis.text.x = element_text(angle = 45, vjust=0.3)) +
+#     theme(legend.position="none") +  
+#     theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
+#     scale_colour_manual(values = colours)
+#   
+#   
+#   p4 <- ggplot(dmat, aes(x=dt_2)) +
+#     labs(x = "", y = expression("Cumulative NEE (g C m"^"-2"*")",sep=""), title = "NEE Shrubland") +
+#     geom_line(aes(y = NEE_uStar_f_s1, colour = "EC1")) + 
+#     geom_line(aes(y = NEE_uStar_f_s2, colour = "EC2")) + 
+#     geom_line(aes(y = NEE_uStar_f_s3, colour = "EC3")) + 
+#     geom_line(aes(y = NEE_uStar_f_s4, colour = "EC4")) +
+#     geom_line(aes(y = NEE_uStar_f_sm, colour = "EC0")) +
+#     geom_line(aes(y = P_plot_nee_sm, colour = "prec")) + 
+#     geom_point(aes(x=dt_2[1], y=ylim_c[1]), colour="white") + # only to specify lower end
+#     scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) - min(ylim_c*(-ylim_p[2]/diff(ylim_c))), name = ya2)) +
+#     theme_bw() + 
+#     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
+#     theme(axis.text.x = element_text(angle = 45, vjust=0.3)) +
+#     theme(legend.position="none") +
+#     theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
+#     scale_colour_manual(values = colours)
+#   
+#   
+#   ## combine plots using Patchwork
+#   pall <- (p1 + p2) / (p3 + p4) +
+#     plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97)) 
+#   
+#   
+#   # Save raster
+#   gpath <- "E:/REC_7_Data/10_Plots/7_cumsum/"
+#   outfile_r <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot.png", sep="")
+#   
+#   ggsave(pall,
+#          filename = outfile_r,
+#          width = 17,
+#          height = 17,
+#          units = "cm")
+#   
+#   # Save vector
+#   gpath <- "E:/REC_7_Data/10_Plots/7_cumsum/"
+#   outfile_v <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot_test.pdf", sep="")
+#   
+#   ggsave(pall,
+#          filename = outfile_v,
+#          width = 17,
+#          height = 17,
+#          units = "cm")
+#   
+# }  # cumulative LE and NEE
+# 
 
 
