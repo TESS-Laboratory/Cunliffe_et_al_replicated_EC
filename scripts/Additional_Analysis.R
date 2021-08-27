@@ -53,7 +53,7 @@ theme_fancy <- function() {
       )
     )
 }
-
+windowsFonts("Helvetica" = windowsFont("Helvetica"))  # Ensure font is mapped correctly
 
 
 #-------------- 1. Read data --------------
@@ -227,9 +227,9 @@ shape_wider <- function(df, variable) {
 
 
 
-#-------------- 2. Analyze data --------------
+#-------------- 3. Analyze data --------------
 
-#-------------- 2.1 Co-location comparison --------------
+#-------------- 3.1 Co-location comparison --------------
 
 
 ### Half-hourly comparison (EC0 versus EC1)----
@@ -1163,15 +1163,148 @@ ggsave(
 
 
 
-#-------------- 2.2 cumulative sum of LE and NEE --------------
+#-------------- 3.2 cumulative sum of LE and NEE --------------
 
 
 # Make GGplot version of SEG LE (using gapfilled and U*filtered records)
-# NB, will need gapfilled version of Marcy's data to enable this!
+# NB, will need gapfilled version of Marcy's (new) data to enable this!
+
+
+# subset to site and compute cumulative fluxes
+DF_EC_study_SEG <- DF_EC_study %>% 
+  filter(Station == c("SEG_EC0", "SEG_EC1", "SEG_EC2", "SEG_EC3", "SEG_EC4")) %>% 
+  group_by(Station) %>% 
+  mutate(
+    NEE_uStar_f_cum = cumsum(NEE_uStar_f) *(12.0107/10^6) * 1800,  # Convert umol m-2 s-1 to g C m-2 30 min-1. Where 12.0107 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
+    LE_f_cum = cumsum(LE_f),
+    LE_f_cum_mm = cumsum(LE_f) * 1800 / 2260 / 1000,  # Calculate mm of cumulative evaporation. Where 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
+    H_f_cum = cumsum(H_f)
+    )
+
+
+DF_EC_study_SES <- DF_EC_study %>% 
+  filter(Station == c("SES_EC0", "SES_EC1", "SES_EC2", "SES_EC3", "SES_EC4")) %>% 
+  group_by(Station) %>% 
+  mutate(
+    NEE_uStar_f_cum = cumsum(NEE_uStar_f) *(12.0107/10^6) * 1800,  # Convert umol m-2 s-1 to g C m-2 30 min-1. Where 12.0107 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
+    LE_f_cum = cumsum(LE_f),
+    LE_f_cum_mm = cumsum(LE_f) * 1800 / 2260 / 1000,  # Calculate mm of cumulative evaporation. Where 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
+    H_f_cum = cumsum(H_f)
+    )
+
+# colour mappings
+selected_colours <- c("orange",
+          "purple",
+          "green",
+          "darkgreen",
+          "brown",
+          "cyan")
+# labs <- c("EC0", "EC1",    "EC2",    "EC3",  "EC4", "Precipit")
+
+# TO DO ----
+### NB. review conversion from LE (W m-2) to evaporation (mm)
+# Our initial analysis suggested annual LE MW m-2 was ca. 400 MW
+
+# 400 MW = 400 000 000 j s-1
+
+# 400,000,000 / 2257 = 177,226 g of water per m-2 
+# 177,226 g of water per m-2 = 177.226 mm evap 
+# This estimate seems highly plausible
+
+# https://www.researchgate.net/post/How-to-calculate-evapotranspiration-from-latent-heat-flux
+
+# t <- 1800  # seconds in 30 mins
+# e <- 2257  # The amount of energy required to evaporate 1 g of water in J g-1.
+
+# (xj <- xw * t) # convert to jules per half hour
+# (evap1 <- xj / e) # convert to g m2 of evaporation 
+# (evap2 <- evap1 / 1000) # convert to mm evaporation
+# 
+# evap <- 65 * 1800 / 2257 / 1000
+
+# You need to divide the LE, which should be in an energy unit such as W/m-2 by
+# the latent heat of evaporation (i.e. the amount of energy required to evaporate
+# 1g or 1ml of water) which is 2257 J/g.
+
+# For example, if you have a total LE of 500 W/m-2 for one hour this would 
+# be 1800 000 J of energy (with watts equal to jouls per second). 
+# Enough to evaporate 798 g of water per m-2 (1800000/2257). 
+# This is equal to 0.798 mm of evaporation (1 kg H20 per m-2 = 1 mm). 
+
+
+## SEG Cumulative LE
+{
+  (cum_seg_le <- ggplot(DF_EC_study_SEG,
+                       aes(y=LE_f_cum_mm, 
+                           x=Datetime_Start,
+                           color=Station
+                       )) +
+     labs(x = "",
+          y = expression("Cumulative evapotranspiration (mm)", sep=""),
+          title = "LE Grassland") +
+     geom_line() +
+     scale_color_manual(values=selected_colours) +
+     theme_fancy()
+  )
+} # SEG Cumulative LE
+
+
+## SES Cumulative LE
+{
+  (cum_ses_le <- ggplot(DF_EC_study_SES,
+                       aes(y=LE_f_cum_mm, 
+                           x=Datetime_Start,
+                           color=Station
+                       )) +
+     labs(x = "",
+          y = expression("Cumulative evapotranspiration (mm)", sep=""),
+          title = "LE Shrubland") +
+     geom_line() +
+     scale_color_manual(values=selected_colours) +
+     theme_fancy()
+  )
+} # SES Cumulative LE
 
 
 
 
+
+mean(DF_EC_study_SEG$NEE, na.rm=t)
+
+# Need to review (and correct) NEE units, 
+
+# ## 
+# ccm <- grep("Fc", colnames(dmat))
+# 
+# dmat[,ccm] <- dmat[ccm]*  (12 / 10^6) * 1800     # 12 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
+
+
+## SEG Cumulative NEE
+{
+  (cum_seg_nee <- ggplot(DF_EC_study_SEG,
+                        aes(y=NEE_uStar_f_cum, 
+                            x=Datetime_Start,
+                            color=Station
+                        )) +
+     labs(x = "",
+          y = expression("Cumulative NEE (g C m"^"-2"*")", sep=""),
+          title = "LE Grassland") +
+     geom_line() +
+     scale_color_manual(values=selected_colours) +
+     theme_fancy()
+  )
+}
+
+
+
+
+
+# add precipitation
+    # geom_line(aes(y = P_plot_le_gm, colour = "prec")) +
+    # scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = ya2)) +
+    # theme(axis.text.x = element_text(angle = 45, vjust=0.3)) +
+    # theme(legend.title = element_blank(), legend.text = element_text(size = 8), legend.position = c(0.18, 0.52)) +    # legend position
+    # theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis
 
 
 
