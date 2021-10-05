@@ -16,7 +16,7 @@ library(tidyverse)
 library(viridis)                                                  # colour palette
 library(patchwork)                                                # to arrange plots
 library(chron)
-library(oce)
+library(oce)                                                      # oce::despike used for removing outliers in time series 
 library(scales)                                                   # for alpha in base r plots
 library(plotrix)                                                  # for std.error() function
 library(fields)                                                   # to plot footprint
@@ -149,7 +149,6 @@ for(i in 1:8){
   dat2 <- read_csv(file=paste0(path, last_date_2, towers[i], "_flux.csv"))
   fluxesc <- fluxes
   
-
     
   if(T){  # add dt to dat
     
@@ -166,7 +165,7 @@ for(i in 1:8){
     thetimes0  <-  chron(dates=dtparts[,1],times=dtparts[,2],format=c("d/m/y","h:m:s"))
     
 
-    # remove 1 hour (timestamp issue)
+    # remove 1 hour (correcting timestamp issue)
     # thetimes0[thetimes0 < "24/02/19"] <- thetimes0[thetimes0 < "24/02/19"]-1/24
     if(i %in% c(1:8))thetimes0 <- thetimes0-1/24     
     
@@ -277,7 +276,7 @@ for(im in 1:2){
     
     
     
-    # invert AmeriFlux wind directions (CSAT vs WindMaster)
+    # Invert AmeriFlux wind directions (CSAT vs WindMaster)
     datm[,"WD"] <- datm[,"WD"]+180
     datm[ datm[,"WD"]>360 ,"WD"] <-  datm[datm[,"WD"]>360  ,"WD"]-360
     
@@ -421,7 +420,7 @@ if(make_txt_for_reddy){
     Rg <- dti[,paste("SW_IN", mdata_vec[i], sep="_")]     # Rg = global radiation = total short wave radiation from the sun
     VPD <- dti[,paste("VPD_F", mdata_vec[i], sep="_")]    # VPD = vapor pressure deficit  
     
-    Tsoil <-  -9999
+    Tsoil <- -9999
     
     
     
@@ -508,7 +507,7 @@ if(make_txt_for_reddy){
   ## make Reddy's input file for mean fluxes from multiple towers (4, 3 and 2x3 RECs)
   for(ia in 1:10){   # 1:10
     
-    # there are 2 ways of doing the average of reddy_fluxes!
+    # There are two ways of calculating the average of reddy_fluxes!
     # 1) reddy the avg_REC  <-  preferred; reddy input is less noisy so output has better quality
     # 2) reddy individual RECs and avg
     
