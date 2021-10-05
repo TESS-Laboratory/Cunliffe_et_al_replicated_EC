@@ -230,24 +230,29 @@ for(i in 1:8){
   
   # remove outliers/despike before ustar/gapfilling as per the FLUXNET_2015 data processing protocol
   
+  # !!!!!!!!!! WARNING !!!!!!!!!!!
+  # THIS SECTION DOES NOT WORK AS INTENDED AS THE IQR CALCULATION IS PREDICATED 
+  # ON THE FLAWED ASSUMPTION THAT THE MEDIAN FLUX IS ZERO.
+  # !!!!!!!!!!!!!!!!!!!!!!!!!!
+  
   # remove outliers according to Tukey's Fence: 
   # 1.5 times the interquartile difference (3 times IQD is "far out") 
   
-  for(fx in fluxesc){ #IQD*30 is 10 times what is considered "far out"
-    #fx <- "Fcc"
-    vec <- as.numeric(as.character(dat[,fx]))
-    med_p <- median(vec[vec>=0], na.rm=T)
-    top_p <- med_p*30 
-    med_n <- median(vec[vec<0], na.rm=T)
-    top_n <- med_n*30
-    vec[vec>top_p | vec<top_n] <- NA
-    dat[,fx] <- vec
-  }
-  
-   dat[, fluxesc] <- oce::despike(dat[, fluxesc])    # Remove spikes from time series
-  
-  
-  
+  # for(fx in fluxesc){ #IQD*30 is 10 times what is considered "far out"
+  #   #fx <- "Fcc"
+  #   vec <- as.numeric(as.character(dat[,fx]))
+  #   med_p <- median(vec[vec>=0], na.rm=T)
+  #   top_p <- med_p*30 
+  #   med_n <- median(vec[vec<0], na.rm=T)
+  #   top_n <- med_n*30
+  #   vec[vec>top_p | vec<top_n] <- NA
+  #   dat[,fx] <- vec
+  # }
+  # 
+  #  dat[, fluxesc] <- oce::despike(dat[, fluxesc])    # Remove spikes from time series
+  # 
+  # 
+  # 
   if(i %in% c(1:8)){
     # rename all columns but "dt
     colnames(dat)[colnames(dat)!="dt"] <- paste(colnames(dat)[colnames(dat)!="dt"], datasets[i], sep="_")
@@ -271,7 +276,6 @@ for(i in 1:8){
 for(im in 1:2){
   d18 <- read_csv(file=paste0(mpath, "US-", mlabs[im], "_HH_201801010000_201901010000.csv"))
   d19 <- read_csv(file=paste0(mpath, "US-", mlabs[im], "_HH_201901010000_202001010000.csv"))
-  
   #d18 <- rbind(d18, c(201812312330, 201901010000, rep(-9999, ncol(d18)-2)))   # last line is missing
   datm <- rbind(d18, d19)
 
@@ -307,21 +311,26 @@ for(im in 1:2){
     # remove outliers according to Tukey's Fence: 
     # 1.5 times the interquartile difference (3 times iqd, it is "far out")
     
-    if(F){
-    for(fx in c("H", "LE", "FC")){ # IQD*30 is 10 times what is considered "far out"
-      #dc <- "Fcc_g1"
-      #vec <- as.numeric(datf[,dc])
-      vec <- datm[,fx]
-      med_p <- median(vec[vec>=0], na.rm=T)
-      top_p <- med_p*30 
-      med_n <- median(vec[vec<0], na.rm=T)
-      top_n <- med_n*30
-      vec[vec>top_p | vec<top_n] <- NA
-      datm[,fx] <- vec
-    }
+    # !!!!!!!!!! WARNING !!!!!!!!!!!
+    # THIS SECTION DOES NOT WORK AS INTENDED AS THE IQR CALCULATION IS PREDICATED 
+    # ON THE FLAWED ASSUMPTION THAT THE MEDIAN FLUX IS ZERO.
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!
     
-    datm[,c("H", "LE", "FC")] <- oce::despike(datm[,c("H", "LE", "FC")])
-    }
+    # if(F){
+    # for(fx in c("H", "LE", "FC")){ # IQD*30 is 10 times what is considered "far out"
+    #   #dc <- "Fcc_g1"
+    #   #vec <- as.numeric(datf[,dc])
+    #   vec <- datm[,fx]
+    #   med_p <- median(vec[vec>=0], na.rm=T)
+    #   top_p <- med_p*30 
+    #   med_n <- median(vec[vec<0], na.rm=T)
+    #   top_n <- med_n*30
+    #   vec[vec>top_p | vec<top_n] <- NA
+    #   datm[,fx] <- vec
+    # }
+    # 
+    # datm[,c("H", "LE", "FC")] <- oce::despike(datm[,c("H", "LE", "FC")])
+    # }
     
     colnames(datm)[3:4] <- c("Fc", "cLE") # Set same column names as REC datasets
     colnames(datm) <- paste(colnames(datm), mdatasets[im], sep="_")
