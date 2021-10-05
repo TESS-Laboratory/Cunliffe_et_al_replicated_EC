@@ -145,19 +145,8 @@ sub_last <- function(x){x <- x-x[length(x)]}
 #-------------- 1 Read REC csv data --------------
 
 for(i in 1:8){
-  
-<<<<<<< HEAD
-  #dat  <- read.csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""))
-  dat  <- read.csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")  # original
-
-  #dat2 <- read_csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""))
-  dat2 <- read.csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""), header=TRUE, sep=",")  # original
-=======
-  dat  <- read_csv(file=paste(path, last_date, towers[i], "_flux.csv", sep=""))
-
-  dat2 <- read_csv(file=paste(path, last_date_2, towers[i], "_flux.csv", sep=""))
->>>>>>> 6b3122c1d4ccde3ff7c8774e71390665b4ea6019
-
+  dat  <- read_csv(file=paste0(path, last_date, towers[i], "_flux.csv"))
+  dat2 <- read_csv(file=paste0(path, last_date_2, towers[i], "_flux.csv"))
   fluxesc <- fluxes
   
 
@@ -279,19 +268,11 @@ for(i in 1:8){
 #### 2.0 get AmeriFlux's csv datasets ==========
 #### 
 for(im in 1:2){
-    
-  #d18 <- read_csv(file=paste(mpath, "US-", mlabs[im], 
-   #                          "_HH_201801010000_201901010000.csv", sep=""))
-  #d19 <- read_csv(file=paste(mpath, "US-", mlabs[im], 
-   #                          "_HH_201901010000_202001010000.csv", sep=""))
-     
-    d18 <- read.csv(file=paste(mpath, "US-", mlabs[im],
-           "_HH_201801010000_201901010000.csv", sep=""), header=TRUE, sep=",")
-    d19 <- read.csv(file=paste(mpath, "US-", mlabs[im],
-           "_HH_201901010000_202001010000.csv", sep=""), header=TRUE, sep=",")
-
-    #d18 <- rbind(d18, c(201812312330, 201901010000, rep(-9999, ncol(d18)-2)))   # last line is missing
-    datm <- rbind(d18, d19)
+  d18 <- read_csv(file=paste0(mpath, "US-", mlabs[im], "_HH_201801010000_201901010000.csv"))
+  d19 <- read_csv(file=paste0(mpath, "US-", mlabs[im], "_HH_201901010000_202001010000.csv"))
+  
+  #d18 <- rbind(d18, c(201812312330, 201901010000, rep(-9999, ncol(d18)-2)))   # last line is missing
+  datm <- rbind(d18, d19)
 
     
     
