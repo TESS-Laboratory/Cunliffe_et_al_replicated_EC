@@ -11,7 +11,8 @@
 
 
 # ------ 0.0 Setup Environment ----------
-## Load packages
+
+#-------------- 0.1 Load packages --------------
 library(tidyverse)
 library(viridis)                                                  # colour palette
 library(patchwork)                                                # to arrange plots
@@ -25,9 +26,9 @@ library(SPEI)
 
 
 
-#-------------- 0.1 Define paths --------------
+#-------------- 0.2 Define paths --------------
 
-# NB. These data are ca. 110 GB
+# NB. These input data are ca. 110 GB
 
 ## Paths on Fabio's machine
 path  <-  "E:/REC_7_Data/8_datasets/"
@@ -42,7 +43,7 @@ mpath  <-  "E:/REC_7_Data/12_Marcys_data/"
 
 
 
-#-------------- 0.2 Initialize lists --------------
+#-------------- 0.3 Initialize lists --------------
 
 sites  <-  c("SEG", "SES")
 
@@ -115,7 +116,7 @@ run_reddy_proc  <-  F            # run gap filling code
 
 
 
-#-------------- 0.3 Create Custom Functions --------------
+#-------------- 0.4 Create Custom Functions --------------
 
 ## flux-specific uncertainty from Hollinger 2005 
 # https://stats.stackexchange.com/questions/281682/how-to-fit-a-data-against-a-laplace-double-exponential-distribution-and-check
@@ -141,8 +142,9 @@ sub_last <- function(x){x <- x-x[length(x)]}
 
 
 
-
-#-------------- 1 Read REC csv data --------------
+#### 
+#### -------------- 1 Read REC csv data --------------
+#### 
 
 for(i in 1:8){
   dat  <- read_csv(file=paste0(path, last_date, towers[i], "_flux.csv"))
@@ -226,12 +228,12 @@ for(i in 1:8){
 
   
   
-  # remove outliers/despike before ustar/gapfilling as in FLUXNET_2015 data processing protocol
+  # remove outliers/despike before ustar/gapfilling as per the FLUXNET_2015 data processing protocol
   
   # remove outliers according to Tukey's Fence: 
   # 1.5 times the interquartile difference (3 times IQD is "far out") 
   
-  for(fx in fluxesc){ # #IQD*30 is 10 times what is considered "far out"
+  for(fx in fluxesc){ #IQD*30 is 10 times what is considered "far out"
     #fx <- "Fcc"
     vec <- as.numeric(as.character(dat[,fx]))
     med_p <- median(vec[vec>=0], na.rm=T)
