@@ -285,7 +285,6 @@ for(im in 1:2){
   #d19 <- read_csv(file=paste(mpath, "US-", mlabs[im], 
    #                          "_HH_201901010000_202001010000.csv", sep=""))
      
-<<<<<<< HEAD
     d18 <- read.csv(file=paste(mpath, "US-", mlabs[im],
            "_HH_201801010000_201901010000.csv", sep=""), header=TRUE, sep=",")
     d19 <- read.csv(file=paste(mpath, "US-", mlabs[im],
@@ -293,9 +292,7 @@ for(im in 1:2){
 
     #d18 <- rbind(d18, c(201812312330, 201901010000, rep(-9999, ncol(d18)-2)))   # last line is missing
     datm <- rbind(d18, d19)
-=======
-  datm <- rbind(d18, d19)
->>>>>>> 6b3122c1d4ccde3ff7c8774e71390665b4ea6019
+
     
     
     
