@@ -202,7 +202,7 @@ scales::show_col(viridis_pal(option = "viridis")(5)) # review colour options
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 )
 
-ggsave("plots/Annual precipitation.png", 
+ggsave("plots/Climatological Context/Annual precipitation.png", 
        AnnualPrecip_plots,
        width=16,
        height=12,
@@ -255,7 +255,7 @@ MonthlyPrecip_Station49_study <- df2 %>%
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 )
 
-ggsave("plots/precipitation seasonality40.png", 
+ggsave("plots/Climatological Context/precipitation seasonality40.png", 
        Precip_seasonal_plots,
        width=16,
        height=12,
@@ -273,7 +273,7 @@ ggsave("plots/precipitation seasonality40.png",
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 )
 
-ggsave("plots/precipitation seasonality49.png", 
+ggsave("plots/Climatological Context/precipitation seasonality49.png", 
        Precip_seasonal_plots,
        width=16,
        height=12,
@@ -296,7 +296,7 @@ MonthlyPrecip_average_study <- (MonthlyPrecip_Station40_study + MonthlyPrecip_St
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 )
 
-ggsave("plots/precipitation seasonality_average.png", 
+ggsave("plots/Climatological Context/precipitation seasonality_average.png", 
        Precip_seasonal_plots,
        width=16,
        height=12,
