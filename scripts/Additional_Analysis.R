@@ -1177,7 +1177,7 @@ DF_EC_study_SEG <- DF_EC_study %>%
   mutate(
     NEE_uStar_f_cum = cumsum(NEE_uStar_f) *(12.0107/10^6) * 1800,  # Convert umol m-2 s-1 to g C m-2 30 min-1. Where 12.0107 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
     LE_f_cum = cumsum(LE_f),
-    LE_f_cum_mm = cumsum(LE_f) * 1800 / 2260 / 1000,  # Calculate mm of cumulative evaporation. Where 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
+    LE_f_cum_mm = cumsum(LE_f) * 1800 / 2260 / 1000,  # Calculate mm of cumulative evaporation. Where cumsum(LE_f) is the cumulative MW m-2, 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
     H_f_cum = cumsum(H_f)
     )
 
@@ -1188,7 +1188,7 @@ DF_EC_study_SES <- DF_EC_study %>%
   mutate(
     NEE_uStar_f_cum = cumsum(NEE_uStar_f) *(12.0107/10^6) * 1800,  # Convert umol m-2 s-1 to g C m-2 30 min-1. Where 12.0107 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
     LE_f_cum = cumsum(LE_f),
-    LE_f_cum_mm = cumsum(LE_f) * 1800 / 2260 / 1000,  # Calculate mm of cumulative evaporation. Where 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
+    LE_f_cum_mm = cumsum(LE_f) * 1800 / 2260 / 1000,  # Calculate mm of cumulative evaporation. Where cumsum(LE_f) is the cumulative MW m-2, 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
     H_f_cum = cumsum(H_f)
     )
 
