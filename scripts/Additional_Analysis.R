@@ -15,9 +15,9 @@ library(tls)
 
 ## Paths Andy's machine
 # path  <-  "C:/workspace/REC_7_Data/8_datasets/"  # Unfilled EdiRe output
-fpath  <-  "C:/workspace/REC_7_Data/11_ReddyProc/"  # Gap filled ReddyProc output
+# fpath  <-  "C:/workspace/REC_7_Data/11_ReddyProc/"  # Gap filled ReddyProc output
 mpath  <-  "C:/workspace/REC_7_Data/12_Marcys_data/"
-
+npath <- "data/gapfilled_fluxes/"
 
 ## Plotting theme
 theme_fancy <- function() {
@@ -58,171 +58,244 @@ windowsFonts("Helvetica" = windowsFont("Helvetica"))  # Ensure font is mapped co
 
 #-------------- 1. Read data --------------
 {
-# Note datetime  format differs (yyyy vs yy) between data files.
+# Note datetime  format differs (yyyy vs yy) between some data files.
   
-## Read data from Marcy's systems
-DF_SEG_EC0a  <- read_csv(file=paste(mpath, "US-Seg_HH_201801010000_201901010000.csv", sep=""),
+## Read data from Licor systems (for met data)
+SEG0a  <- read_csv(file=paste(mpath, "US-Seg_HH_201801010000_201901010000.csv", sep=""),
                       col_types = cols(TIMESTAMP_START = col_datetime("%Y %m %d %H %M"),
                                        TIMESTAMP_END = col_datetime("%Y %m %d %H %M")),
                       na = c("", "NA",-9999))
 
-DF_SEG_EC0b  <- read_csv(file=paste(mpath, "US-Seg_HH_201901010000_202001010000.csv", sep=""),
+SEG0b  <- read_csv(file=paste(mpath, "US-Seg_HH_201901010000_202001010000.csv", sep=""),
                       col_types = cols(TIMESTAMP_START = col_datetime("%Y %m %d %H %M"),
                                        TIMESTAMP_END = col_datetime("%Y %m %d %H %M")),
                       na = c("", "NA",-9999))
 
-DF_SEG_EC0c  <- read_csv(file=paste(mpath, "US-Seg_HH_202001010000_202101010000.csv", sep=""),
+SEG0c  <- read_csv(file=paste(mpath, "US-Seg_HH_202001010000_202101010000.csv", sep=""),
                          col_types = cols(TIMESTAMP_START = col_datetime("%Y %m %d %H %M"),
                                           TIMESTAMP_END = col_datetime("%Y %m %d %H %M")),
                          na = c("", "NA",-9999))
 
 
-DF_SES_EC0a  <- read_csv(file=paste(mpath, "US-Ses_HH_201801010000_201901010000.csv", sep=""),
+SES0a  <- read_csv(file=paste(mpath, "US-Ses_HH_201801010000_201901010000.csv", sep=""),
                       col_types = cols(TIMESTAMP_START = col_datetime("%Y %m %d %H %M"),
                                        TIMESTAMP_END = col_datetime("%Y %m %d %H %M")),
                       na = c("", "NA",-9999))
 
-DF_SES_EC0b  <- read_csv(file=paste(mpath, "US-Ses_HH_201901010000_202001010000.csv", sep=""),
+SES0b  <- read_csv(file=paste(mpath, "US-Ses_HH_201901010000_202001010000.csv", sep=""),
                       col_types = cols(TIMESTAMP_START = col_datetime("%Y %m %d %H %M"),
                                        TIMESTAMP_END = col_datetime("%Y %m %d %H %M")),
                       na = c("", "NA",-9999))
 
-DF_SES_EC0c  <- read_csv(file=paste(mpath, "US-Ses_HH_202001010000_202101010000.csv", sep=""),
+SES0c  <- read_csv(file=paste(mpath, "US-Ses_HH_202001010000_202101010000.csv", sep=""),
                          col_types = cols(TIMESTAMP_START = col_datetime("%Y %m %d %H %M"),
                                           TIMESTAMP_END = col_datetime("%Y %m %d %H %M")),
                          na = c("", "NA",-9999))
 
 
-## Read gap filled Reddy Proc output (tab delimited, read twice because the second row contains units)
-## '_f' in variable names indicates gap filled.
-df_names <- read_tsv(file=paste(fpath, "SEG_REC1_2020_50_filled_Txcor.txt", sep=""), n_max = 1) %>% names()
-DF_SEG_EC1  <- read_tsv(file=paste(fpath, "SEG_REC1_2020_50_filled_Txcor.txt", sep=""), col_names = df_names, na = c("-9999"), skip=2, guess_max = min(10000))  # Needed to parse the first 10,000 records to ensure col types were correctl specified.
+## Compile time series from Licor systems
+SEG0_all <- dplyr::bind_rows(SEG0a, SEG0b, SEG0c); rm(SEG0a, SEG0b, SEG0c)
+SES0_all <- dplyr::bind_rows(SES0a, SES0b, SES0c); rm(SES0a, SES0b, SES0c)
 
-df_names <- read_tsv(file=paste(fpath, "SEG_REC2_2020_50_filled_Txcor.txt", sep=""), n_max = 1) %>% names()
-DF_SEG_EC2  <- read_tsv(file=paste(fpath, "SEG_REC2_2020_50_filled_Txcor.txt", sep=""), col_names = df_names, na = c("-9999"), skip=2, guess_max = min(10000))  # Needed to parse the first 10,000 records to ensure col types were correctl specified.
 
-df_names <- read_tsv(file=paste(fpath, "SEG_REC2_2020_50_filled_Txcor.txt", sep=""), n_max = 1) %>% names()
-DF_SEG_EC2  <- read_tsv(file=paste(fpath, "SEG_REC2_2020_50_filled_Txcor.txt", sep=""), col_names = df_names, na = c("-9999"), skip=2, guess_max = min(10000))  # Needed to parse the first 10,000 records to ensure col types were correctl specified.
+## Create lists for processing Licor systems ## not currently used
+# list_licor_a <- list(SEG0_all, SES0_all) 
+# list_licor_b <- c("SEG0", "SES0") 
 
-df_names <- read_tsv(file=paste(fpath, "SEG_REC3_2020_50_filled_Txcor.txt", sep=""), n_max = 1) %>% names()
-DF_SEG_EC3  <- read_tsv(file=paste(fpath, "SEG_REC3_2020_50_filled_Txcor.txt", sep=""), col_names = df_names, na = c("-9999"), skip=2, guess_max = min(10000))  # Needed to parse the first 10,000 records to ensure col types were correctl specified.
+## Create function to rename and select meteorological variables of interest 
+tidy_licor <- function(df, station) {
+  df %>%
+    rename(Precipitation = P_F,
+           datetime = TIMESTAMP_START,
+           AirTemperature = TA_F) %>% 
+    select(datetime,
+           Precipitation, 
+           SW_IN,
+           AirTemperature,
+           VPD_F,
+           PPFD_IN
+    ) %>%
+    mutate(Station = station,
+           datetime = datetime + 15*60) # adding 15 minutes (in seconds) to change datetime to center of half hour
+}  # Tidy Licor data
 
-df_names <- read_tsv(file=paste(fpath, "SEG_REC4_2020_50_filled_Txcor.txt", sep=""), n_max = 1) %>% names()
-DF_SEG_EC4  <- read_tsv(file=paste(fpath, "SEG_REC4_2020_50_filled_Txcor.txt", sep=""), col_names = df_names, na = c("-9999"), skip=2, guess_max = min(10000))  # Needed to parse the first 10,000 records to ensure col types were correctl specified.
 
-df_names <- read_tsv(file=paste(fpath, "SES_REC1_2020_50_filled_Txcor.txt", sep=""), n_max = 1) %>% names()
-DF_SES_EC1  <- read_tsv(file=paste(fpath, "SES_REC1_2020_50_filled_Txcor.txt", sep=""), col_names = df_names, na = c("-9999"), skip=2, guess_max = min(10000))  # Needed to parse the first 10,000 records to ensure col types were correctl specified.
+SEG_met <- tidy_licor(SEG0_all, "SEG0"); rm(SEG0_all)
+SES_met <- tidy_licor(SES0_all, "SES0"); rm(SES0_all)
 
-df_names <- read_tsv(file=paste(fpath, "SES_REC2_2020_50_filled_Txcor.txt", sep=""), n_max = 1) %>% names()
-DF_SES_EC2  <- read_tsv(file=paste(fpath, "SES_REC2_2020_50_filled_Txcor.txt", sep=""), col_names = df_names, na = c("-9999"), skip=2, guess_max = min(10000))  # Needed to parse the first 10,000 records to ensure col types were correctl specified.
 
-df_names <- read_tsv(file=paste(fpath, "SES_REC3_2020_50_filled_Txcor.txt", sep=""), n_max = 1) %>% names()
-DF_SES_EC3  <- read_tsv(file=paste(fpath, "SES_REC3_2020_50_filled_Txcor.txt", sep=""), col_names = df_names, na = c("-9999"), skip=2, guess_max = min(10000))  # Needed to parse the first 10,000 records to ensure col types were correctl specified.
 
-df_names <- read_tsv(file=paste(fpath, "SES_REC4_2020_50_filled_Txcor.txt", sep=""), n_max = 1) %>% names()
-DF_SES_EC4  <- read_tsv(file=paste(fpath, "SES_REC4_2020_50_filled_Txcor.txt", sep=""), col_names = df_names, na = c("-9999"), skip=2, guess_max = min(10000))  # Needed to parse the first 10,000 records to ensure col types were correctl specified.
 
-rm(df_names)
+#### Read fluxes gap filled with Random Forest Regression workflow. 
+## Note that timestamps are the middle of the half hour rather than start and end.
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#### WORK IN PROGRESS ####
+
+# ultimately aiming for a single data frame, containing P, SW_in, NEE, H, LE, Station, Site
+# merge met obbs (code above) with gapfilled fluxes (code below)...
+
+
+## Want to automate reading in 30 files, with list of station codes and list of variables
+## Then use these station and variable codes to put the data together
+
+## Think I want a purrr solution?
+
+# list_station <- c("SEG_EC1", "SEG_EC2", "SEG_EC3", "SEG_EC4", "SES_EC1", "SES_EC2", "SES_EC3", "SES_EC4")
+# list_variable <- c("H", "LE", "NEE")
+
+
+
+# X  <- read_csv(file=paste(npath, "XXX.csv", sep=""))
+# SEG_EC0 <- "cbind"(SEG_EC0_H, SEG_EC0_LE, SEG_EC0_NEE) #  cbind generates with duplicate datetime columns!!!
+
+# ## Use purrr::map2 to process multiple tibbles through pipe and return a single merged dataframe of Licor data
+# DF_EC_licor <- list1a %>%
+# purrr::map2(.x =., .y=list1b, ~tidy_licor(.x, .y)) %>%
+# # bind_rows()
+
+# ## Use purrr::map2 to process multiple tibbles through pipe and return a single merged dataframe
+# DF_EC_test <- list1a %>%
+#   purrr::map2(.x =.) %>%
+#   bind_rows()
+# 
+
+
+
+# the ugly way!!!
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+# Read and combine gap filled flux files for SEG0
+SEG0_H  <- read_csv("data/gapfilled_fluxes/SEG0 H.csv") 
+SEG0_LE  <- read_csv("data/gapfilled_fluxes/SEG0 LE.csv") 
+SEG0_NEE <- read_csv("data/gapfilled_fluxes/SEG0 NEE.csv") 
+SEG0_flux <- merge(SEG0_H, SEG0_LE, by = "datetime")  # Merge happens visa two step because it can only work with two inputs
+SEG0_flux <- merge(SEG0_flux, SEG0_NEE, by = "datetime")
+rm(SEG0_H, SEG0_LE, SEG0_NEE)  # Tidy up
+
+# Read and combine gap filled flux files for SES0
+SES0_H  <- read_csv("data/gapfilled_fluxes/SES0 H.csv") 
+SES0_LE  <- read_csv("data/gapfilled_fluxes/SES0 LE.csv") 
+SES0_NEE <- read_csv("data/gapfilled_fluxes/SES0 NEE.csv") 
+SES0_flux <- merge(SES0_H, SES0_LE, by = "datetime")  # Merge happens visa two step because it can only work with two inputs
+SES0_flux <- merge(SES0_flux, SES0_NEE, by = "datetime")
+rm(SES0_H, SES0_LE, SES0_NEE)  # Tidy up
+
+# Read gap filled flux files for low frequency systems
+SEG1_H  <- read_csv("data/gapfilled_fluxes/SEG1 H.csv") 
+SEG1_LE  <- read_csv("data/gapfilled_fluxes/SEG1 LE.csv") 
+SEG1_NEE <- read_csv("data/gapfilled_fluxes/SEG1 NEE.csv") 
+SEG1_flux <- merge(SEG1_H, SEG1_LE, by = "datetime")  # Merge happens visa two step because it can only work with two inputs
+SEG1_flux <- merge(SEG1_flux, SEG1_NEE, by = "datetime"); rm(SEG1_H, SEG1_LE, SEG1_NEE)  # Tidy up
+
+SEG2_H  <- read_csv("data/gapfilled_fluxes/SEG2 H.csv") 
+SEG2_LE  <- read_csv("data/gapfilled_fluxes/SEG2 LE.csv") 
+SEG2_NEE <- read_csv("data/gapfilled_fluxes/SEG2 NEE.csv") 
+SEG2_flux <- merge(SEG2_H, SEG2_LE, by = "datetime")  # Merge happens visa two step because it can only work with two inputs
+SEG2_flux <- merge(SEG2_flux, SEG2_NEE, by = "datetime"); rm(SEG2_H, SEG2_LE, SEG2_NEE)  # Tidy up
+
+SEG3_H  <- read_csv("data/gapfilled_fluxes/SEG3 H.csv") 
+SEG3_LE  <- read_csv("data/gapfilled_fluxes/SEG3 LE.csv") 
+SEG3_NEE <- read_csv("data/gapfilled_fluxes/SEG3 NEE.csv")
+SEG3_flux <- merge(SEG3_H, SEG3_LE, by = "datetime")  # Merge happens visa two step because it can only work with two inputs
+SEG3_flux <- merge(SEG3_flux, SEG3_NEE, by = "datetime"); rm(SEG3_H, SEG3_LE, SEG3_NEE)  # Tidy up
+
+SEG4_H  <- read_csv("data/gapfilled_fluxes/SEG4 H.csv") 
+SEG4_LE  <- read_csv("data/gapfilled_fluxes/SEG4 LE.csv") 
+SEG4_NEE <- read_csv("data/gapfilled_fluxes/SEG4 NEE.csv") 
+SEG4_flux <- merge(SEG4_H, SEG4_LE, by = "datetime")  # Merge happens visa two step because it can only work with two inputs
+SEG4_flux <- merge(SEG4_flux, SEG4_NEE, by = "datetime"); rm(SEG4_H, SEG4_LE, SEG4_NEE)  # Tidy up
+
+SES1_H  <- read_csv("data/gapfilled_fluxes/SES1 H.csv") 
+SES1_LE  <- read_csv("data/gapfilled_fluxes/SES1 LE.csv") 
+SES1_NEE <- read_csv("data/gapfilled_fluxes/SES1 NEE.csv") 
+SES1_flux <- merge(SES1_H, SES1_LE, by = "datetime")  # Merge happens visa two step because it can only work with two inputs
+SES1_flux <- merge(SES1_flux, SES1_NEE, by = "datetime"); rm(SES1_H, SES1_LE, SES1_NEE)  # Tidy up
+
+SES2_H  <- read_csv("data/gapfilled_fluxes/SES2 H.csv") 
+SES2_LE  <- read_csv("data/gapfilled_fluxes/SES2 LE.csv") 
+SES2_NEE <- read_csv("data/gapfilled_fluxes/SES2 NEE.csv") 
+SES2_flux <- merge(SES2_H, SES2_LE, by = "datetime")  # Merge happens visa two step because it can only work with two inputs
+SES2_flux <- merge(SES2_flux, SES2_NEE, by = "datetime"); rm(SES2_H, SES2_LE, SES2_NEE)  # Tidy up
+
+SES3_H  <- read_csv("data/gapfilled_fluxes/SES3 H.csv") 
+SES3_LE  <- read_csv("data/gapfilled_fluxes/SES3 LE.csv") 
+SES3_NEE <- read_csv("data/gapfilled_fluxes/SES3 NEE.csv") 
+SES3_flux <- merge(SES3_H, SES3_LE, by = "datetime")  # Merge happens visa two step because it can only work with two inputs
+SES3_flux <- merge(SES3_flux, SES3_NEE, by = "datetime"); rm(SES3_H, SES3_LE, SES3_NEE)  # Tidy up
+
+SES4_H  <- read_csv("data/gapfilled_fluxes/SES4 H.csv") 
+SES4_LE  <- read_csv("data/gapfilled_fluxes/SES4 LE.csv") 
+SES4_NEE <- read_csv("data/gapfilled_fluxes/SES4 NEE.csv") 
+SES4_flux <- merge(SES4_H, SES4_LE, by = "datetime")  # Merge happens visa two step because it can only work with two inputs
+SES4_flux <- merge(SES4_flux, SES4_NEE, by = "datetime"); rm(SES4_H, SES4_LE, SES4_NEE)  # Tidy up
+
+
+### add station codes to flux tibbles
+add_stations <- function(df, station) {
+  df %>%
+    mutate(Station = station)
+  }  # Tidy flux data
+
+SEG0 <- add_stations(SEG0_flux, "SEG0"); rm(SEG0_flux)
+SEG1 <- add_stations(SEG1_flux, "SEG1"); rm(SEG1_flux)
+SEG2 <- add_stations(SEG2_flux, "SEG2"); rm(SEG2_flux)
+SEG3 <- add_stations(SEG3_flux, "SEG3"); rm(SEG3_flux)
+SEG4 <- add_stations(SEG4_flux, "SEG4"); rm(SEG4_flux)
+
+SES0 <- add_stations(SES0_flux, "SES0"); rm(SES0_flux)
+SES1 <- add_stations(SES1_flux, "SES1"); rm(SES1_flux)
+SES2 <- add_stations(SES2_flux, "SES2"); rm(SES2_flux)
+SES3 <- add_stations(SES3_flux, "SES3"); rm(SES3_flux)
+SES4 <- add_stations(SES4_flux, "SES4"); rm(SES4_flux)
+
+
+# combine all systems into long form
+SEG_fluxes_long <- rbind(SEG0, SEG1, SEG2, SEG3, SEG4)
+SES_fluxes_long <- rbind(SES0, SES1, SES2, SES3, SES4)
+rm(SEG0, SEG1, SEG2, SEG3, SEG4)
+rm(SES0, SES1, SES2, SES3, SES4)
 }  # Read data
 
 
 
 #-------------- 2. Tidy data --------------
 
-## Compile Marcy's files
-DF_SEG_EC0 <- dplyr::bind_rows(DF_SEG_EC0a, DF_SEG_EC0b, DF_SEG_EC0c); rm(DF_SEG_EC0a, DF_SEG_EC0b, DF_SEG_EC0c)
-DF_SES_EC0 <- dplyr::bind_rows(DF_SES_EC0a, DF_SES_EC0b, DF_SES_EC0c); rm(DF_SES_EC0a, DF_SES_EC0b, DF_SES_EC0c)
-
-
-## create lists for processing
-list1a <- list(DF_SEG_EC0, DF_SES_EC0) 
-list1b <- c("SEG_EC0", "SES_EC0") 
-
-list2a <- list(DF_SEG_EC1, DF_SEG_EC2, DF_SEG_EC3, DF_SEG_EC4, DF_SES_EC1, DF_SES_EC2, DF_SES_EC3, DF_SES_EC4) 
-list2b <- c("SEG_EC1", "SEG_EC2", "SEG_EC3", "SEG_EC4", "SES_EC1", "SES_EC2", "SES_EC3", "SES_EC4") 
-
-## Create functions to rename and select variables of interest 
-## Marcy's data
-tidy_marcy <- function(df, station) {
-  df %>%
-    rename(Precipitation = P_F,
-           Datetime_Start = TIMESTAMP_START) %>% 
-    select(Datetime_Start,
-           FC,
-           LE,
-           H,
-           Precipitation, 
-           SW_IN
-    ) %>%
-    rename(NEE = FC) %>% 
-    mutate(Station = station)
-  }  # Tidy Marcy's data
-
-
-## REC data
-tidy_RECs <- function(df, station) {
-  df %>%
-    mutate(
-      Station = station,
-      Datetime_Start = lubridate::make_datetime(year = Year, min = round(Hour*60)) + lubridate::days(DoY-1)
-      ) %>%
-    select(
-      Datetime_Start,
-      NEE,
-      NEE_uStar_f,
-      LE,
-      LE_f,
-      H,
-      H_f,
-      Station)
-  }  # Tidy REC data
-
-
-
-## Use purrr::map2 to process multiple tibbles through pipe and return a single merged dataframe
-DF_EC_Marcy <- list1a %>%
-  purrr::map2(.x =., .y=list1b, ~tidy_marcy(.x, .y)) %>%
-  bind_rows()
-
-DF_EC_REC <- list2a %>%
-  purrr::map2(.x =., .y=list2b, ~tidy_RECs(.x, .y)) %>%
-  bind_rows()
-
-## NB. If we need to handle more than two lists, use purrr::pmap
-## Example:
-# my_list <- list(df_list, name_list, other_varlist)
-# purrr::pmap(my_list, ~myfunction(..1, ..2, ..3))
-
-# merge data from all stations
-DF_EC <- dplyr::bind_rows(DF_EC_Marcy, DF_EC_REC) 
-
-# remove unnecessary objects
-rm(list1a, list1b, list2a, list2b,
-   DF_SEG_EC0, DF_SES_EC0,
-   DF_SEG_EC1, DF_SEG_EC2, DF_SEG_EC3, DF_SEG_EC4, DF_SES_EC1, DF_SES_EC2, DF_SES_EC3, DF_SES_EC4,
-   DF_EC_Marcy, DF_EC_REC)
-
-
 # Subset time series to study period dates
-DF_EC_study <- DF_EC %>%
-  filter(between(Datetime_Start,
-                 as.POSIXct("2018-11-01 00:00:00"),
-                 as.POSIXct("2020-10-31 23:30:00")))
+subset_datetime <- function(df) {
+  df %>%
+    filter(between(datetime,
+                   as.POSIXct("2018-11-01 00:00:00"),
+                   as.POSIXct("2020-10-31 23:30:00")))
+}
+
+SEG_fluxes <- subset_datetime(SEG_fluxes_long); rm(SEG_fluxes_long)
+SES_fluxes <- subset_datetime(SES_fluxes_long); rm(SES_fluxes_long)
+SEG_met <- subset_datetime(SEG_met)
+SES_met <- subset_datetime(SES_met)
+
+fluxes <- rbind(SEG_fluxes, SES_fluxes)
 
 
 # create function pivoting data from long to wide form for analysis
 shape_wider <- function(df, variable) {
   df %>%
-    select(Datetime_Start, variable, Station) %>%
+    select(datetime, variable, Station) %>%
     pivot_wider(names_from = Station,
                 values_from = variable)
 }  #
 
 # pivot data to wide form
 {
-  DF_EC_study_H <- shape_wider(DF_EC_study, "H")
-  DF_EC_study_LE <- shape_wider(DF_EC_study, "LE")
-  DF_EC_study_NEE <- shape_wider(DF_EC_study, "NEE")
+  fluxes_H <- shape_wider(fluxes, "H_filled")
+  fluxes_LE <- shape_wider(fluxes, "LE_filled")
+  fluxes_NEE <- shape_wider(fluxes, "NEE_filled")
 }
 
 
@@ -235,9 +308,9 @@ shape_wider <- function(df, variable) {
 ### Half-hourly comparison (EC0 versus EC1)----
 {
 ## Determine axis limits
-lims_h  <- range(DF_EC_study_H[, c("SEG_EC0",  "SEG_EC1",  "SES_EC0",  "SES_EC1")],  na.rm=T)
-lims_le  <- range(DF_EC_study_LE[, c("SEG_EC0",  "SEG_EC1",  "SES_EC0",  "SES_EC1")],  na.rm=T)
-lims_nee  <- range(DF_EC_study_NEE[, c("SEG_EC0",  "SEG_EC1",  "SES_EC0",  "SES_EC1")],  na.rm=T)
+lims_h  <- range(fluxes_H[, c("SEG0",  "SEG1",  "SES0",  "SES1")],  na.rm=T)
+lims_le  <- range(fluxes_LE[, c("SEG0",  "SEG1",  "SES0",  "SES1")],  na.rm=T)
+lims_nee  <- range(fluxes_NEE[, c("SEG0",  "SEG1",  "SES0",  "SES1")],  na.rm=T)
 
 ### H
 {
@@ -245,18 +318,18 @@ lims_nee  <- range(DF_EC_study_NEE[, c("SEG_EC0",  "SEG_EC1",  "SES_EC0",  "SES_
 {
 
 # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_H)
+pca <- prcomp(~SEG0+SEG1, fluxes_H)
 tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
 tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
 
 equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
 
 # Compute Pearson correlation coefficient
-r <- cor(DF_EC_study_H$SEG_EC0, DF_EC_study_H$SEG_EC1, method="pearson", use = "complete.obs")
+r <- cor(fluxes_H$SEG0, fluxes_H$SEG1, method="pearson", use = "complete.obs")
 r <- paste("r: ", round(r,2))
 
 # create plot
-seg_h <- ggplot(DF_EC_study_H, aes(x=SEG_EC0, y=SEG_EC1)) +
+seg_h <- ggplot(fluxes_H, aes(x=SEG0, y=SEG1)) +
   labs(x = expression("Seg EC0 - H (W m"^"-2"*")"),
        y = expression("Seg EC1 - H (W m"^"-2"*")"),
        title = "Sensible Heat Flux - Seg") +
@@ -269,8 +342,8 @@ seg_h <- ggplot(DF_EC_study_H, aes(x=SEG_EC0, y=SEG_EC1)) +
   theme(legend.position = c(0.85, 0.25)) + # legend position
   geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
   geom_abline(intercept = tls_int, slope = tls_slp) +
-  annotate("text", x = 65, y = 500, label = equation, size=4) +
-  annotate("text", x = -100, y = 420, label = r, size=4)
+  annotate("text", x = -250, y = 650, label = equation, size=4) +
+  annotate("text", x = -550, y = 540, label = r, size=4)
 
 } # H / US-Seg
 
@@ -278,18 +351,18 @@ seg_h <- ggplot(DF_EC_study_H, aes(x=SEG_EC0, y=SEG_EC1)) +
 ## H / US-Ses
 {
   # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-  pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_H)
+  pca <- prcomp(~SES0+SES1, fluxes_H)
   tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
   tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
   
   equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
   
   # Compute Pearson correlation coefficient
-  r <- cor(DF_EC_study_H$SES_EC0, DF_EC_study_H$SES_EC1, method="pearson", use = "complete.obs")
+  r <- cor(fluxes_H$SES0, fluxes_H$SES1, method="pearson", use = "complete.obs")
   r <- paste("r: ", round(r,2))
   
   # create plot
-  ses_h <- ggplot(DF_EC_study_H, aes(x=SES_EC0, y=SES_EC1)) +
+  ses_h <- ggplot(fluxes_H, aes(x=SES0, y=SES1)) +
     labs(x = expression("Ses EC0 - H (W m"^"-2"*")"),
          y = expression("Ses EC1 - H (W m"^"-2"*")"),
          title = "Sensible Heat Flux - Ses") +
@@ -302,8 +375,8 @@ seg_h <- ggplot(DF_EC_study_H, aes(x=SEG_EC0, y=SEG_EC1)) +
     theme(legend.position = c(0.85, 0.25)) + # legend position
     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = tls_int, slope = tls_slp) +
-    annotate("text", x = 65, y = 500, label = equation, size=4) +
-    annotate("text", x = -100, y = 420, label = r, size=4)
+    annotate("text", x = -250, y = 650, label = equation, size=4) +
+    annotate("text", x = -550, y = 540, label = r, size=4)
   } # H / US-Ses
 
 # Calculate the range of values in both plots for consistent scalars
@@ -318,18 +391,18 @@ ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range)
 ## LE / US-Seg
 {
   # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-  pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_LE)
+  pca <- prcomp(~SEG0+SEG1, fluxes_LE)
   tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
   tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
   
   equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
   
   # Compute Pearson correlation coefficient
-  r <- cor(DF_EC_study_LE$SEG_EC0, DF_EC_study_LE$SEG_EC1, method="pearson", use = "complete.obs")
+  r <- cor(fluxes_LE$SEG0, fluxes_LE$SEG1, method="pearson", use = "complete.obs")
   r <- paste("r: ", round(r,2))
   
   # create plot
-  seg_le <- ggplot(DF_EC_study_LE, aes(x=SEG_EC0, y=SEG_EC1)) +
+  seg_le <- ggplot(fluxes_LE, aes(x=SEG0, y=SEG1)) +
     labs(x = expression("Seg EC0 - LE (W m"^"-2"*")"),
          y = expression("Seg EC1 - LE (W m"^"-2"*")"),
          title = "Latent Heat Flux - Seg") +
@@ -342,8 +415,8 @@ ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range)
     theme(legend.position = c(0.85, 0.25)) + # legend position
     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = tls_int, slope = tls_slp) +
-    annotate("text", x = 100, y = 430, label = equation, size=4) +
-    annotate("text", x = 0, y = 380, label = r, size=4)
+    annotate("text", x = 10, y = 430, label = equation, size=4) +
+    annotate("text", x = -110, y = 380, label = r, size=4)
   
 } # LE / US-Seg
 
@@ -351,18 +424,18 @@ ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range)
 # LE / US-Ses
 {
   # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-  pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_LE)
+  pca <- prcomp(~SES0+SES1, fluxes_LE)
   tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
   tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
   
   equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
   
   # Compute Pearson correlation coefficient
-  r <- cor(DF_EC_study_LE$SES_EC0, DF_EC_study_LE$SES_EC1, method="pearson", use = "complete.obs")
+  r <- cor(fluxes_LE$SES0, fluxes_LE$SES1, method="pearson", use = "complete.obs")
   r <- paste("r: ", round(r,2))
   
   # create plot
-  ses_le <- ggplot(DF_EC_study_LE, aes(x=SES_EC0, y=SES_EC1)) +
+  ses_le <- ggplot(fluxes_LE, aes(x=SES0, y=SES1)) +
     labs(x = expression("Ses EC0 - LE (W m"^"-2"*")"),
          y = expression("Ses EC1 - LE (W m"^"-2"*")"),
          title = "Latent Heat Flux - Ses") +
@@ -375,8 +448,8 @@ ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range)
     theme(legend.position = c(0.85, 0.25)) + # legend position
     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = tls_int, slope = tls_slp) +
-    annotate("text", x = 100, y = 430, label = equation, size=4) +
-    annotate("text", x = 0, y = 380, label = r, size=4)
+    annotate("text", x = 25, y = 430, label = equation, size=4) +
+    annotate("text", x = -120, y = 380, label = r, size=4)
   
 } # LE / US-Ses
 
@@ -393,18 +466,18 @@ ses_le <- ses_le +   scale_fill_continuous(type = "viridis", limits=c(count.rang
 ## NEE / US-Seg
 {
   # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-  pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_NEE)
+  pca <- prcomp(~SEG0+SEG1, fluxes_NEE)
   tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
   tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
   
   equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
   
   # Compute Pearson correlation coefficient
-  r <- cor(DF_EC_study_NEE$SEG_EC0, DF_EC_study_NEE$SEG_EC1, method="pearson", use = "complete.obs")
+  r <- cor(fluxes_NEE$SEG0, fluxes_NEE$SEG1, method="pearson", use = "complete.obs")
   r <- paste("r: ", round(r,2))
   
   # create plot
-  seg_nee <- ggplot(DF_EC_study_NEE, aes(x=SEG_EC0, y=SEG_EC1)) +
+  seg_nee <- ggplot(fluxes_NEE, aes(x=SEG0, y=SEG1)) +
     labs(
       x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
       y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
@@ -418,8 +491,8 @@ ses_le <- ses_le +   scale_fill_continuous(type = "viridis", limits=c(count.rang
     theme(legend.position = c(0.85, 0.25)) + # legend position
     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = tls_int, slope = tls_slp) +
-    annotate("text", x = -5, y = 7.5, label = equation, size=4) +
-    annotate("text", x = -8.5, y = 5.5, label = r, size=4)
+    annotate("text", x = -4.4, y = 10.6, label = equation, size=4) +
+    annotate("text", x = -8.7, y = 8.6, label = r, size=4)
   
 } # NEE / US-Seg
 
@@ -427,18 +500,18 @@ ses_le <- ses_le +   scale_fill_continuous(type = "viridis", limits=c(count.rang
 ## NEE / US-Ses
 {
   # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-  pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_NEE)
+  pca <- prcomp(~SES0+SES1, fluxes_NEE)
   tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
   tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
   
   equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
   
   # Compute Pearson correlation coefficient
-  r <- cor(DF_EC_study_NEE$SES_EC0, DF_EC_study_NEE$SES_EC1, method="pearson", use = "complete.obs")
+  r <- cor(fluxes_NEE$SES0, fluxes_NEE$SES1, method="pearson", use = "complete.obs")
   r <- paste("r: ", round(r,2))
   
   # create plot
-  ses_nee <- ggplot(DF_EC_study_NEE, aes(x=SES_EC0, y=SES_EC1)) +
+  ses_nee <- ggplot(fluxes_NEE, aes(x=SES0, y=SES1)) +
     labs(
       x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
       y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
@@ -452,8 +525,8 @@ ses_le <- ses_le +   scale_fill_continuous(type = "viridis", limits=c(count.rang
     theme(legend.position = c(0.85, 0.25)) + # legend position
     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = tls_int, slope = tls_slp) +
-    annotate("text", x = -5, y = 7.5, label = equation, size=4) +
-    annotate("text", x = -9, y = 5.5, label = r, size=4)
+    annotate("text", x = -4.5, y = 10.6, label = equation, size=4) +
+    annotate("text", x = -8.6, y = 8.6, label = r, size=4)
   
 } # NEE / US-Ses
 
@@ -470,7 +543,7 @@ ses_nee <- ses_nee +   scale_fill_continuous(type = "viridis", limits=c(count.ra
 pall <- (seg_h + ses_h) / (seg_le + ses_le) / (seg_nee + ses_nee) +
   plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97))
 
-filename = "plots/EC0 vs EC1 comparison - half hourly"
+filename = "plots/EC0 vs EC1 comparison A - half hourly"
 
 ggsave(
   pall,
@@ -496,99 +569,93 @@ ggsave(
 {
   ## Resample time series to desired temporal resolution
     ## Resample H
-     DF_EC_study_H_SEG_daily <- DF_EC_study_H %>%
-       mutate(Datetime_Start_res = as.Date(Datetime_Start, format = "%Y-%m-%d")) %>% 
+  fluxes_H_SEG_daily <- fluxes_H %>%
+       mutate(Datetime_Start_res = as.Date(datetime, format = "%Y-%m-%d")) %>% 
        group_by(Datetime_Start_res) %>%
-       select(SEG_EC0,
-              SEG_EC1) %>% 
-       na.omit %>%  # drop incomplete half hours
+       select(SEG0,
+              SEG1) %>% 
        summarise(
-         SEG_EC0 = mean(SEG_EC0),
-         SEG_EC1 = mean(SEG_EC1)
+         SEG0 = mean(SEG0),
+         SEG1 = mean(SEG1)
          )
 
-     DF_EC_study_H_SES_daily <- DF_EC_study_H %>%
-       mutate(Datetime_Start_res = as.Date(Datetime_Start, format = "%Y-%m-%d")) %>% 
+  fluxes_H_SES_daily <- fluxes_H %>%
+       mutate(Datetime_Start_res = as.Date(datetime, format = "%Y-%m-%d")) %>% 
        group_by(Datetime_Start_res) %>%
-       select(SES_EC0,
-              SES_EC1) %>% 
-       na.omit %>%  # drop incomplete half hours
+       select(SES0,
+              SES1) %>% 
        summarise(
-         SES_EC0 = mean(SES_EC0),
-         SES_EC1 = mean(SES_EC1)
+         SES0 = mean(SES0),
+         SES1 = mean(SES1)
        )
      
      
      ## Resample LE
-     DF_EC_study_LE_SEG_daily <- DF_EC_study_LE %>%
-       mutate(Datetime_Start_res = as.Date(Datetime_Start, format = "%Y-%m-%d")) %>% 
+     fluxes_LE_SEG_daily <- fluxes_LE %>%
+       mutate(Datetime_Start_res = as.Date(datetime, format = "%Y-%m-%d")) %>% 
        group_by(Datetime_Start_res) %>%
-       select(SEG_EC0,
-              SEG_EC1) %>% 
-       na.omit %>%  # drop incomplete half hours
+       select(SEG0,
+              SEG1) %>% 
        summarise(
-         SEG_EC0 = mean(SEG_EC0),
-         SEG_EC1 = mean(SEG_EC1)
+         SEG0 = mean(SEG0),
+         SEG1 = mean(SEG1)
        )   
    
-     DF_EC_study_LE_SES_daily <- DF_EC_study_LE %>%
-       mutate(Datetime_Start_res = as.Date(Datetime_Start, format = "%Y-%m-%d")) %>% 
+     fluxes_LE_SES_daily <- fluxes_LE %>%
+       mutate(Datetime_Start_res = as.Date(datetime, format = "%Y-%m-%d")) %>% 
        group_by(Datetime_Start_res) %>%
-       select(SES_EC0,
-              SES_EC1) %>% 
-       na.omit %>%  # drop incomplete half hours
+       select(SES0,
+              SES1) %>% 
        summarise(
-         SES_EC0 = mean(SES_EC0),
-         SES_EC1 = mean(SES_EC1)
+         SES0 = mean(SES0),
+         SES1 = mean(SES1)
        )   
      
      
      ## Resample NEE 
-     DF_EC_study_NEE_SEG_daily <- DF_EC_study_NEE %>%
-       mutate(Datetime_Start_res = as.Date(Datetime_Start, format = "%Y-%m-%d")) %>% 
+     fluxes_NEE_SEG_daily <- fluxes_NEE %>%
+       mutate(Datetime_Start_res = as.Date(datetime, format = "%Y-%m-%d")) %>% 
        group_by(Datetime_Start_res) %>%
-       select(SEG_EC0,
-              SEG_EC1) %>% 
-       na.omit %>%  # drop incomplete half hours
+       select(SEG0,
+              SEG1) %>% 
        summarise(
-         SEG_EC0 = mean(SEG_EC0),
-         SEG_EC1 = mean(SEG_EC1)
+         SEG0 = mean(SEG0),
+         SEG1 = mean(SEG1)
        )
     
-     DF_EC_study_NEE_SES_daily <- DF_EC_study_NEE %>%
-       mutate(Datetime_Start_res = as.Date(Datetime_Start, format = "%Y-%m-%d")) %>% 
+     fluxes_NEE_SES_daily <- fluxes_NEE %>%
+       mutate(Datetime_Start_res = as.Date(datetime, format = "%Y-%m-%d")) %>% 
        group_by(Datetime_Start_res) %>%
-       select(SES_EC0,
-              SES_EC1) %>% 
-       na.omit %>%  # drop incomplete half hours
+       select(SES0,
+              SES1) %>% 
        summarise(
-         SES_EC0 = mean(SES_EC0),
-         SES_EC1 = mean(SES_EC1)
+         SES0 = mean(SES0),
+         SES1 = mean(SES1)
        )
      
    
   ## Determine axis limits
-  lims_h  <- range(range(DF_EC_study_H_SEG_daily[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_H_SES_daily[, c("SES_EC0",  "SES_EC1")]))
-  lims_le  <- range(range(DF_EC_study_LE_SEG_daily[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_LE_SES_daily[, c("SES_EC0",  "SES_EC1")]))
-  lims_nee  <- range(range(DF_EC_study_NEE_SEG_daily[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_NEE_SES_daily[, c("SES_EC0",  "SES_EC1")]))
+  lims_h  <- range(range(fluxes_H_SEG_daily[, c("SEG0",  "SEG1")]), range(fluxes_H_SES_daily[, c("SES0",  "SES1")]))
+  lims_le  <- range(range(fluxes_LE_SEG_daily[, c("SEG0",  "SEG1")]), range(fluxes_LE_SES_daily[, c("SES0",  "SES1")]))
+  lims_nee  <- range(range(fluxes_NEE_SEG_daily[, c("SEG0",  "SEG1")]), range(fluxes_NEE_SES_daily[, c("SES0",  "SES1")]))
 
   ### H
   {
   ## H / US-Seg
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_H_SEG_daily)
+    pca <- prcomp(~SEG0+SEG1, fluxes_H_SEG_daily)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_H_SEG_daily$SEG_EC0, DF_EC_study_H_SEG_daily$SEG_EC1, method="pearson", use = "complete.obs")
+    r <- cor(fluxes_H_SEG_daily$SEG0, fluxes_H_SEG_daily$SEG1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    seg_h <- ggplot(DF_EC_study_H_SEG_daily, aes(x=SEG_EC0, y=SEG_EC1)) +
+    seg_h <- ggplot(fluxes_H_SEG_daily, aes(x=SEG0, y=SEG1)) +
       labs(x = expression("Seg EC0 - H (W m"^"-2"*")"),
            y = expression("Seg EC1 - H (W m"^"-2"*")"),
            title = "Sensible Heat Flux - Seg") +
@@ -611,18 +678,18 @@ ggsave(
   # H / US-Ses
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_H_SES_daily)
+    pca <- prcomp(~SES0+SES1, fluxes_H_SES_daily)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_H_SES_daily$SES_EC0, DF_EC_study_H_SES_daily$SES_EC1, method="pearson", use = "complete.obs")
+    r <- cor(fluxes_H_SES_daily$SES0, fluxes_H_SES_daily$SES1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    ses_h <- ggplot(DF_EC_study_H_SES_daily, aes(x=SES_EC0, y=SES_EC1)) +
+    ses_h <- ggplot(fluxes_H_SES_daily, aes(x=SES0, y=SES1)) +
       labs(x = expression("Ses EC0 - H (W m"^"-2"*")"),
            y = expression("Ses EC1 - H (W m"^"-2"*")"),
            title = "Sensible Heat Flux - Ses") +
@@ -655,18 +722,18 @@ ggsave(
   # LE / US-Seg
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_LE_SEG_daily)
+    pca <- prcomp(~SEG0+SEG1, fluxes_LE_SEG_daily)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_LE_SEG_daily$SEG_EC0, DF_EC_study_LE_SEG_daily$SEG_EC1, method="pearson", use = "complete.obs")
+    r <- cor(fluxes_LE_SEG_daily$SEG0, fluxes_LE_SEG_daily$SEG1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    seg_le <- ggplot(DF_EC_study_LE_SEG_daily, aes(x=SEG_EC0, y=SEG_EC1)) +
+    seg_le <- ggplot(fluxes_LE_SEG_daily, aes(x=SEG0, y=SEG1)) +
       labs(x = expression("Seg EC0 - LE (W m"^"-2"*")"),
            y = expression("Seg EC1 - LE (W m"^"-2"*")"),
            title = "Latent Heat Flux - Seg") +
@@ -689,18 +756,18 @@ ggsave(
   # LE / US-Ses
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_LE_SES_daily)
+    pca <- prcomp(~SES0+SES1, fluxes_LE_SES_daily)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_LE_SES_daily$SES_EC0, DF_EC_study_LE_SES_daily$SES_EC1, method="pearson", use = "complete.obs")
+    r <- cor(fluxes_LE_SES_daily$SES0, fluxes_LE_SES_daily$SES1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    ses_le <- ggplot(DF_EC_study_LE_SES_daily, aes(x=SES_EC0, y=SES_EC1)) +
+    ses_le <- ggplot(fluxes_LE_SES_daily, aes(x=SES0, y=SES1)) +
       labs(x = expression("Ses EC0 - LE (W m"^"-2"*")"),
            y = expression("Ses EC1 - LE (W m"^"-2"*")"),
            title = "Latent Heat Flux - Ses") +
@@ -733,18 +800,18 @@ ggsave(
   # NEE / US-Seg
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_NEE_SEG_daily)
+    pca <- prcomp(~SEG0+SEG1, fluxes_NEE_SEG_daily)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_NEE_SEG_daily$SEG_EC0, DF_EC_study_NEE_SEG_daily$SEG_EC1, method="pearson", use = "complete.obs")
+    r <- cor(fluxes_NEE_SEG_daily$SEG0, fluxes_NEE_SEG_daily$SEG1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    seg_nee <- ggplot(DF_EC_study_NEE_SEG_daily, aes(x=SEG_EC0, y=SEG_EC1)) +
+    seg_nee <- ggplot(fluxes_NEE_SEG_daily, aes(x=SEG0, y=SEG1)) +
       labs(
         x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
         y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
@@ -768,18 +835,18 @@ ggsave(
   # NEE / US-Ses
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_NEE_SES_daily)
+    pca <- prcomp(~SES0+SES1, fluxes_NEE_SES_daily)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_NEE_SES_daily$SES_EC0, DF_EC_study_NEE_SES_daily$SES_EC1, method="pearson", use = "complete.obs")
+    r <- cor(fluxes_NEE_SES_daily$SES0, fluxes_NEE_SES_daily$SES1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    ses_nee <- ggplot(DF_EC_study_NEE_SES_daily, aes(x=SES_EC0, y=SES_EC1)) +
+    ses_nee <- ggplot(fluxes_NEE_SES_daily, aes(x=SES0, y=SES1)) +
       labs(
         x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
         y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
@@ -810,7 +877,7 @@ ggsave(
   pall <- (seg_h + ses_h) / (seg_le + ses_le) / (seg_nee + ses_nee) +
     plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97))
   
-  filename = "plots/EC0 vs EC1 comparison - daily"
+  filename = "plots/EC0 vs EC1 comparison B - daily"
   
   ggsave(
     pall,
@@ -833,120 +900,118 @@ ggsave(
 
 
 ### Monthly comparison (EC0 versus EC1) ----
-# NB. monthly comparison doesn't work because every month contains gaps in the EC0
 {
   ## Resample time series to desired temporal resolution
   ## Resample H
-  DF_EC_study_H_SEG_monthly <- DF_EC_study_H %>%
-    mutate(year = format(Datetime_Start, format = "%Y"),
-           month = format(Datetime_Start, format = "%m"),
-           day = format(Datetime_Start, format = "%d")
+  fluxes_H_SEG_monthly <- fluxes_H %>%
+    mutate(year = format(datetime, format = "%Y"),
+           month = format(datetime, format = "%m"),
+           day = format(datetime, format = "%d")
            ) %>% 
     group_by(year, month) %>% 
-    select(SEG_EC0,
-           SEG_EC1) %>% 
-    na.omit %>%  # drop incomplete half hours
+    select(SEG0,
+           SEG1) %>% 
     summarize(
-      SEG_EC0 = mean(SEG_EC0),
-      SEG_EC1 = mean(SEG_EC1)
+      SEG0 = mean(SEG0),
+      SEG1 = mean(SEG1)
     )
 
-  DF_EC_study_H_SES_monthly <- DF_EC_study_H %>%
-    mutate(year = format(Datetime_Start, format = "%Y"),
-           month = format(Datetime_Start, format = "%m"),
-           day = format(Datetime_Start, format = "%d")
+  fluxes_H_SES_monthly <- fluxes_H %>%
+    mutate(year = format(datetime, format = "%Y"),
+           month = format(datetime, format = "%m"),
+           day = format(datetime, format = "%d")
     ) %>% 
     group_by(year, month) %>% 
-    select(SES_EC0,
-           SES_EC1) %>% 
+    select(SES0,
+           SES1) %>% 
     na.omit %>%  # drop incomplete half hours
     summarize(
-      SES_EC0 = mean(SES_EC0),
-      SES_EC1 = mean(SES_EC1)
+      SES0 = mean(SES0),
+      SES1 = mean(SES1)
       )
   
   
   ## Resample LE
-  DF_EC_study_LE_SEG_monthly <- DF_EC_study_LE %>%
-    mutate(year = format(Datetime_Start, format = "%Y"),
-           month = format(Datetime_Start, format = "%m"),
-           day = format(Datetime_Start, format = "%d")
+  fluxes_LE_SEG_monthly <- fluxes_LE %>%
+    mutate(year = format(datetime, format = "%Y"),
+           month = format(datetime, format = "%m"),
+           day = format(datetime, format = "%d")
     ) %>% 
     group_by(year, month) %>% 
-    select(SEG_EC0,
-           SEG_EC1) %>% 
+    select(SEG0,
+           SEG1) %>% 
     na.omit %>%  # drop incomplete half hours
     summarize(
-      SEG_EC0 = mean(SEG_EC0),
-      SEG_EC1 = mean(SEG_EC1)
+      SEG0 = mean(SEG0),
+      SEG1 = mean(SEG1)
     )
   
-  DF_EC_study_LE_SES_monthly <- DF_EC_study_LE %>%
-    mutate(year = format(Datetime_Start, format = "%Y"),
-           month = format(Datetime_Start, format = "%m"),
-           day = format(Datetime_Start, format = "%d")
+  fluxes_LE_SES_monthly <- fluxes_LE %>%
+    mutate(year = format(datetime, format = "%Y"),
+           month = format(datetime, format = "%m"),
+           day = format(datetime, format = "%d")
     ) %>% 
     group_by(year, month) %>% 
-    select(SES_EC0,
-           SES_EC1) %>% 
+    select(SES0,
+           SES1) %>% 
     na.omit %>%  # drop incomplete half hours
     summarize(
-      SES_EC0 = mean(SES_EC0),
-      SES_EC1 = mean(SES_EC1)
+      SES0 = mean(SES0),
+      SES1 = mean(SES1)
     )
 
   
   ## Resample NEE
-  DF_EC_study_NEE_SEG_monthly <- DF_EC_study_NEE %>%
-    mutate(year = format(Datetime_Start, format = "%Y"),
-           month = format(Datetime_Start, format = "%m"),
-           day = format(Datetime_Start, format = "%d")
+  fluxes_NEE_SEG_monthly <- fluxes_NEE %>%
+    mutate(year = format(datetime, format = "%Y"),
+           month = format(datetime, format = "%m"),
+           day = format(datetime, format = "%d")
     ) %>% 
     group_by(year, month) %>% 
-    select(SEG_EC0,
-           SEG_EC1) %>% 
+    select(SEG0,
+           SEG1) %>% 
     na.omit %>%  # drop incomplete half hours
     summarize(
-      SEG_EC0 = mean(SEG_EC0),
-      SEG_EC1 = mean(SEG_EC1)
+      SEG0 = mean(SEG0),
+      SEG1 = mean(SEG1)
     )
   
-  DF_EC_study_NEE_SES_monthly <- DF_EC_study_NEE %>%
-    mutate(year = format(Datetime_Start, format = "%Y"),
-           month = format(Datetime_Start, format = "%m"),
-           day = format(Datetime_Start, format = "%d")
+  fluxes_NEE_SES_monthly <- fluxes_NEE %>%
+    mutate(year = format(datetime, format = "%Y"),
+           month = format(datetime, format = "%m"),
+           day = format(datetime, format = "%d")
     ) %>% 
     group_by(year, month) %>% 
-    select(SES_EC0,
-           SES_EC1) %>% 
+    select(SES0,
+           SES1) %>% 
     na.omit %>%  # drop incomplete half hours
     summarize(
-      SES_EC0 = mean(SES_EC0),
-      SES_EC1 = mean(SES_EC1)
+      SES0 = mean(SES0),
+      SES1 = mean(SES1)
     )
  
   ## Determine axis limits
-  lims_h  <- range(range(DF_EC_study_H_SEG_monthly[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_H_SES_monthly[, c("SES_EC0",  "SES_EC1")]))
-  lims_le  <- range(range(DF_EC_study_LE_SEG_monthly[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_LE_SES_monthly[, c("SES_EC0",  "SES_EC1")]))
-  lims_nee  <- range(range(DF_EC_study_NEE_SEG_monthly[, c("SEG_EC0",  "SEG_EC1")]), range(DF_EC_study_NEE_SES_monthly[, c("SES_EC0",  "SES_EC1")]))
+  lims_h  <- range(range(fluxes_H_SEG_monthly[, c("SEG0",  "SEG1")]), range(fluxes_H_SES_monthly[, c("SES0",  "SES1")]))
+  lims_le  <- range(range(fluxes_LE_SEG_monthly[, c("SEG0",  "SEG1")]), range(fluxes_LE_SES_monthly[, c("SES0",  "SES1")]))
+  lims_nee  <- range(range(fluxes_NEE_SEG_monthly[, c("SEG0",  "SEG1")]), range(fluxes_NEE_SES_monthly[, c("SES0",  "SES1")]))
   
   
   
   ## H / US-Seg
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_H_SEG_monthly)
+    pca <- prcomp(~SEG0+SEG1, fluxes_H_SEG_monthly)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_H_SEG_monthly$SEG_EC0, DF_EC_study_H_SEG_monthly$SEG_EC1, method="pearson", use = "complete.obs")
+    r <- cor(fluxes_H_SEG_monthly$SEG0, fluxes_H_SEG_monthly$SEG1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    seg_h <- ggplot(DF_EC_study_H_SEG_monthly, aes(x=SEG_EC0, y=SEG_EC1)) +
+    seg_h <- ggplot(fluxes_H_SEG_monthly, aes(x=SEG0, y=SEG1)) +
       labs(x = expression("Seg EC0 - H (W m"^"-2"*")"),
            y = expression("Seg EC1 - H (W m"^"-2"*")"),
            title = "Sensible Heat Flux - Seg") +
@@ -969,18 +1034,18 @@ ggsave(
   # H / US-Ses
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_H_SES_monthly)
+    pca <- prcomp(~SES0+SES1, fluxes_H_SES_monthly)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_H_SES_monthly$SES_EC0, DF_EC_study_H_SES_monthly$SES_EC1, method="pearson", use = "complete.obs")
+    r <- cor(fluxes_H_SES_monthly$SES0, fluxes_H_SES_monthly$SES1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    ses_h <- ggplot(DF_EC_study_H_SES_monthly, aes(x=SES_EC0, y=SES_EC1)) +
+    ses_h <- ggplot(fluxes_H_SES_monthly, aes(x=SES0, y=SES1)) +
       labs(x = expression("Ses EC0 - H (W m"^"-2"*")"),
            y = expression("Ses EC1 - H (W m"^"-2"*")"),
            title = "Sensible Heat Flux - Ses") +
@@ -1003,18 +1068,18 @@ ggsave(
   # LE / US-Seg
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_LE_SEG_monthly)
+    pca <- prcomp(~SEG0+SEG1, fluxes_LE_SEG_monthly)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_LE_SEG_monthly$SEG_EC0, DF_EC_study_LE_SEG_monthly$SEG_EC1, method="pearson", use = "complete.obs")
+    r <- cor(fluxes_LE_SEG_monthly$SEG0, fluxes_LE_SEG_monthly$SEG1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    seg_le <- ggplot(DF_EC_study_LE_SEG_monthly, aes(x=SEG_EC0, y=SEG_EC1)) +
+    seg_le <- ggplot(fluxes_LE_SEG_monthly, aes(x=SEG0, y=SEG1)) +
       labs(x = expression("Seg EC0 - LE (W m"^"-2"*")"),
            y = expression("Seg EC1 - LE (W m"^"-2"*")"),
            title = "Latent Heat Flux - Seg") +
@@ -1037,18 +1102,18 @@ ggsave(
   # LE / US-Ses
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_LE_SES_monthly)
+    pca <- prcomp(~SES0+SES1, fluxes_LE_SES_monthly)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_LE_SES_monthly$SES_EC0, DF_EC_study_LE_SES_monthly$SES_EC1, method="pearson", use = "complete.obs")
+    r <- cor(fluxes_LE_SES_monthly$SES0, fluxes_LE_SES_monthly$SES1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    ses_le <- ggplot(DF_EC_study_LE_SES_monthly, aes(x=SES_EC0, y=SES_EC1)) +
+    ses_le <- ggplot(fluxes_LE_SES_monthly, aes(x=SES0, y=SES1)) +
       labs(x = expression("Ses EC0 - LE (W m"^"-2"*")"),
            y = expression("Ses EC1 - LE (W m"^"-2"*")"),
            title = "Latent Heat Flux - Ses") +
@@ -1070,18 +1135,18 @@ ggsave(
   # NEE / US-Seg
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SEG_EC0+SEG_EC1, DF_EC_study_NEE_SEG_monthly)
+    pca <- prcomp(~SEG0+SEG1, fluxes_NEE_SEG_monthly)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_NEE_SEG_monthly$SEG_EC0, DF_EC_study_NEE_SEG_monthly$SEG_EC1, method="pearson", use = "complete.obs")
+    r <- cor(fluxes_NEE_SEG_monthly$SEG0, fluxes_NEE_SEG_monthly$SEG1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    seg_nee <- ggplot(DF_EC_study_NEE_SEG_monthly, aes(x=SEG_EC0, y=SEG_EC1)) +
+    seg_nee <- ggplot(fluxes_NEE_SEG_monthly, aes(x=SEG0, y=SEG1)) +
       labs(
         x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
         y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
@@ -1105,18 +1170,18 @@ ggsave(
   # NEE / US-Ses
   {
     # Fit linear model with Total Least Squares regression (extracted from base-R PCA function)
-    pca <- prcomp(~SES_EC0+SES_EC1, DF_EC_study_NEE_SES_monthly)
+    pca <- prcomp(~SES0+SES1, fluxes_NEE_SES_monthly)
     tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
     tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
     # Compute Pearson correlation coefficient
-    r <- cor(DF_EC_study_NEE_SES_monthly$SES_EC0, DF_EC_study_NEE_SES_monthly$SES_EC1, method="pearson", use = "complete.obs")
+    r <- cor(fluxes_NEE_SES_monthly$SES0, fluxes_NEE_SES_monthly$SES1, method="pearson", use = "complete.obs")
     r <- paste("r: ", round(r,2))
     
     # create plot
-    ses_nee <- ggplot(DF_EC_study_NEE_SES_monthly, aes(x=SES_EC0, y=SES_EC1)) +
+    ses_nee <- ggplot(fluxes_NEE_SES_monthly, aes(x=SES0, y=SES1)) +
       labs(
         x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
         y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
@@ -1142,7 +1207,7 @@ ggsave(
   pall <- (seg_h + ses_h) / (seg_le + ses_le) / (seg_nee + ses_nee) +
     plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97))
   
-  filename = "plots/EC0 vs EC1 comparison - monthly"
+  filename = "plots/EC0 vs EC1 comparison C - monthly"
   
   ggsave(
     pall,
