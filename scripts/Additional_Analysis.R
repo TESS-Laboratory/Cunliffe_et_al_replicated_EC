@@ -8,6 +8,7 @@
 library(tidyverse)
 library(patchwork)   
 library(tls)   
+library(DescTools)
 
 
 ## Define paths
@@ -15,7 +16,6 @@ library(tls)
 
 ## Paths Andy's machine
 # path  <-  "C:/workspace/REC_7_Data/8_datasets/"  # Unfilled EdiRe output
-# fpath  <-  "C:/workspace/REC_7_Data/11_ReddyProc/"  # Gap filled ReddyProc output
 mpath  <-  "C:/workspace/REC_7_Data/12_Marcys_data/"
 npath <- "data/gapfilled_fluxes/"
 
@@ -324,9 +324,13 @@ tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
 
 equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
 
-# Compute Pearson correlation coefficient
-r <- cor(fluxes_H$SEG0, fluxes_H$SEG1, method="pearson", use = "complete.obs")
-r <- paste("r: ", round(r,2))
+# # Compute Pearson correlation coefficient
+# r <- cor(fluxes_H$SEG0, fluxes_H$SEG1, method="pearson", use = "complete.obs")
+# r <- paste("r: ", round(r,2))
+
+# Compute  Lin's  correlation concordance coefficient
+ccc_result <- DescTools::CCC(fluxes_H$SEG0, fluxes_H$SEG1, ci = "z-transform", conf.level = 0.95)
+ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
 
 # create plot
 seg_h <- ggplot(fluxes_H, aes(x=SEG0, y=SEG1)) +
@@ -342,8 +346,8 @@ seg_h <- ggplot(fluxes_H, aes(x=SEG0, y=SEG1)) +
   theme(legend.position = c(0.85, 0.25)) + # legend position
   geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
   geom_abline(intercept = tls_int, slope = tls_slp) +
-  annotate("text", x = -250, y = 650, label = equation, size=4) +
-  annotate("text", x = -550, y = 540, label = r, size=4)
+  annotate("text", x = -250, y = 650, label = equation) +
+  annotate("text", x = -440, y = 530, label = ccc)
 
 } # H / US-Seg
 
@@ -357,9 +361,13 @@ seg_h <- ggplot(fluxes_H, aes(x=SEG0, y=SEG1)) +
   
   equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
   
-  # Compute Pearson correlation coefficient
-  r <- cor(fluxes_H$SES0, fluxes_H$SES1, method="pearson", use = "complete.obs")
-  r <- paste("r: ", round(r,2))
+  # # Compute Pearson correlation coefficient
+  # r <- cor(fluxes_H$SES0, fluxes_H$SES1, method="pearson", use = "complete.obs")
+  # r <- paste("r: ", round(r,2))
+  
+  # Compute  Lin's  correlation concordance coefficient
+  ccc_result <- DescTools::CCC(fluxes_H$SES0, fluxes_H$SES1, ci = "z-transform", conf.level = 0.95)
+  ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
   
   # create plot
   ses_h <- ggplot(fluxes_H, aes(x=SES0, y=SES1)) +
@@ -375,8 +383,8 @@ seg_h <- ggplot(fluxes_H, aes(x=SEG0, y=SEG1)) +
     theme(legend.position = c(0.85, 0.25)) + # legend position
     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = tls_int, slope = tls_slp) +
-    annotate("text", x = -250, y = 650, label = equation, size=4) +
-    annotate("text", x = -550, y = 540, label = r, size=4)
+    annotate("text", x = -250, y = 650, label = equation) +
+    annotate("text", x = -420, y = 530, label = ccc)
   } # H / US-Ses
 
 # Calculate the range of values in both plots for consistent scalars
@@ -397,9 +405,13 @@ ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range)
   
   equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
   
-  # Compute Pearson correlation coefficient
-  r <- cor(fluxes_LE$SEG0, fluxes_LE$SEG1, method="pearson", use = "complete.obs")
-  r <- paste("r: ", round(r,2))
+  # # Compute Pearson correlation coefficient
+  # r <- cor(fluxes_LE$SEG0, fluxes_LE$SEG1, method="pearson", use = "complete.obs")
+  # r <- paste("r: ", round(r,2))
+  
+  # Compute  Lin's  correlation concordance coefficient
+  ccc_result <- DescTools::CCC(fluxes_LE$SEG0, fluxes_LE$SEG1, ci = "z-transform", conf.level = 0.95)
+  ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
   
   # create plot
   seg_le <- ggplot(fluxes_LE, aes(x=SEG0, y=SEG1)) +
@@ -415,8 +427,8 @@ ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range)
     theme(legend.position = c(0.85, 0.25)) + # legend position
     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = tls_int, slope = tls_slp) +
-    annotate("text", x = 10, y = 430, label = equation, size=4) +
-    annotate("text", x = -110, y = 380, label = r, size=4)
+    annotate("text", x = 10, y = 430, label = equation) +
+    annotate("text", x = -70, y = 380, label = ccc)
   
 } # LE / US-Seg
 
@@ -430,9 +442,13 @@ ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range)
   
   equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
   
-  # Compute Pearson correlation coefficient
-  r <- cor(fluxes_LE$SES0, fluxes_LE$SES1, method="pearson", use = "complete.obs")
-  r <- paste("r: ", round(r,2))
+  # # Compute Pearson correlation coefficient
+  # r <- cor(fluxes_LE$SES0, fluxes_LE$SES1, method="pearson", use = "complete.obs")
+  # r <- paste("r: ", round(r,2))
+  
+  # Compute  Lin's  correlation concordance coefficient
+  ccc_result <- DescTools::CCC(fluxes_LE$SES0, fluxes_LE$SES1, ci = "z-transform", conf.level = 0.95)
+  ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
   
   # create plot
   ses_le <- ggplot(fluxes_LE, aes(x=SES0, y=SES1)) +
@@ -448,8 +464,8 @@ ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range)
     theme(legend.position = c(0.85, 0.25)) + # legend position
     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = tls_int, slope = tls_slp) +
-    annotate("text", x = 25, y = 430, label = equation, size=4) +
-    annotate("text", x = -120, y = 380, label = r, size=4)
+    annotate("text", x = 25, y = 430, label = equation) +
+    annotate("text", x = -80, y = 380, label = ccc)
   
 } # LE / US-Ses
 
@@ -472,9 +488,13 @@ ses_le <- ses_le +   scale_fill_continuous(type = "viridis", limits=c(count.rang
   
   equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
   
-  # Compute Pearson correlation coefficient
-  r <- cor(fluxes_NEE$SEG0, fluxes_NEE$SEG1, method="pearson", use = "complete.obs")
-  r <- paste("r: ", round(r,2))
+  # # Compute Pearson correlation coefficient
+  # r <- cor(fluxes_NEE$SEG0, fluxes_NEE$SEG1, method="pearson", use = "complete.obs")
+  # r <- paste("r: ", round(r,2))
+  
+  # Compute  Lin's  correlation concordance coefficient
+  ccc_result <- DescTools::CCC(fluxes_NEE$SEG0, fluxes_NEE$SEG1, ci = "z-transform", conf.level = 0.95)
+  ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
   
   # create plot
   seg_nee <- ggplot(fluxes_NEE, aes(x=SEG0, y=SEG1)) +
@@ -491,8 +511,8 @@ ses_le <- ses_le +   scale_fill_continuous(type = "viridis", limits=c(count.rang
     theme(legend.position = c(0.85, 0.25)) + # legend position
     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = tls_int, slope = tls_slp) +
-    annotate("text", x = -4.4, y = 10.6, label = equation, size=4) +
-    annotate("text", x = -8.7, y = 8.6, label = r, size=4)
+    annotate("text", x = -4.4, y = 10.6, label = equation) +
+    annotate("text", x = -7, y = 8.7, label = ccc)
   
 } # NEE / US-Seg
 
@@ -506,9 +526,13 @@ ses_le <- ses_le +   scale_fill_continuous(type = "viridis", limits=c(count.rang
   
   equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
   
-  # Compute Pearson correlation coefficient
-  r <- cor(fluxes_NEE$SES0, fluxes_NEE$SES1, method="pearson", use = "complete.obs")
-  r <- paste("r: ", round(r,2))
+  # # Compute Pearson correlation coefficient
+  # r <- cor(fluxes_NEE$SES0, fluxes_NEE$SES1, method="pearson", use = "complete.obs")
+  # r <- paste("r: ", round(r,2))
+  
+  # Compute  Lin's  correlation concordance coefficient
+  ccc_result <- DescTools::CCC(fluxes_NEE$SES0, fluxes_NEE$SES1, ci = "z-transform", conf.level = 0.95)
+  ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
   
   # create plot
   ses_nee <- ggplot(fluxes_NEE, aes(x=SES0, y=SES1)) +
@@ -525,8 +549,8 @@ ses_le <- ses_le +   scale_fill_continuous(type = "viridis", limits=c(count.rang
     theme(legend.position = c(0.85, 0.25)) + # legend position
     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = tls_int, slope = tls_slp) +
-    annotate("text", x = -4.5, y = 10.6, label = equation, size=4) +
-    annotate("text", x = -8.6, y = 8.6, label = r, size=4)
+    annotate("text", x = -4.5, y = 10.6, label = equation) +
+    annotate("text", x = -6.6, y = 8.6, label = ccc)
   
 } # NEE / US-Ses
 
@@ -650,9 +674,13 @@ ggsave(
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
-    # Compute Pearson correlation coefficient
-    r <- cor(fluxes_H_SEG_daily$SEG0, fluxes_H_SEG_daily$SEG1, method="pearson", use = "complete.obs")
-    r <- paste("r: ", round(r,2))
+    # # Compute Pearson correlation coefficient
+    # r <- cor(fluxes_H_SEG_daily$SEG0, fluxes_H_SEG_daily$SEG1, method="pearson", use = "complete.obs")
+    # r <- paste("r: ", round(r,2))
+    # 
+        # Compute  Lin's  correlation concordance coefficient
+    ccc_result <- DescTools::CCC(fluxes_H_SEG_daily$SEG0, fluxes_H_SEG_daily$SEG1, ci = "z-transform", conf.level = 0.95)
+    ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
     
     # create plot
     seg_h <- ggplot(fluxes_H_SEG_daily, aes(x=SEG0, y=SEG1)) +
@@ -669,9 +697,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 77, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
-      annotate("text", x = -14, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
-
+      annotate("text", x = 77, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation) +
+      annotate("text", x = 25, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = ccc)
   } # H / US-Seg
   
   
@@ -684,9 +711,13 @@ ggsave(
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
-    # Compute Pearson correlation coefficient
-    r <- cor(fluxes_H_SES_daily$SES0, fluxes_H_SES_daily$SES1, method="pearson", use = "complete.obs")
-    r <- paste("r: ", round(r,2))
+    # # Compute Pearson correlation coefficient
+    # r <- cor(fluxes_H_SES_daily$SES0, fluxes_H_SES_daily$SES1, method="pearson", use = "complete.obs")
+    # r <- paste("r: ", round(r,2))
+    
+    # Compute  Lin's  correlation concordance coefficient
+    ccc_result <- DescTools::CCC(fluxes_H_SES_daily$SES0, fluxes_H_SES_daily$SES1, ci = "z-transform", conf.level = 0.95)
+    ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
     
     # create plot
     ses_h <- ggplot(fluxes_H_SES_daily, aes(x=SES0, y=SES1)) +
@@ -703,8 +734,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 77, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
-      annotate("text", x = -14, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
+      annotate("text", x = 77, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation) +
+      annotate("text", x = 25, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = ccc)
     
   } # H / US-Ses
   
@@ -728,10 +759,14 @@ ggsave(
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
-    # Compute Pearson correlation coefficient
-    r <- cor(fluxes_LE_SEG_daily$SEG0, fluxes_LE_SEG_daily$SEG1, method="pearson", use = "complete.obs")
-    r <- paste("r: ", round(r,2))
+    # # Compute Pearson correlation coefficient
+    # r <- cor(fluxes_LE_SEG_daily$SEG0, fluxes_LE_SEG_daily$SEG1, method="pearson", use = "complete.obs")
+    # r <- paste("r: ", round(r,2))
     
+    # Compute  Lin's  correlation concordance coefficient
+    ccc_result <- DescTools::CCC(fluxes_LE_SEG_daily$SEG0, fluxes_LE_SEG_daily$SEG1, ci = "z-transform", conf.level = 0.95)
+    ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
+        
     # create plot
     seg_le <- ggplot(fluxes_LE_SEG_daily, aes(x=SEG0, y=SEG1)) +
       labs(x = expression("Seg EC0 - LE (W m"^"-2"*")"),
@@ -747,8 +782,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 36, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
-      annotate("text", x = 10, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
+      annotate("text", x = 26, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation) +
+      annotate("text", x = 14, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = ccc)
     
   } # LE / US-Seg
   
@@ -762,9 +797,13 @@ ggsave(
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
-    # Compute Pearson correlation coefficient
-    r <- cor(fluxes_LE_SES_daily$SES0, fluxes_LE_SES_daily$SES1, method="pearson", use = "complete.obs")
-    r <- paste("r: ", round(r,2))
+    # # Compute Pearson correlation coefficient
+    # r <- cor(fluxes_LE_SES_daily$SES0, fluxes_LE_SES_daily$SES1, method="pearson", use = "complete.obs")
+    # r <- paste("r: ", round(r,2))
+    
+    # Compute  Lin's  correlation concordance coefficient
+    ccc_result <- DescTools::CCC(fluxes_LE_SES_daily$SES0, fluxes_LE_SES_daily$SES1, ci = "z-transform", conf.level = 0.95)
+    ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
     
     # create plot
     ses_le <- ggplot(fluxes_LE_SES_daily, aes(x=SES0, y=SES1)) +
@@ -781,8 +820,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 36, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
-      annotate("text", x = 10, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
+      annotate("text", x = 26, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation) +
+      annotate("text", x = 14, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = ccc)
     
   } # LE / US-Ses
   
@@ -806,9 +845,13 @@ ggsave(
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
-    # Compute Pearson correlation coefficient
-    r <- cor(fluxes_NEE_SEG_daily$SEG0, fluxes_NEE_SEG_daily$SEG1, method="pearson", use = "complete.obs")
-    r <- paste("r: ", round(r,2))
+    # # Compute Pearson correlation coefficient
+    # r <- cor(fluxes_NEE_SEG_daily$SEG0, fluxes_NEE_SEG_daily$SEG1, method="pearson", use = "complete.obs")
+    # r <- paste("r: ", round(r,2))
+    
+    # Compute  Lin's  correlation concordance coefficient
+    ccc_result <- DescTools::CCC(fluxes_NEE_SEG_daily$SEG0, fluxes_NEE_SEG_daily$SEG1, ci = "z-transform", conf.level = 0.95)
+    ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
     
     # create plot
     seg_nee <- ggplot(fluxes_NEE_SEG_daily, aes(x=SEG0, y=SEG1)) +
@@ -826,8 +869,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 0, y = (lims_nee[1] + 0.99 * abs(lims_nee[1] - lims_nee[2])), label = equation, size=4) +
-      annotate("text", x = -1.05, y = (lims_nee[1] + 0.90 * abs(lims_nee[1] - lims_nee[2])), label = r, size=4)
+      annotate("text", x = -0.3, y = (lims_nee[1] + 0.99 * abs(lims_nee[1] - lims_nee[2])), label = equation) +
+      annotate("text", x = -0.92, y = (lims_nee[1] + 0.90 * abs(lims_nee[1] - lims_nee[2])), label = ccc)
     
   } # NEE / US-Seg
   
@@ -841,9 +884,13 @@ ggsave(
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
-    # Compute Pearson correlation coefficient
-    r <- cor(fluxes_NEE_SES_daily$SES0, fluxes_NEE_SES_daily$SES1, method="pearson", use = "complete.obs")
-    r <- paste("r: ", round(r,2))
+    # # Compute Pearson correlation coefficient
+    # r <- cor(fluxes_NEE_SES_daily$SES0, fluxes_NEE_SES_daily$SES1, method="pearson", use = "complete.obs")
+    # r <- paste("r: ", round(r,2))
+    
+    # Compute  Lin's  correlation concordance coefficient
+    ccc_result <- DescTools::CCC(fluxes_NEE_SES_daily$SES0, fluxes_NEE_SES_daily$SES1, ci = "z-transform", conf.level = 0.95)
+    ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
     
     # create plot
     ses_nee <- ggplot(fluxes_NEE_SES_daily, aes(x=SES0, y=SES1)) +
@@ -861,8 +908,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 0, y = (lims_nee[1] + 0.99 * abs(lims_nee[1] - lims_nee[2])), label = equation, size=4) +
-      annotate("text", x = -1.05, y = (lims_nee[1] + 0.90 * abs(lims_nee[1] - lims_nee[2])), label = r, size=4)
+      annotate("text", x = -0.35, y = (lims_nee[1] + 0.99 * abs(lims_nee[1] - lims_nee[2])), label = equation) +
+      annotate("text", x = -0.92, y = (lims_nee[1] + 0.90 * abs(lims_nee[1] - lims_nee[2])), label = ccc)
     
   } # NEE / US-Ses
   
@@ -1006,9 +1053,13 @@ ggsave(
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
-    # Compute Pearson correlation coefficient
-    r <- cor(fluxes_H_SEG_monthly$SEG0, fluxes_H_SEG_monthly$SEG1, method="pearson", use = "complete.obs")
-    r <- paste("r: ", round(r,2))
+    # # Compute Pearson correlation coefficient
+    # r <- cor(fluxes_H_SEG_monthly$SEG0, fluxes_H_SEG_monthly$SEG1, method="pearson", use = "complete.obs")
+    # r <- paste("r: ", round(r,2))
+    
+    # Compute  Lin's  correlation concordance coefficient
+    ccc_result <- DescTools::CCC(fluxes_H_SEG_monthly$SEG0, fluxes_H_SEG_monthly$SEG1, ci = "z-transform", conf.level = 0.95)
+    ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
     
     # create plot
     seg_h <- ggplot(fluxes_H_SEG_monthly, aes(x=SEG0, y=SEG1)) +
@@ -1025,8 +1076,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 45, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
-      annotate("text", x = 25, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
+      annotate("text", x = 46, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation) +
+      annotate("text", x = 36, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = ccc)
     
   } # H / US-Seg
   
@@ -1040,9 +1091,13 @@ ggsave(
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
-    # Compute Pearson correlation coefficient
-    r <- cor(fluxes_H_SES_monthly$SES0, fluxes_H_SES_monthly$SES1, method="pearson", use = "complete.obs")
-    r <- paste("r: ", round(r,2))
+    # # Compute Pearson correlation coefficient
+    # r <- cor(fluxes_H_SES_monthly$SES0, fluxes_H_SES_monthly$SES1, method="pearson", use = "complete.obs")
+    # r <- paste("r: ", round(r,2))
+    
+    # Compute  Lin's  correlation concordance coefficient
+    ccc_result <- DescTools::CCC(fluxes_H_SES_monthly$SES0, fluxes_H_SES_monthly$SES1, ci = "z-transform", conf.level = 0.95)
+    ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
     
     # create plot
     ses_h <- ggplot(fluxes_H_SES_monthly, aes(x=SES0, y=SES1)) +
@@ -1059,8 +1114,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x =45, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation, size=4) +
-      annotate("text", x = 25, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = r, size=4)
+      annotate("text", x = 46, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation) +
+      annotate("text", x = 36, y = (lims_h[1] + 0.90 * abs(lims_h[1] - lims_h[2])), label = ccc)
 
   } # H / US-Ses
   
@@ -1074,9 +1129,13 @@ ggsave(
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
-    # Compute Pearson correlation coefficient
-    r <- cor(fluxes_LE_SEG_monthly$SEG0, fluxes_LE_SEG_monthly$SEG1, method="pearson", use = "complete.obs")
-    r <- paste("r: ", round(r,2))
+    # # Compute Pearson correlation coefficient
+    # r <- cor(fluxes_LE_SEG_monthly$SEG0, fluxes_LE_SEG_monthly$SEG1, method="pearson", use = "complete.obs")
+    # r <- paste("r: ", round(r,2))
+    
+    # Compute  Lin's  correlation concordance coefficient
+    ccc_result <- DescTools::CCC(fluxes_LE_SEG_monthly$SEG0, fluxes_LE_SEG_monthly$SEG1, ci = "z-transform", conf.level = 0.95)
+    ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
     
     # create plot
     seg_le <- ggplot(fluxes_LE_SEG_monthly, aes(x=SEG0, y=SEG1)) +
@@ -1093,8 +1152,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 15, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
-      annotate("text", x = 9, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
+      annotate("text", x = 13.3, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation) +
+      annotate("text", x = 10, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = ccc)
     
   } # LE / US-Seg
   
@@ -1108,9 +1167,13 @@ ggsave(
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
-    # Compute Pearson correlation coefficient
-    r <- cor(fluxes_LE_SES_monthly$SES0, fluxes_LE_SES_monthly$SES1, method="pearson", use = "complete.obs")
-    r <- paste("r: ", round(r,2))
+    # # Compute Pearson correlation coefficient
+    # r <- cor(fluxes_LE_SES_monthly$SES0, fluxes_LE_SES_monthly$SES1, method="pearson", use = "complete.obs")
+    # r <- paste("r: ", round(r,2))
+    
+    # Compute  Lin's  correlation concordance coefficient
+    ccc_result <- DescTools::CCC(fluxes_LE_SES_monthly$SES0, fluxes_LE_SES_monthly$SES1, ci = "z-transform", conf.level = 0.95)
+    ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
     
     # create plot
     ses_le <- ggplot(fluxes_LE_SES_monthly, aes(x=SES0, y=SES1)) +
@@ -1127,8 +1190,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = 15, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation, size=4) +
-      annotate("text", x = 9, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = r, size=4)
+      annotate("text", x = 13.3, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation) +
+      annotate("text", x = 10, y = (lims_le[1] + 0.90 * abs(lims_le[1] - lims_le[2])), label = ccc)
   } # LE / US-Ses
   
   
@@ -1141,9 +1204,13 @@ ggsave(
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
-    # Compute Pearson correlation coefficient
-    r <- cor(fluxes_NEE_SEG_monthly$SEG0, fluxes_NEE_SEG_monthly$SEG1, method="pearson", use = "complete.obs")
-    r <- paste("r: ", round(r,2))
+    # # Compute Pearson correlation coefficient
+    # r <- cor(fluxes_NEE_SEG_monthly$SEG0, fluxes_NEE_SEG_monthly$SEG1, method="pearson", use = "complete.obs")
+    # r <- paste("r: ", round(r,2))
+    
+    # Compute  Lin's  correlation concordance coefficient
+    ccc_result <- DescTools::CCC(fluxes_NEE_SEG_monthly$SEG0, fluxes_NEE_SEG_monthly$SEG1, ci = "z-transform", conf.level = 0.95)
+    ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
     
     # create plot
     seg_nee <- ggplot(fluxes_NEE_SEG_monthly, aes(x=SEG0, y=SEG1)) +
@@ -1161,8 +1228,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = -0.4, y = (lims_nee[1] + 0.99 * abs(lims_nee[1] - lims_nee[2])), label = equation, size=4) +
-      annotate("text", x = -0.6, y = (lims_nee[1] + 0.90 * abs(lims_nee[1] - lims_nee[2])), label = r, size=4)
+      annotate("text", x = -0.25, y = (lims_nee[1] + 0.99 * abs(lims_nee[1] - lims_nee[2])), label = equation) +
+      annotate("text", x = -0.35, y = (lims_nee[1] + 0.90 * abs(lims_nee[1] - lims_nee[2])), label = ccc)
     
   } # NEE / US-Seg
   
@@ -1176,9 +1243,13 @@ ggsave(
     
     equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
     
-    # Compute Pearson correlation coefficient
-    r <- cor(fluxes_NEE_SES_monthly$SES0, fluxes_NEE_SES_monthly$SES1, method="pearson", use = "complete.obs")
-    r <- paste("r: ", round(r,2))
+    # # Compute Pearson correlation coefficient
+    # r <- cor(fluxes_NEE_SES_monthly$SES0, fluxes_NEE_SES_monthly$SES1, method="pearson", use = "complete.obs")
+    # r <- paste("r: ", round(r,2))
+    
+    # Compute  Lin's  correlation concordance coefficient
+    ccc_result <- DescTools::CCC(fluxes_NEE_SES_monthly$SES0, fluxes_NEE_SES_monthly$SES1, ci = "z-transform", conf.level = 0.95)
+    ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
     
     # create plot
     ses_nee <- ggplot(fluxes_NEE_SES_monthly, aes(x=SES0, y=SES1)) +
@@ -1196,8 +1267,8 @@ ggsave(
       theme(legend.position = c(0.85, 0.25)) + # legend position
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
-      annotate("text", x = -0.4, y = (lims_nee[1] + 0.99 * abs(lims_nee[1] - lims_nee[2])), label = equation, size=4) +
-      annotate("text", x = -0.6, y = (lims_nee[1] + 0.90 * abs(lims_nee[1] - lims_nee[2])), label = r, size=4)
+      annotate("text", x = -0.25, y = (lims_nee[1] + 0.99 * abs(lims_nee[1] - lims_nee[2])), label = equation) +
+      annotate("text", x = -0.35, y = (lims_nee[1] + 0.90 * abs(lims_nee[1] - lims_nee[2])), label = ccc)
     
   } # NEE / US-Ses
   
