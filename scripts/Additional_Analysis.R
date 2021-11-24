@@ -129,48 +129,6 @@ SES_met <- tidy_licor(SES0_all, "SES0"); rm(SES0_all)
 #### Read fluxes gap filled with Random Forest Regression workflow. 
 ## Note that timestamps are the middle of the half hour rather than start and end.
 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#### WORK IN PROGRESS ####
-
-# ultimately aiming for a single data frame, containing P, SW_in, NEE, H, LE, Station, Site
-# merge met obbs (code above) with gapfilled fluxes (code below)...
-
-
-## Want to automate reading in 30 files, with list of station codes and list of variables
-## Then use these station and variable codes to put the data together
-
-## Think I want a purrr solution?
-
-# list_station <- c("SEG_EC1", "SEG_EC2", "SEG_EC3", "SEG_EC4", "SES_EC1", "SES_EC2", "SES_EC3", "SES_EC4")
-# list_variable <- c("H", "LE", "NEE")
-
-
-
-# X  <- read_csv(file=paste(npath, "XXX.csv", sep=""))
-# SEG_EC0 <- "cbind"(SEG_EC0_H, SEG_EC0_LE, SEG_EC0_NEE) #  cbind generates with duplicate datetime columns!!!
-
-# ## Use purrr::map2 to process multiple tibbles through pipe and return a single merged dataframe of Licor data
-# DF_EC_licor <- list1a %>%
-# purrr::map2(.x =., .y=list1b, ~tidy_licor(.x, .y)) %>%
-# # bind_rows()
-
-# ## Use purrr::map2 to process multiple tibbles through pipe and return a single merged dataframe
-# DF_EC_test <- list1a %>%
-#   purrr::map2(.x =.) %>%
-#   bind_rows()
-# 
-
-
-
-# the ugly way!!!
-
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
 # Read and combine gap filled flux files for SEG0
 SEG0_H  <- read_csv("data/gapfilled_fluxes/SEG0 H.csv") 
 SEG0_LE  <- read_csv("data/gapfilled_fluxes/SEG0 LE.csv") 
@@ -281,6 +239,19 @@ SEG_met <- subset_datetime(SEG_met)
 SES_met <- subset_datetime(SES_met)
 
 fluxes <- rbind(SEG_fluxes, SES_fluxes)
+
+
+
+# NB. SEG2 instrument failed on 2020-02-19, so LE_filled and NEE_filled are 
+# invalid after this date and should be excluded from analysis.
+
+fluxes <- fluxes %>% 
+  mutate(LE_filled = ifelse(datetime > as.Date("2020-03-29") & Station == "SEG2",
+         NA,
+         LE_filled),
+         NEE_filled = ifelse(datetime > as.Date("2020-03-29") & Station == "SEG2",
+                            NA,
+                            NEE_filled))
 
 
 # create function pivoting data from long to wide form for analysis
@@ -1298,43 +1269,58 @@ ggsave(
 } # Generate monthly comparative plots (EC0 versus EC1)
 
 
-
 #-------------- 3.2 cumulative sum of LE and NEE --------------
 
-
-# Make GGplot version of SEG LE (using gapfilled and U*filtered records)
-# NB, will need gapfilled version of Marcy's (new) data to enable this!
-
-
 # subset to site and compute cumulative fluxes
-DF_EC_study_SEG <- DF_EC_study %>% 
-  filter(Station == c("SEG_EC0", "SEG_EC1", "SEG_EC2", "SEG_EC3", "SEG_EC4")) %>% 
+fluxes_SEG_cum <- fluxes %>% 
+  filter(Station == c("SEG0", "SEG1", "SEG2", "SEG3", "SEG4")) %>% 
   group_by(Station) %>% 
   mutate(
-    NEE_uStar_f_cum = cumsum(NEE_uStar_f) *(12.0107/10^6) * 1800,  # Convert umol m-2 s-1 to g C m-2 30 min-1. Where 12.0107 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
-    LE_f_cum = cumsum(LE_f),
-    LE_f_cum_mm = cumsum(LE_f) * 1800 / 2260 / 1000,  # Calculate mm of cumulative evaporation. Where cumsum(LE_f) is the cumulative MW m-2, 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
-    H_f_cum = cumsum(H_f)
-    )
+    NEE_cum = cumsum(NEE_filled) *(12.0107/10^6) * 1800,  # Convert umol m-2 s-1 to g C m-2 30 min-1. Where 12.0107 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
+    LE_cum = cumsum(LE_filled),
+    LE_cum_mm = cumsum(LE_filled) * 1800 / 2260 / 1000,  # Calculate mm of cumulative evaporation. Where cumsum(LE_f) is the cumulative MW m-2, 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
+    H_cum = cumsum(H_filled)
+  ) %>% 
+  select(datetime,
+         Station,
+         NEE_cum,
+         LE_cum,
+         LE_cum_mm,
+         H_cum)
 
-
-DF_EC_study_SES <- DF_EC_study %>% 
-  filter(Station == c("SES_EC0", "SES_EC1", "SES_EC2", "SES_EC3", "SES_EC4")) %>% 
+fluxes_SES_cum <- fluxes %>% 
+  filter(Station == c("SES0", "SES1", "SES2", "SES3", "SES4")) %>% 
   group_by(Station) %>% 
   mutate(
-    NEE_uStar_f_cum = cumsum(NEE_uStar_f) *(12.0107/10^6) * 1800,  # Convert umol m-2 s-1 to g C m-2 30 min-1. Where 12.0107 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
-    LE_f_cum = cumsum(LE_f),
-    LE_f_cum_mm = cumsum(LE_f) * 1800 / 2260 / 1000,  # Calculate mm of cumulative evaporation. Where cumsum(LE_f) is the cumulative MW m-2, 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
-    H_f_cum = cumsum(H_f)
-    )
+    NEE_cum = cumsum(NEE_filled) *(12.0107/10^6) * 1800,  # Convert umol m-2 s-1 to g C m-2 30 min-1. Where 12.0107 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
+    LE_cum = cumsum(LE_filled),
+    LE_cum_mm = cumsum(LE_filled) * 1800 / 2260 / 1000,  # Calculate mm of cumulative evaporation. Where cumsum(LE_f) is the cumulative MW m-2, 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
+    H_cum = cumsum(H_filled)
+  ) %>% 
+  select(datetime,
+         Station,
+         NEE_cum,
+         LE_cum,
+         LE_cum_mm,
+         H_cum)
+
+
+## Determine axis limits
+
+lims_le <- range(range(fluxes_SEG_cum$LE_cum, na.rm=T),range(fluxes_SES_cum$LE_cum, na.rm=T))
+lims_le_mm <- range(range(fluxes_SEG_cum$LE_cum_mm, na.rm=T),range(fluxes_SES_cum$LE_cum_mm, na.rm=T))
+lims_nee <- range(range(fluxes_SEG_cum$NEE_cum, na.rm=T),range(fluxes_SES_cum$NEE_cum, na.rm=T))
+
+change LE to zero to MAX (cealing) to look better
 
 # colour mappings
 selected_colours <- c("orange",
-          "purple",
-          "green",
-          "darkgreen",
-          "brown",
-          "cyan")
+                      "purple",
+                      "green",
+                      "darkgreen",
+                      "brown",
+                      "cyan")
+
 # labs <- c("EC0", "EC1",    "EC2",    "EC3",  "EC4", "Precipit")
 
 # TO DO ----
@@ -1368,28 +1354,74 @@ selected_colours <- c("orange",
 # This is equal to 0.798 mm of evaporation (1 kg H20 per m-2 = 1 mm). 
 
 
+{  # Create Cumulative LE and NEE plots
+ #set params for legend theme
+   leg_pos <- 0.14
+  leg_tx <- 8
+  
 ## SEG Cumulative LE
 {
-  (cum_seg_le <- ggplot(DF_EC_study_SEG,
-                       aes(y=LE_f_cum_mm, 
-                           x=Datetime_Start,
-                           color=Station
-                       )) +
+  (cum_seg_le <- ggplot(fluxes_SEG_cum,
+                        aes(y=LE_cum, 
+                            x=datetime,
+                            color=Station
+                        )) +
+     labs(x = "",
+          y = expression("Cumulative evapotranspiration (MW m"^-2*")", sep=""),
+          title = "LE Grassland") +
+     geom_line() +
+     scale_color_manual(values=selected_colours) +
+     theme_fancy() +
+     theme(legend.position = c(leg_pos, 0.8),
+           legend.text = element_text(size=leg_tx))
+  )
+} # SEG Cumulative LE
+
+
+## SEG Cumulative LE mm
+{
+  (cum_seg_le_mm <- ggplot(fluxes_SEG_cum,
+                        aes(y=LE_cum_mm, 
+                            x=datetime,
+                            color=Station
+                        )) +
      labs(x = "",
           y = expression("Cumulative evapotranspiration (mm)", sep=""),
           title = "LE Grassland") +
      geom_line() +
      scale_color_manual(values=selected_colours) +
-     theme_fancy()
+     theme_fancy() +
+     theme(legend.position = c(leg_pos, 0.8),
+           legend.text = element_text(size=leg_tx)) # legend position
   )
 } # SEG Cumulative LE
 
 
+
 ## SES Cumulative LE
 {
-  (cum_ses_le <- ggplot(DF_EC_study_SES,
-                       aes(y=LE_f_cum_mm, 
-                           x=Datetime_Start,
+  (cum_ses_le <- ggplot(fluxes_SES_cum,
+                       aes(y=LE_cum, 
+                           x=datetime,
+                           color=Station
+                       )) +
+     labs(x = "",
+          y = expression("Cumulative evapotranspiration (MW m"^-2*")", sep=""),
+          title = "LE Shrubland") +
+     geom_line() +
+     scale_color_manual(values=selected_colours) +
+     theme_fancy() +
+     theme(legend.position = c(leg_pos, 0.8),
+           legend.text = element_text(size=leg_tx)) # legend position
+   )
+} # SES Cumulative LE
+
+
+## SES Cumulative LE mm
+{
+  (cum_ses_le_mm <- ggplot(fluxes_SES_cum,
+                       aes(y=LE_cum_mm, 
+                           x=datetime,
                            color=Station
                        )) +
      labs(x = "",
@@ -1397,39 +1429,79 @@ selected_colours <- c("orange",
           title = "LE Shrubland") +
      geom_line() +
      scale_color_manual(values=selected_colours) +
-     theme_fancy()
+     theme_fancy() +
+     theme(legend.position = c(leg_pos, 0.8),
+           legend.text = element_text(size=leg_tx)) # legend position
   )
-} # SES Cumulative LE
+} # SES Cumulative LE mm
 
 
 
-
-
-mean(DF_EC_study_SEG$NEE, na.rm=t)
-
-# Need to review (and correct) NEE units, 
-
-# ## 
-# ccm <- grep("Fc", colnames(dmat))
-# 
-# dmat[,ccm] <- dmat[ccm]*  (12 / 10^6) * 1800     # 12 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
 
 
 ## SEG Cumulative NEE
 {
-  (cum_seg_nee <- ggplot(DF_EC_study_SEG,
-                        aes(y=NEE_uStar_f_cum, 
-                            x=Datetime_Start,
+  (cum_seg_nee <- ggplot(fluxes_SEG_cum,
+                        aes(y=NEE_cum, 
+                            x=datetime,
                             color=Station
                         )) +
      labs(x = "",
           y = expression("Cumulative NEE (g C m"^"-2"*")", sep=""),
-          title = "LE Grassland") +
+          title = "NEE Grassland") +
      geom_line() +
      scale_color_manual(values=selected_colours) +
-     theme_fancy()
+     theme_fancy() +
+     theme(legend.position = c(leg_pos, 0.23),
+           legend.text = element_text(size=leg_tx)) # legend position
   )
 }
+
+
+
+## SES Cumulative NEE
+{
+  (cum_ses_nee <- ggplot(fluxes_SES_cum,
+                         aes(y=NEE_cum, 
+                             x=datetime,
+                             color=Station
+                         )) +
+     labs(x = "",
+          y = expression("Cumulative NEE (g C m"^"-2"*")", sep=""),
+          title = "NEE Shrubland") +
+     geom_line() +
+     scale_color_manual(values=selected_colours) +
+     theme_fancy() +
+     theme(legend.position = c(leg_pos, 0.23),
+           legend.text = element_text(size=leg_tx)) # legend position
+  )
+}
+
+
+
+## combine plots using Patchwork
+pall <- (cum_seg_le_mm + cum_ses_le_mm) / (cum_seg_nee + cum_ses_nee) +
+  plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97))
+
+filename = "plots/Cumulative LE and NEE"
+
+ggsave(
+  pall,
+  filename = paste0(filename, ".png"),
+  width = 18,
+  height = 18,
+  units = "cm"
+)
+
+ggsave(
+  pall,
+  filename = paste0(filename, ".pdf"),
+  width = 18,
+  height = 18,
+  units = "cm"
+)
+}  # Create Cumulative LE and NEE plots
+
 
 
 
@@ -1443,154 +1515,6 @@ mean(DF_EC_study_SEG$NEE, na.rm=t)
     # theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis
 
 
-
-# if(T){
-#   
-#   cols <- rep(c("purple", "green", "darkgreen", "brown"), 2)
-#   add_AmeriFlux <- T
-#   add_AmeriFlux_edire <- F
-#   add_AmeriFlux_edire_no_WPL <- F
-#   add_prec <- T
-#   use_reddy <- T
-#   no_seg_nee <- F
-#   
-#   
-#   day_only <- F
-#   night_only <- F    
-#   pre_prec <- F
-#   post_prec <- F     
-#   
-#   #   
-#   plot_nm <- last_date; tp1 <- 1:4; tp2 <- 5:8; attr <- ""
-#   les <- paste("cLEc", datasets, sep="_")
-#   nees <- paste("Fcc", datasets, sep="_")
-#   
-#   legend_g <- c("EC1", "EC2", "EC3", "EC4")
-#   # u* filtered (NEE only) and gapfilled
-#   
-#   
-#   if(add_AmeriFlux){
-#     cols <- c(cols, "orange", "orange")
-#     les <- c(les, "cLE_gm", "cLE_sm")
-#     nees <- c(nees, "Fc_gm", "Fc_sm")
-#     legend_g <- c(legend_g, "EC0")
-#     plot_nm <- paste(plot_nm, "_plusm", sep=""); tp1 <- c(tp1, 9); tp2 <- c(tp2, 10)
-#   }
-#   
-#   if(add_prec){    plot_nm <- paste(plot_nm, "_prec", sep="")  }
-#   
-#   if(use_reddy){
-#     les <- paste("LE_f", adatasets[1:10], sep="_")
-#     nees <- paste("NEE_uStar_f", adatasets[1:10], sep="_")
-#     attr <- "_reddy"
-#   }
-#   
-#   if(add_AmeriFlux_edire){
-#     cols <- c(cols, "red", "red")
-#     les <- c(les, "LEcw_gp", "LEcw_sp")
-#     nees <- c(nees, "Fccw_gp", "Fccw_sp")
-#     legend_g <- c(legend_g, "US-SEG EdiRe")
-#     #legend_s <- c(legend_s, "US-SES EdiRe")
-#     plot_nm <- paste(plot_nm, "_m_edire", sep=""); tp1 <- c(tp1, 11); tp2 <- c(tp2, 12)
-#     attr <- "_m_edire"
-#   }
-#   
-#   
-#   if(add_AmeriFlux_edire_no_WPL){
-#     cols <- c(cols, "blue4", "blue4")
-#     les <- c(les, "LEc_gp", "LEc_sp")
-#     nees <- c(nees, "Fcc_gp", "Fcc_sp")
-#     legend_g <- c(legend_g, "SEG Edi no WPL")
-#     #legend_s <- c(legend_s, "SES Edi no WPL")
-#     plot_nm <- paste(plot_nm, "_no_WPL", sep=""); tp1 <- c(tp1, 13); tp2 <- c(tp2, 14)
-#     attr <- "_m_edire_no_WPL"
-#   }
-#   
-#   
-#   
-#   
-#   datp <- datdd   # temp datasets
-#   
-#   gcs <- c(les[grepl("_g", les)], nees[grepl("_g", nees)])
-#   scs <- c(les[grepl("_s", les)], nees[grepl("_s", nees)])
-#   
-#   # filter day/night (gm/sm specific filter for H)
-#   selh_gm <- datp[,"H_gm"]>0;    selh_gm[is.na(selh_gm)] <- T     # data.frame does not allow NAs in sel
-#   selh_sm <- datp[,"H_sm"]>0;    selh_sm[is.na(selh_sm)] <- T
-#   
-#   if(day_only){  datp[!selh_gm, gcs] <- NA; datp[!selh_sm, scs] <- NA; attr <- paste(attr, "_day_only", sep="")}
-#   if(night_only){datp[selh_gm, gcs] <- NA;  datp[selh_sm, scs] <- NA;  attr <- paste(attr, "_night_only", sep="")}
-#   
-#   
-#   
-#   
-#   
-#   #### filter before/after precipitation
-#   
-#   selp_gm <- selp_sm <- rep(F, nrow(datp))
-#   selp_gm[unique( unlist(   lapply( which( datp[,"P_hh_gm"]>0 ) , day3_fun)    ) )] <- T
-#   selp_sm[unique( unlist(   lapply( which( datp[,"P_hh_sm"]>0 ) , day3_fun)    ) )] <- T
-#   
-#   if(pre_prec){  datp[!selp_gm, gcs] <- NA; datp[!selp_sm, scs] <- NA; attr <- paste(attr, "_pre_prec", sep="")}
-#   if(post_prec){ datp[selp_gm, gcs] <- NA;  datp[selp_sm, scs] <- NA;  attr <- paste(attr, "_post_prec", sep="")}
-#   
-#   
-#   
-#   
-#   ## cumsum
-#   dmat <- datp[, c(nees, les)]; dmat[is.na(dmat)] <- 0; 
-#   dmat$dt <- datp[,"dt"]; dmat$P_gm <- datp[,"P_hh_gm"]; dmat$P_sm <- datp[,"P_hh_sm"]
-#   dmat <- dmat[dmat[,"dt"]>="20/10/18",]
-#   for(i in 1:(ncol(dmat)-3)){dmat[,i] <- cumsum(dmat[,i])}
-#   
-#   
-#   
-#   ## convert umol m-2 s-1 to gC m-2 30min-1
-#   ccm <- grep("Fc", colnames(dmat))
-#   if(use_reddy){ccm <- grep("NEE", colnames(dmat))}
-#   if(add_AmeriFlux_edire)ccm <- c(ccm, grep("Fc", colnames(dmat)))
-#   
-#   dmat[,ccm] <- dmat[ccm]*  (12 / 10^6) * 1800     # 12 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
-#   
-#   ## convert W m-2 into MW m-2 (30 min sum)
-#   lcm <- grep("LE", colnames(dmat))
-#   dmat[,lcm] <- dmat[lcm]*  (1 / 10^6) * 1800
-#   
-#   
-#   # exclude NEE of US-SEG
-#   if(no_seg_nee){ 
-#     ec <- grepl("_gm", colnames(dmat)) & 
-#       (grepl("NEE", colnames(dmat)) | grepl("Fcc", colnames(dmat)))
-#     dmat[, ec] <- NA
-#     attr <- paste("_no_seg_nee", attr, sep="")  
-#   } 
-#   
-#   
-#   
-#   
-#   
-#   xlim <- range(dmat[,"dt"])
-#   ylim_c <- range(dmat[,ccm], na.rm=T)*c(1, 1.5)
-#   if(ylim_c[1]<0)ylim_c <- ylim_c*c(1.05, 1)
-#   #ylim_c[1] <- (-40)
-#   if(add_AmeriFlux_edire_no_WPL)ylim_c[1] <- (-1100)
-#   ylim_l <- range(dmat[,lcm], na.rm=T)*c(1, 1.5)
-#   ylim_p <- range(datdd[,c("P_hh_gm", "P_hh_sm")], na.rm=T)*c(1, 2.2)
-#   
-#   if(pre_prec | post_prec){ylim_l <- c(0, 450); ylim_c <- c(-30, 70)}
-#   if(day_only | night_only){ylim_c <- c(-60, 80)}
-#   
-#   
-#   
-#   # time stamp
-#   mthetimes <-  as.POSIXct(dmat[,"dt"], format="%d/%m/%y %H:%M:%S") 
-#   dmat$dt_2 <- mthetimes
-#   
-#   ylim_l <- c(0, 800)
-#   
-#   ya2 <- expression("Precipitation (mm h"^"-1"*")",sep="")
-#   
-#   
 #   # ylim correction factor for precipitation
 #   
 #   # diff(ylim_l)/ylim_p[2]   = 20.41817
@@ -1598,8 +1522,7 @@ mean(DF_EC_study_SEG$NEE, na.rm=t)
 #   
 #   # diff(ylim_c)/ylim_p[2]   =  1.629766
 #   # diff(ylim_c)/ 1.629766   =  36.322     # desired ylim
-#   
-#   
+#    
 #   
 #   # add modified precipitation
 #   dmat$P_plot_le_gm <- (dmat$P_gm * (-diff(ylim_l)/ylim_p[2])) + ylim_l[2]
@@ -1609,101 +1532,7 @@ mean(DF_EC_study_SEG$NEE, na.rm=t)
 #   
 #   
 #   
-#   p1 <- ggplot(dmat, aes(x=dt_2)) +
-#     labs(x = "", y = expression("Cumulative LE (MW m"^"-2"*")",sep=""), title = "LE Grassland") +
-#     geom_line(aes(y = LE_f_g1, colour = "EC1")) + 
-#     geom_line(aes(y = LE_f_g2, colour = "EC2")) + 
-#     geom_line(aes(y = LE_f_g3, colour = "EC3")) + 
-#     geom_line(aes(y = LE_f_g4, colour = "EC4")) +
-#     geom_line(aes(y = LE_f_gm, colour = "EC0")) +
-#     geom_line(aes(y = P_plot_le_gm, colour = "prec")) +
-#     scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = ya2)) +
-#     theme_bw() +
-#     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-#     theme(axis.text.x = element_text(angle = 45, vjust=0.3)) +
-#     theme(legend.title = element_blank(), legend.text = element_text(size = 8), legend.position = c(0.18, 0.52)) +    # legend position
-#     theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
-#     scale_colour_manual(values = colours)
-#   
-#   
-#   p2 <- ggplot(dmat, aes(x=dt_2)) +
-#     labs(x = "", y = expression("Cumulative LE (MW m"^"-2"*")",sep=""), title = "LE Shrubland") +
-#     geom_line(aes(y = LE_f_s1, colour = "EC1")) + 
-#     geom_line(aes(y = LE_f_s2, colour = "EC2")) + 
-#     geom_line(aes(y = LE_f_s3, colour = "EC3")) + 
-#     geom_line(aes(y = LE_f_s4, colour = "EC4")) +
-#     geom_line(aes(y = LE_f_sm, colour = "EC0")) +
-#     geom_line(aes(y = P_plot_le_sm, colour = "prec")) +
-#     scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_l) + (ylim_p[2]), name = ya2)) +
-#     theme_bw() + 
-#     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-#     theme(axis.text.x = element_text(angle = 45, vjust=0.3)) +
-#     theme(legend.position="none") +  
-#     theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
-#     scale_colour_manual(values = colours)
-#   
-#   
-#   p3 <- ggplot(dmat, aes(x=dt_2)) +
-#     labs(x = "", y = expression("Cumulative NEE (g C m"^"-2"*")",sep=""), title = "NEE Grassland") +
-#     geom_line(aes(y = NEE_uStar_f_g1, colour = "EC1")) + 
-#     geom_line(aes(y = NEE_uStar_f_g2, colour = "EC2")) + 
-#     geom_line(aes(y = NEE_uStar_f_g3, colour = "EC3")) + 
-#     geom_line(aes(y = NEE_uStar_f_g4, colour = "EC4")) +
-#     geom_line(aes(y = NEE_uStar_f_gm, colour = "EC0")) +
-#     geom_line(aes(y = P_plot_nee_gm, colour = "prec")) +
-#     geom_point(aes(x=dt_2[1], y=ylim_c[1]), colour="white") + # only to specify lower end
-#     scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) - min(ylim_c*(-ylim_p[2]/diff(ylim_c))), name = ya2)) +
-#     theme_bw() + 
-#     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-#     theme(axis.text.x = element_text(angle = 45, vjust=0.3)) +
-#     theme(legend.position="none") +  
-#     theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
-#     scale_colour_manual(values = colours)
-#   
-#   
-#   p4 <- ggplot(dmat, aes(x=dt_2)) +
-#     labs(x = "", y = expression("Cumulative NEE (g C m"^"-2"*")",sep=""), title = "NEE Shrubland") +
-#     geom_line(aes(y = NEE_uStar_f_s1, colour = "EC1")) + 
-#     geom_line(aes(y = NEE_uStar_f_s2, colour = "EC2")) + 
-#     geom_line(aes(y = NEE_uStar_f_s3, colour = "EC3")) + 
-#     geom_line(aes(y = NEE_uStar_f_s4, colour = "EC4")) +
-#     geom_line(aes(y = NEE_uStar_f_sm, colour = "EC0")) +
-#     geom_line(aes(y = P_plot_nee_sm, colour = "prec")) + 
-#     geom_point(aes(x=dt_2[1], y=ylim_c[1]), colour="white") + # only to specify lower end
-#     scale_y_continuous(sec.axis = sec_axis(~.*-ylim_p[2]/diff(ylim_c) - min(ylim_c*(-ylim_p[2]/diff(ylim_c))), name = ya2)) +
-#     theme_bw() + 
-#     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-#     theme(axis.text.x = element_text(angle = 45, vjust=0.3)) +
-#     theme(legend.position="none") +
-#     theme(axis.title.y.right = element_text( angle = 90)) +   # Rotate secondary axis 
-#     scale_colour_manual(values = colours)
-#   
-#   
-#   ## combine plots using Patchwork
-#   pall <- (p1 + p2) / (p3 + p4) +
-#     plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97)) 
-#   
-#   
-#   # Save raster
-#   gpath <- "E:/REC_7_Data/10_Plots/7_cumsum/"
-#   outfile_r <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot.png", sep="")
-#   
-#   ggsave(pall,
-#          filename = outfile_r,
-#          width = 17,
-#          height = 17,
-#          units = "cm")
-#   
-#   # Save vector
-#   gpath <- "E:/REC_7_Data/10_Plots/7_cumsum/"
-#   outfile_v <- paste(gpath, plot_nm, "_cumsum", attr, "_h", xch, "_ggplot_test.pdf", sep="")
-#   
-#   ggsave(pall,
-#          filename = outfile_v,
-#          width = 17,
-#          height = 17,
-#          units = "cm")
-#   
+#  
 # }  # cumulative LE and NEE
 # 
 
