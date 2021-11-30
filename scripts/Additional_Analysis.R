@@ -1367,7 +1367,7 @@ selected_colours <- c("orange",
      labs(x = "",
           y = expression("Cumulative evapotranspiration (MW m"^-2*")", sep=""),
           title = "LE Grassland") +
-     geom_line() +
+     geom_line(na.rm=T) +
      scale_color_manual(values=selected_colours) +
      ylim(lims_le) +
      theme_fancy() +
@@ -1387,7 +1387,7 @@ selected_colours <- c("orange",
      labs(x = "",
           y = expression("Cumulative evapotranspiration (mm)", sep=""),
           title = "LE Grassland") +
-     geom_line() +
+     geom_line(na.rm=T) +
      scale_color_manual(values=selected_colours) +
      ylim(lims_le_mm) +
      theme_fancy() +
@@ -1408,7 +1408,7 @@ selected_colours <- c("orange",
      labs(x = "",
           y = expression("Cumulative evapotranspiration (MW m"^-2*")", sep=""),
           title = "LE Shrubland") +
-     geom_line() +
+     geom_line(na.rm=T) +
      scale_color_manual(values=selected_colours) +
      ylim(lims_le) +
      theme_fancy() +
@@ -1428,7 +1428,7 @@ selected_colours <- c("orange",
      labs(x = "",
           y = expression("Cumulative evapotranspiration (mm)", sep=""),
           title = "LE Shrubland") +
-     geom_line() +
+     geom_line(na.rm=T) +
      scale_color_manual(values=selected_colours) +
      ylim(lims_le_mm) +
      theme_fancy() +
@@ -1451,7 +1451,7 @@ selected_colours <- c("orange",
      labs(x = "",
           y = expression("Cumulative NEE (g C m"^"-2"*")", sep=""),
           title = "NEE Grassland") +
-     geom_line() +
+     geom_line(na.rm=T) +
      scale_color_manual(values=selected_colours) +
      ylim(lims_nee) +
      theme_fancy() +
@@ -1472,7 +1472,7 @@ selected_colours <- c("orange",
      labs(x = "",
           y = expression("Cumulative NEE (g C m"^"-2"*")", sep=""),
           title = "NEE Shrubland") +
-     geom_line() +
+     geom_line(na.rm=T) +
      scale_color_manual(values=selected_colours) +
      ylim(lims_nee) +
      theme_fancy() +
