@@ -1311,8 +1311,6 @@ lims_le <- range(range(fluxes_SEG_cum$LE_cum, na.rm=T),range(fluxes_SES_cum$LE_c
 lims_le_mm <- range(range(fluxes_SEG_cum$LE_cum_mm, na.rm=T),range(fluxes_SES_cum$LE_cum_mm, na.rm=T))
 lims_nee <- range(range(fluxes_SEG_cum$NEE_cum, na.rm=T),range(fluxes_SES_cum$NEE_cum, na.rm=T))
 
-change LE to zero to MAX (cealing) to look better
-
 # colour mappings
 selected_colours <- c("orange",
                       "purple",
@@ -1371,6 +1369,7 @@ selected_colours <- c("orange",
           title = "LE Grassland") +
      geom_line() +
      scale_color_manual(values=selected_colours) +
+     ylim(lims_le) +
      theme_fancy() +
      theme(legend.position = c(leg_pos, 0.8),
            legend.text = element_text(size=leg_tx))
@@ -1390,6 +1389,7 @@ selected_colours <- c("orange",
           title = "LE Grassland") +
      geom_line() +
      scale_color_manual(values=selected_colours) +
+     ylim(lims_le_mm) +
      theme_fancy() +
      theme(legend.position = c(leg_pos, 0.8),
            legend.text = element_text(size=leg_tx)) # legend position
@@ -1410,6 +1410,7 @@ selected_colours <- c("orange",
           title = "LE Shrubland") +
      geom_line() +
      scale_color_manual(values=selected_colours) +
+     ylim(lims_le) +
      theme_fancy() +
      theme(legend.position = c(leg_pos, 0.8),
            legend.text = element_text(size=leg_tx)) # legend position
@@ -1429,6 +1430,7 @@ selected_colours <- c("orange",
           title = "LE Shrubland") +
      geom_line() +
      scale_color_manual(values=selected_colours) +
+     ylim(lims_le_mm) +
      theme_fancy() +
      theme(legend.position = c(leg_pos, 0.8),
            legend.text = element_text(size=leg_tx)) # legend position
@@ -1451,6 +1453,7 @@ selected_colours <- c("orange",
           title = "NEE Grassland") +
      geom_line() +
      scale_color_manual(values=selected_colours) +
+     ylim(lims_nee) +
      theme_fancy() +
      theme(legend.position = c(leg_pos, 0.23),
            legend.text = element_text(size=leg_tx)) # legend position
@@ -1471,6 +1474,7 @@ selected_colours <- c("orange",
           title = "NEE Shrubland") +
      geom_line() +
      scale_color_manual(values=selected_colours) +
+     ylim(lims_nee) +
      theme_fancy() +
      theme(legend.position = c(leg_pos, 0.23),
            legend.text = element_text(size=leg_tx)) # legend position
