@@ -4329,7 +4329,7 @@ if(T){
   
   ## convert W m-2 into MW m-2 (30 min sum)
   lcm <- grep("LE", colnames(dmat))
-  dmat[,lcm] <- dmat[lcm]*  (1 / 10^6) * 1800
+  dmat[,lcm] <- dmat[lcm]*  (1 / 10^6) # * 1800 NOTE THAT THIS WAS AN ERROR!
 
   
   # exclude NEE of US-SEG

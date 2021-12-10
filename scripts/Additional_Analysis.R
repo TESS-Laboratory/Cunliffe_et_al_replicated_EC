@@ -98,10 +98,6 @@ SEG0_all <- dplyr::bind_rows(SEG0a, SEG0b, SEG0c); rm(SEG0a, SEG0b, SEG0c)
 SES0_all <- dplyr::bind_rows(SES0a, SES0b, SES0c); rm(SES0a, SES0b, SES0c)
 
 
-## Create lists for processing Licor systems ## not currently used
-# list_licor_a <- list(SEG0_all, SES0_all) 
-# list_licor_b <- c("SEG0", "SES0") 
-
 ## Create function to rename and select meteorological variables of interest 
 tidy_licor <- function(df, station) {
   df %>%
@@ -1276,9 +1272,9 @@ fluxes_SEG_cum <- fluxes %>%
   filter(Station == c("SEG0", "SEG1", "SEG2", "SEG3", "SEG4")) %>% 
   group_by(Station) %>% 
   mutate(
-    NEE_cum = cumsum(NEE_filled) *(12.0107/10^6) * 1800,  # Convert umol m-2 s-1 to g C m-2 30 min-1. Where 12.0107 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
+    NEE_cum = cumsum(NEE_filled) *(12.0107/10^6) * 1800,  # Convert umol m^2 s-1 to g C m-2 30 min-1. Where 12.0107 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
     LE_cum = cumsum(LE_filled),
-    LE_cum_mm = cumsum(LE_filled) * 1800 / 2260 / 1000,  # Calculate mm of cumulative evaporation. Where cumsum(LE_f) is the cumulative MW m-2, 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
+    LE_cum_mm = cumsum(LE_filled) * 1800 / 2260 / 1000,  # Convert W m^2 to mm of cumulative evapotranspiration. Where cumsum(LE_f) is the cumulative W m-2, 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
     H_cum = cumsum(H_filled)
   ) %>% 
   select(datetime,
@@ -1294,7 +1290,7 @@ fluxes_SES_cum <- fluxes %>%
   mutate(
     NEE_cum = cumsum(NEE_filled) *(12.0107/10^6) * 1800,  # Convert umol m-2 s-1 to g C m-2 30 min-1. Where 12.0107 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
     LE_cum = cumsum(LE_filled),
-    LE_cum_mm = cumsum(LE_filled) * 1800 / 2260 / 1000,  # Calculate mm of cumulative evaporation. Where cumsum(LE_f) is the cumulative MW m-2, 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
+    LE_cum_mm = cumsum(LE_filled) * 1800 / 2260 / 1000,  # Convert W m^2 to mm of cumulative evapotranspiration. Where cumsum(LE_f) is the cumulative W m-2, 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
     H_cum = cumsum(H_filled)
   ) %>% 
   select(datetime,
@@ -1305,31 +1301,16 @@ fluxes_SES_cum <- fluxes %>%
          H_cum)
 
 
-## Determine axis limits
-
-lims_le <- range(range(fluxes_SEG_cum$LE_cum, na.rm=T),range(fluxes_SES_cum$LE_cum, na.rm=T))
-lims_le_mm <- range(range(fluxes_SEG_cum$LE_cum_mm, na.rm=T),range(fluxes_SES_cum$LE_cum_mm, na.rm=T))
-lims_nee <- range(range(fluxes_SEG_cum$NEE_cum, na.rm=T),range(fluxes_SES_cum$NEE_cum, na.rm=T))
-
-# colour mappings
-selected_colours <- c("orange",
-                      "purple",
-                      "green",
-                      "darkgreen",
-                      "brown",
-                      "cyan")
-
-# labs <- c("EC0", "EC1",    "EC2",    "EC3",  "EC4", "Precipit")
 
 # TO DO ----
-### NB. review conversion from LE (W m-2) to evaporation (mm)
-# Our initial analysis suggested annual LE MW m-2 was ca. 400 MW
+### NB. review conversion from LE (MW m-2) to evaporation (mm)
 
-# 400 MW = 400 000 000 j s-1
-
-# 400,000,000 / 2257 = 177,226 g of water per m-2 
-# 177,226 g of water per m-2 = 177.226 mm evap 
-# This estimate seems highly plausible
+# 400 MW = 400,000,000 W
+# 400,000,000 W = 400,000,000 j s-1
+# 400,000,000 W j s-1 * 1800 second in 30 mins = 720,000 j
+# 720,000 / 2260 = 318.58 g of water per m-2
+# 318.58 g of water per m-2 = 0.318 mm evapotranspiration
+# This estimate seems implausibly small
 
 # https://www.researchgate.net/post/How-to-calculate-evapotranspiration-from-latent-heat-flux
 
@@ -1352,10 +1333,30 @@ selected_colours <- c("orange",
 # This is equal to 0.798 mm of evaporation (1 kg H20 per m-2 = 1 mm). 
 
 
+
+## Determine axis limits
+lims_le <- range(range(fluxes_SEG_cum$LE_cum, na.rm=T),range(fluxes_SES_cum$LE_cum, na.rm=T))
+lims_le_mm <- range(range(fluxes_SEG_cum$LE_cum_mm, na.rm=T),range(fluxes_SES_cum$LE_cum_mm, na.rm=T))
+lims_nee <- range(range(fluxes_SEG_cum$NEE_cum, na.rm=T),range(fluxes_SES_cum$NEE_cum, na.rm=T))
+
+# colour mappings
+selected_colours <- c("orange",
+                      "purple",
+                      "green",
+                      "darkgreen",
+                      "brown",
+                      "cyan")
+
+# labs <- c("EC0", "EC1",    "EC2",    "EC3",  "EC4", "Precipit")
+
+
+
+
 {  # Create Cumulative LE and NEE plots
  #set params for legend theme
-   leg_pos <- 0.14
+  leg_pos <- 0.14
   leg_tx <- 8
+  
   
 ## SEG Cumulative LE
 {
@@ -1365,7 +1366,7 @@ selected_colours <- c("orange",
                             color=Station
                         )) +
      labs(x = "",
-          y = expression("Cumulative evapotranspiration (MW m"^-2*")", sep=""),
+          y = expression("Cumulative evapotranspiration (W m"^-2*")", sep=""),
           title = "LE Grassland") +
      geom_line(na.rm=T) +
      scale_color_manual(values=selected_colours) +
@@ -1406,7 +1407,7 @@ selected_colours <- c("orange",
                            color=Station
                        )) +
      labs(x = "",
-          y = expression("Cumulative evapotranspiration (MW m"^-2*")", sep=""),
+          y = expression("Cumulative evapotranspiration (W m"^-2*")", sep=""),
           title = "LE Shrubland") +
      geom_line(na.rm=T) +
      scale_color_manual(values=selected_colours) +
