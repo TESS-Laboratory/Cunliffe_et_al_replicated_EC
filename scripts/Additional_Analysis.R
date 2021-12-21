@@ -122,7 +122,7 @@ SES_met <- tidy_licor(SES0_all, "SES0"); rm(SES0_all)
 
 
 
-#### Read fluxes gap filled with Random Forest Regression workflow. 
+#### Read fluxes (gap filled with Random Forest Regression workflow). 
 ## Note that timestamps are the middle of the half hour rather than start and end.
 
 # Read and combine gap filled flux files for SEG0
@@ -219,6 +219,7 @@ rm(SES0, SES1, SES2, SES3, SES4)
 
 
 
+
 #-------------- 2. Tidy data --------------
 
 # Subset time series to study period dates
@@ -240,11 +241,10 @@ fluxes <- rbind(SEG_fluxes, SES_fluxes)
 
 # NB. SEG2 instrument failed on 2020-02-19, so LE_filled and NEE_filled are 
 # invalid after this date and should be excluded from analysis.
-
-fluxes <- fluxes %>% 
+fluxes <- fluxes %>%
   mutate(LE_filled = ifelse(datetime > as.Date("2020-03-29") & Station == "SEG2",
-         NA,
-         LE_filled),
+                            NA,
+                            LE_filled),
          NEE_filled = ifelse(datetime > as.Date("2020-03-29") & Station == "SEG2",
                             NA,
                             NEE_filled))
@@ -264,6 +264,9 @@ shape_wider <- function(df, variable) {
   fluxes_LE <- shape_wider(fluxes, "LE_filled")
   fluxes_NEE <- shape_wider(fluxes, "NEE_filled")
 }
+
+
+
 
 
 
@@ -938,7 +941,6 @@ ggsave(
     group_by(year, month) %>% 
     select(SES0,
            SES1) %>% 
-    na.omit %>%  # drop incomplete half hours
     summarize(
       SES0 = mean(SES0),
       SES1 = mean(SES1)
@@ -1267,75 +1269,101 @@ ggsave(
 
 #-------------- 3.2 cumulative sum of LE and NEE --------------
 
-# subset to site and compute cumulative fluxes
-fluxes_SEG_cum <- fluxes %>% 
-  filter(Station == c("SEG0", "SEG1", "SEG2", "SEG3", "SEG4")) %>% 
-  group_by(Station) %>% 
-  mutate(
-    NEE_cum = cumsum(NEE_filled) *(12.0107/10^6) * 1800,  # Convert umol m^2 s-1 to g C m-2 30 min-1. Where 12.0107 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
-    LE_cum = cumsum(LE_filled),
-    LE_cum_mm = cumsum(LE_filled) * 1800 / 2260 / 1000,  # Convert W m^2 to mm of cumulative evapotranspiration. Where cumsum(LE_f) is the cumulative W m-2, 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
-    H_cum = cumsum(H_filled)
-  ) %>% 
-  select(datetime,
-         Station,
-         NEE_cum,
-         LE_cum,
-         LE_cum_mm,
-         H_cum)
+
+#### temp diagnostic ####
+fluxes %>% 
+  filter(Station == "SES0") %>% 
+  mutate(sum_LE = cumsum(LE_filled)) %>% 
+  summarise(max = max(sum_LE))
+#### = 560003.2
+
+#### temp diagnostic ####
+fluxes_LE %>% 
+  # select(SES0) %>% 
+  mutate(sum_LE = cumsum(SES0)) %>% 
+  summarise(max = max(sum_LE))
+#### = 560003.
+
+#### temp diagnostic ####
+sum(fluxes_LE$SES0) #### = 559993.3
+
+
+## PICK UP HERE ####
+# So before going into this pipe below, the sum of the LE vector appears correct 
+# for both the 'fluxes' and the 'fluxes_LE' DF (with very minor differences due 
+# to rounding errors).
+# The origional pipe below is only returning every 5th row!?! why!!! This is why the pipe output is ca. 4-fold low!
+
+# This is okay (doesn't drop rows)
+fluxes_SES_cum <- fluxes %>% 
+  filter(Station == "SES0")
+
+# This is wrong (drops rows)
+fluxes_SES_cum <- fluxes %>%
+  filter(Station == c("SES0", "SES1", "SES2", "SES3", "SES4"))
+
+
 
 fluxes_SES_cum <- fluxes %>% 
   filter(Station == c("SES0", "SES1", "SES2", "SES3", "SES4")) %>% 
-  group_by(Station) %>% 
+  # group_by(Station) # %>% 
   mutate(
-    NEE_cum = cumsum(NEE_filled) *(12.0107/10^6) * 1800,  # Convert umol m-2 s-1 to g C m-2 30 min-1. Where 12.0107 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
-    LE_cum = cumsum(LE_filled),
-    LE_cum_mm = cumsum(LE_filled) * 1800 / 2260 / 1000,  # Convert W m^2 to mm of cumulative evapotranspiration. Where cumsum(LE_f) is the cumulative W m-2, 1800 = seconds in 30 mins, 2260 =  specific latent heat = energy required to evaporate 1 g of water in J g-1, and '/1000' converts from g m-2 to mm.
-    H_cum = cumsum(H_filled)
-  ) %>% 
-  select(datetime,
-         Station,
-         NEE_cum,
-         LE_cum,
-         LE_cum_mm,
-         H_cum)
+    # NEE_cum = cumsum(NEE_filled) *(12.0107/10^6) * 1800,  # Convert umol m-2 s-1 to g C m-2 30 min-1. Where 12.0107 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
+    LE_cum = cumsum(LE_filled)
+    # LE_cum_mj = cumsum(LE_filled * 1800 / 1000000),  # convert to megajoules.
+    # LE_cum_mm = cumsum(LE_filled) * 1800 / 2461 / 1000,  # Convert W m^2 to mm of cumulative evapotranspiration. 
+    # Where cumsum(LE_filled) is the cumulative W m-2, 
+    # 1800 = seconds in 30 mins,
+    # 2461 =  specific latent heat = energy required to evaporate 1 g of water in J g-1 based on lamba of our EdiRe output, 
+    # '/1000' converts from g m-2 to mm.
+    # H_cum = cumsum(H_filled)
+  ) # %>% 
+select(datetime,
+       Station,
+       # NEE_cum,
+       LE_filled,
+       LE_cum
+       # LE_cum_mj,
+       # LE_cum_mm,
+       # H_cum
+)
 
 
 
-# TO DO ----
-### NB. review conversion from LE (MW m-2) to evaporation (mm)
+# subset to site and compute cumulative fluxes
+# {
+# fluxes_SEG_cum <- fluxes %>% 
+#   filter(Station == c("SEG0", "SEG1", "SEG2", "SEG3", "SEG4")) %>% 
+#   group_by(Station) %>% 
+#   mutate(
+#     # NEE_cum = cumsum(NEE_filled) *(12.0107/10^6) * 1800,  # Convert umol m^2 s-1 to g C m-2 30 min-1. Where 12.0107 g C/mole * 1 gram /10^6 ugrams * time (1800 s)
+#     LE_cum = cumsum(LE_filled), 
+#     #### temp ####
+#     # LE_cum_mj = cumsum(LE_filled * 1800 / 1000000),  # convert to megajoules.
+#     # LE_cum_mm = cumsum(LE_filled * 1800 / 2461 / 1000),  # Convert W m^2 to mm of cumulative evapotranspiration. Where cumsum(LE_f) is the cumulative W m-2, 1800 = seconds in 30 mins, 2461 =  specific latent heat = energy required to evaporate 1 g of water in J g-1 based on lamba of our EdiRe output, and '/1000' converts from g m-2 to mm.
+#     # H_cum = cumsum(H_filled)
+#   ) %>% 
+#   select(datetime,
+#          Station,
+#          # NEE_cum,
+#          LE_cum,
+#          # LE_cum_mj,
+#          # LE_cum_mm,
+#          # H_cum
+#          )}
 
-# 400 MW = 400,000,000 W
-# 400,000,000 W = 400,000,000 j s-1
-# 400,000,000 W j s-1 * 1800 second in 30 mins = 720,000 j
-# 720,000 / 2260 = 318.58 g of water per m-2
-# 318.58 g of water per m-2 = 0.318 mm evapotranspiration
-# This estimate seems implausibly small
 
-# https://www.researchgate.net/post/How-to-calculate-evapotranspiration-from-latent-heat-flux
 
-# t <- 1800  # seconds in 30 mins
-# e <- 2257  # The amount of energy required to evaporate 1 g of water in J g-1.
 
-# (xj <- xw * t) # convert to jules per half hour
-# (evap1 <- xj / e) # convert to g m2 of evaporation 
-# (evap2 <- evap1 / 1000) # convert to mm evaporation
-# 
-# evap <- 65 * 1800 / 2257 / 1000
 
-# You need to divide the LE, which should be in an energy unit such as W/m-2 by
-# the latent heat of evaporation (i.e. the amount of energy required to evaporate
-# 1g or 1ml of water) which is 2257 J/g.
 
-# For example, if you have a total LE of 500 W/m-2 for one hour this would 
-# be 1800 000 J of energy (with watts equal to jouls per second). 
-# Enough to evaporate 798 g of water per m-2 (1800000/2257). 
-# This is equal to 0.798 mm of evaporation (1 kg H20 per m-2 = 1 mm). 
 
+
+# plot(fluxes_SES_cum$LE_cum)
 
 
 ## Determine axis limits
-lims_le <- range(range(fluxes_SEG_cum$LE_cum, na.rm=T),range(fluxes_SES_cum$LE_cum, na.rm=T))
+lims_le <- range(range(fluxes_SEG_cum$LE_cum_mj, na.rm=T),range(fluxes_SES_cum$LE_cum_mj, na.rm=T))
 lims_le_mm <- range(range(fluxes_SEG_cum$LE_cum_mm, na.rm=T),range(fluxes_SES_cum$LE_cum_mm, na.rm=T))
 lims_nee <- range(range(fluxes_SEG_cum$NEE_cum, na.rm=T),range(fluxes_SES_cum$NEE_cum, na.rm=T))
 
@@ -1349,33 +1377,214 @@ selected_colours <- c("orange",
 
 # labs <- c("EC0", "EC1",    "EC2",    "EC3",  "EC4", "Precipit")
 
-
-
-
 {  # Create Cumulative LE and NEE plots
- #set params for legend theme
+ # set parameters for legend theme
   leg_pos <- 0.14
   leg_tx <- 8
-  
   
 ## SEG Cumulative LE
 {
   (cum_seg_le <- ggplot(fluxes_SEG_cum,
-                        aes(y=LE_cum, 
+                        # aes(y=LE_cum_mj, 
+                        aes(y=LE_cum,
                             x=datetime,
                             color=Station
                         )) +
      labs(x = "",
-          y = expression("Cumulative evapotranspiration (W m"^-2*")", sep=""),
+          # y = expression("Latent Energy (MJ m"^-2*")", sep=""),
+          y = expression("Latent Energy (W m"^-2*")", sep=""),
           title = "LE Grassland") +
      geom_line(na.rm=T) +
      scale_color_manual(values=selected_colours) +
-     ylim(lims_le) +
+     # ylim(lims_le) +
      theme_fancy() +
      theme(legend.position = c(leg_pos, 0.8),
            legend.text = element_text(size=leg_tx))
   )
 } # SEG Cumulative LE
+
+
+## SES Cumulative LE
+{
+  (cum_ses_le <- ggplot(fluxes_SES_cum,
+                        aes(y=LE_cum_mj, 
+                            x=datetime,
+                            color=Station
+                        )) +
+     labs(x = "",
+          y = expression("Latent Energy (MJ m"^-2*")", sep=""),
+          title = "LE Shrubland") +
+     geom_line(na.rm=T) +
+     scale_color_manual(values=selected_colours) +
+     ylim(lims_le) +
+     theme_fancy() +
+     theme(legend.position = c(leg_pos, 0.8),
+           legend.text = element_text(size=leg_tx)) # legend position
+  )
+} # SES Cumulative LE  
+  
+  ######################
+  #####################
+##### TEMP Diagnostic ####
+summary(fluxes$LE)
+summary(fluxes$LE_filled)  # the NA's should be here.
+
+14 * 1800 * 48 * 365 / 2461 / 1000  # Based on the average LE value in W (~14 W m2 hh), evapotranspiration is ca. 179 mm yr-1
+  
+
+
+14 * 48 * 730 # = 490,560 total watts per two years, based on the average LE value in W (~14 W m2 hh)
+# Songyan calculated in Python that SES0 LE_filled cumulative was 559,000 W over the same two years. This make sense and seems okay.
+
+max(temp_fluxes_SES_cum$LE_cum) # 111,733 total watts per two years (ca. factor of four lower - WHY)
+
+### WHY ARE THESE ALL SO DIFFERENT!!! ### THIS IS THE PROBLEM
+
+# Something with the cumulative (CUMSUM) in R isn't working as expected? but is working in python. 
+
+
+
+plot(temp_fluxes_SES_cum$LE_cum)
+
+
+
+
+
+temp_fluxes_SES_cum$LE_cum
+
+temp_SES0_cum <- temp_fluxes_SES_cum %>% 
+  filter(Station == c("SES0"))
+ 
+  
+
+sum(temp_SES0_cum$LE_filled)  # 111,733
+max(temp_SES0_cum$LE_cum) # 111,733
+111733 * 1800 / 1000000
+
+
+##### Dig back into Vector- something is wrong with that!
+# Is there a scaling error somewhere in the preceding code.
+
+
+summary(fluxes_LE)
+
+sum(fluxes$LE_filled, na.rm=T)  # 4854567
+
+4854567 / 350400 # = 13.85 w m2 average.
+
+
+
+# temp_fluxes_SES_cum <- fluxes %>% 
+#   filter(Station == c("SES0", "SES1", "SES2", "SES3", "SES4")) %>% 
+#   group_by(Station) %>% 
+#   mutate(
+#     LE_j = LE_filled * 1800,
+#     LE_cum = cumsum(LE_filled),
+#     LE_mm = LE_j / 2461 / 1000,
+#     LE_mm_cum = cumsum(LE_mm),
+#     LE_cum_j1 = cumsum(LE_filled * 1800),  # convert to joules.
+#     LE_cum_j3 = cumsum(LE_filled) * 1800,  # convert to joules.
+#     LE_cum_j2 = cumsum(LE_j),  # convert to megajoules.
+#     LE_cum_mj = cumsum(LE_filled * 1800 / 1000000),  # convert to megajoules.
+#     LE_cum_mm1 = cumsum(LE_filled) * 1800 / 2461 / 1000,  # Convert W m^2 to mm of cumulative evapotranspiration. Where cumsum(LE_f) is the cumulative W m-2, 1800 = seconds in 30 mins, 2461 =  specific latent heat = energy required to evaporate 1 g of water in J g-1 based on lamba of our EdiRe output, and '/1000' converts from g m-2 to mm.
+#     LE_cum_mm3 = cumsum(LE_filled * 1800) / 2461 / 1000,  # Convert W m^2 to mm of cumulative evapotranspiration. Where cumsum(LE_f) is the cumulative W m-2, 1800 = seconds in 30 mins, 2461 =  specific latent heat = energy required to evaporate 1 g of water in J g-1 based on lamba of our EdiRe output, and '/1000' converts from g m-2 to mm.
+#     LE_cum_mm2 = LE_cum_j2 / 2461 / 1000,  # Convert W m^2 to mm of cumulative evapotranspiration. Where cumsum(LE_f) is the cumulative W m-2, 1800 = seconds in 30 mins, 2461 =  specific latent heat = energy required to evaporate 1 g of water in J g-1 based on lamba of our EdiRe output, and '/1000' converts from g m-2 to mm.
+#     ) %>% 
+#   select(datetime,
+#          Station,
+#          LE,
+#          LE_filled,
+#          LE_j,
+#          LE_cum,
+#          LE_mm,
+#          LE_mm_cum,
+#          LE_cum_j1,
+#          LE_cum_j2,
+#          LE_cum_j3,
+#          LE_cum_mm1,
+#          LE_cum_mm2,
+#          LE_cum_mm3
+#   )
+
+# temp_fluxes_SES_cum  # 0.00212
+# 
+# fluxes_SES_cum  # 0.00212
+# 
+
+# 
+# (ggplot(temp_fluxes_SES_cum,
+#                    aes(y=LE_mm_cum, 
+#                        x=datetime,
+#                        color=Station
+#                    )) +
+#     labs(x = "",
+#          y = expression("XXX", sep=""),
+#          title = "XXd") +
+#     geom_line(na.rm=T) +
+#     scale_color_manual(values=selected_colours) +
+#     # ylim(lims_le) +
+#     theme_fancy() +
+#     theme(legend.position = c(leg_pos, 0.8),
+#           legend.text = element_text(size=leg_tx)) # legend position
+# )
+# 
+# 
+
+# Issue is that the calculated mm ET is ca. 40 mm yr-1, far too low.
+# calculating the mean value yields a plausible estimate, but something else is off in the calculations
+# All NA's are only in the latter part of the SEG2 record (known issue)
+
+# LE filled looks good
+# LE j (or MJ) looks good
+# LE j Cum looks good
+# cumulative total mm are low
+
+
+plot(temp_fluxes_SES_cum$LE_cum_mm2)
+
+plot(fluxes$LE)
+plot(fluxes$LE_filled)
+
+
+
+
+
+summary(fluxes_SEG_cum$LE_cum_j)
+summary(fluxes_SES_cum$LE_cum_j)
+  
+summary(fluxes_SEG_cum$LE_cum_mm)
+summary(fluxes_SES_cum$LE_cum_mm)
+  
+
+
+
+
+# visualizing variance in LE
+
+(temp_le <- ggplot(fluxes,
+                      aes(y=LE_filled, 
+                          x=datetime,
+                          color=Station
+                      )) +
+    labs(x = "",
+         y = expression("LE filled (W m"^-2*" half hour)", sep=""),
+         title = "LE Shrubland") +
+    geom_line(na.rm=T) +
+    scale_color_manual(values=selected_colours) +
+    ylim(lims_le) +
+    theme_fancy() +
+    theme(legend.position = c(leg_pos, 0.8),
+          legend.text = element_text(size=leg_tx)) # legend position
+)
+
+
+
+
+############
+############
+############
+
+
 
 
 ## SEG Cumulative LE mm
@@ -1399,24 +1608,6 @@ selected_colours <- c("orange",
 
 
 
-## SES Cumulative LE
-{
-  (cum_ses_le <- ggplot(fluxes_SES_cum,
-                       aes(y=LE_cum, 
-                           x=datetime,
-                           color=Station
-                       )) +
-     labs(x = "",
-          y = expression("Cumulative evapotranspiration (W m"^-2*")", sep=""),
-          title = "LE Shrubland") +
-     geom_line(na.rm=T) +
-     scale_color_manual(values=selected_colours) +
-     ylim(lims_le) +
-     theme_fancy() +
-     theme(legend.position = c(leg_pos, 0.8),
-           legend.text = element_text(size=leg_tx)) # legend position
-   )
-} # SES Cumulative LE
 
 
 ## SES Cumulative LE mm
