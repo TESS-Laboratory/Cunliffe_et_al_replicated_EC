@@ -282,6 +282,9 @@ lims_h  <- range(fluxes_H[, c("SEG0",  "SEG1",  "SES0",  "SES1")],  na.rm=T)
 lims_le  <- range(fluxes_LE[, c("SEG0",  "SEG1",  "SES0",  "SES1")],  na.rm=T)
 lims_nee  <- range(fluxes_NEE[, c("SEG0",  "SEG1",  "SES0",  "SES1")],  na.rm=T)
 
+legend_position_x <- 0.88
+legend_position_y <- 0.29
+
 ### H
 {
 ## H / US-Seg
@@ -304,8 +307,8 @@ ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
 
 # create plot
 seg_h <- ggplot(fluxes_H, aes(x=SEG0, y=SEG1)) +
-  labs(x = expression("Seg EC0 - H (W m"^"-2"*")"),
-       y = expression("Seg EC1 - H (W m"^"-2"*")"),
+  labs(x = expression("SEG0 - H (W m"^"-2"*")"),
+       y = expression("SEG1 - H (W m"^"-2"*")"),
        title = "Sensible Heat Flux - Seg") +
   geom_hex(bins = 100, show.legend=T) +
   # scale_fill_continuous(type = "viridis")) +     # colour palette
@@ -313,7 +316,7 @@ seg_h <- ggplot(fluxes_H, aes(x=SEG0, y=SEG1)) +
   ylim(lims_h) +
   theme_fancy() +
   theme(plot.title = element_text(size = 14, face = "bold")) +
-  theme(legend.position = c(0.85, 0.25)) + # legend position
+  theme(legend.position = c(legend_position_x, legend_position_y))  +
   geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
   geom_abline(intercept = tls_int, slope = tls_slp) +
   annotate("text", x = -250, y = 650, label = equation) +
@@ -341,8 +344,8 @@ seg_h <- ggplot(fluxes_H, aes(x=SEG0, y=SEG1)) +
   
   # create plot
   ses_h <- ggplot(fluxes_H, aes(x=SES0, y=SES1)) +
-    labs(x = expression("Ses EC0 - H (W m"^"-2"*")"),
-         y = expression("Ses EC1 - H (W m"^"-2"*")"),
+    labs(x = expression("SES0 - H (W m"^"-2"*")"),
+         y = expression("SES1 - H (W m"^"-2"*")"),
          title = "Sensible Heat Flux - Ses") +
     geom_hex(bins = 100, show.legend=T) +
     # scale_fill_continuous(type = "viridis") +     # colour palette
@@ -350,7 +353,7 @@ seg_h <- ggplot(fluxes_H, aes(x=SEG0, y=SEG1)) +
     ylim(lims_h) +
     theme_fancy() +
     theme(plot.title = element_text(size = 14, face = "bold")) +
-    theme(legend.position = c(0.85, 0.25)) + # legend position
+    theme(legend.position = c(legend_position_x, legend_position_y))  +
     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = tls_int, slope = tls_slp) +
     annotate("text", x = -250, y = 650, label = equation) +
@@ -385,8 +388,8 @@ ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range)
   
   # create plot
   seg_le <- ggplot(fluxes_LE, aes(x=SEG0, y=SEG1)) +
-    labs(x = expression("Seg EC0 - LE (W m"^"-2"*")"),
-         y = expression("Seg EC1 - LE (W m"^"-2"*")"),
+    labs(x = expression("SEG0 - LE (W m"^"-2"*")"),
+         y = expression("SEG1 - LE (W m"^"-2"*")"),
          title = "Latent Heat Flux - Seg") +
     geom_hex(bins = 100, show.legend=T) +
     # scale_fill_continuous(type = "viridis") +     # colour palette
@@ -394,7 +397,7 @@ ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range)
     ylim(lims_le) +
     theme_fancy() +
     theme(plot.title = element_text(size = 14, face = "bold")) +
-    theme(legend.position = c(0.85, 0.25)) + # legend position
+    theme(legend.position = c(legend_position_x, legend_position_y))  +
     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = tls_int, slope = tls_slp) +
     annotate("text", x = 10, y = 430, label = equation) +
@@ -422,8 +425,8 @@ ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range)
   
   # create plot
   ses_le <- ggplot(fluxes_LE, aes(x=SES0, y=SES1)) +
-    labs(x = expression("Ses EC0 - LE (W m"^"-2"*")"),
-         y = expression("Ses EC1 - LE (W m"^"-2"*")"),
+    labs(x = expression("SES0 - LE (W m"^"-2"*")"),
+         y = expression("SES1 - LE (W m"^"-2"*")"),
          title = "Latent Heat Flux - Ses") +
     geom_hex(bins = 100, show.legend=T) +
     # scale_fill_continuous(type = "viridis") +     # colour palette
@@ -431,7 +434,7 @@ ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range)
     ylim(lims_le) +
     theme_fancy() +
     theme(plot.title = element_text(size = 14, face = "bold")) +
-    theme(legend.position = c(0.85, 0.25)) + # legend position
+    theme(legend.position = c(legend_position_x, legend_position_y))  +
     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = tls_int, slope = tls_slp) +
     annotate("text", x = 25, y = 430, label = equation) +
@@ -469,16 +472,16 @@ ses_le <- ses_le +   scale_fill_continuous(type = "viridis", limits=c(count.rang
   # create plot
   seg_nee <- ggplot(fluxes_NEE, aes(x=SEG0, y=SEG1)) +
     labs(
-      x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
-      y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
-      title = "Net Ecosys. Exchange - Ses") +
+      x = expression(paste("SEG0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+      y = expression(paste("SEG1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+      title = "Net Ecosys. Exchange - Seg") +
     geom_hex(bins = 100, show.legend=T) +
     # scale_fill_continuous(type = "viridis") +     # colour palette
     xlim(lims_nee) +
     ylim(lims_nee) +
     theme_fancy() +
     theme(plot.title = element_text(size = 14, face = "bold")) +
-    theme(legend.position = c(0.85, 0.25)) + # legend position
+    theme(legend.position = c(legend_position_x, legend_position_y))  +
     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = tls_int, slope = tls_slp) +
     annotate("text", x = -4.4, y = 10.6, label = equation) +
@@ -507,8 +510,8 @@ ses_le <- ses_le +   scale_fill_continuous(type = "viridis", limits=c(count.rang
   # create plot
   ses_nee <- ggplot(fluxes_NEE, aes(x=SES0, y=SES1)) +
     labs(
-      x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
-      y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+      x = expression(paste("SES0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+      y = expression(paste("SES1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
       title = "Net Ecosys. Exchange - Ses") +
     geom_hex(bins = 100, show.legend=T) +
     # scale_fill_continuous(type = "viridis") +     # colour palette
@@ -516,11 +519,11 @@ ses_le <- ses_le +   scale_fill_continuous(type = "viridis", limits=c(count.rang
     ylim(lims_nee) +
     theme_fancy() +
     theme(plot.title = element_text(size = 14, face = "bold")) +
-    theme(legend.position = c(0.85, 0.25)) + # legend position
+    theme(legend.position = c(legend_position_x, legend_position_y))  +
     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
     geom_abline(intercept = tls_int, slope = tls_slp) +
     annotate("text", x = -4.5, y = 10.6, label = equation) +
-    annotate("text", x = -6.6, y = 8.6, label = ccc)
+    annotate("text", x = -6.55, y = 8.6, label = ccc)
   
 } # NEE / US-Ses
 
@@ -543,7 +546,7 @@ ggsave(
   pall,
   filename = paste0(filename, ".png"),
   width = 17,
-  height = 22,
+  height = 23,
   units = "cm"
 )
 
@@ -551,7 +554,7 @@ ggsave(
   pall,
   filename = paste0(filename, ".pdf"),
   width = 17,
-  height = 22,
+  height = 23,
   units = "cm"
 )
 
@@ -633,6 +636,9 @@ ggsave(
   lims_le  <- range(range(fluxes_LE_SEG_daily[, c("SEG0",  "SEG1")]), range(fluxes_LE_SES_daily[, c("SES0",  "SES1")]))
   lims_nee  <- range(range(fluxes_NEE_SEG_daily[, c("SEG0",  "SEG1")]), range(fluxes_NEE_SES_daily[, c("SES0",  "SES1")]))
 
+  legend_position_x <- 0.88
+  legend_position_y <- 0.29
+  
   ### H
   {
   ## H / US-Seg
@@ -654,8 +660,8 @@ ggsave(
     
     # create plot
     seg_h <- ggplot(fluxes_H_SEG_daily, aes(x=SEG0, y=SEG1)) +
-      labs(x = expression("Seg EC0 - H (W m"^"-2"*")"),
-           y = expression("Seg EC1 - H (W m"^"-2"*")"),
+      labs(x = expression("SEG0 - H (W m"^"-2"*")"),
+           y = expression("SEG1 - H (W m"^"-2"*")"),
            title = "Sensible Heat Flux - Seg") +
       # geom_point(shape=1) +
       geom_hex(bins = 50, show.legend=T) +
@@ -664,7 +670,7 @@ ggsave(
       ylim(lims_h) +
       theme_fancy() +
       theme(plot.title = element_text(size = 14, face = "bold")) +
-      theme(legend.position = c(0.85, 0.25)) + # legend position
+      theme(legend.position = c(legend_position_x, legend_position_y))  +
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
       annotate("text", x = 77, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation) +
@@ -691,8 +697,8 @@ ggsave(
     
     # create plot
     ses_h <- ggplot(fluxes_H_SES_daily, aes(x=SES0, y=SES1)) +
-      labs(x = expression("Ses EC0 - H (W m"^"-2"*")"),
-           y = expression("Ses EC1 - H (W m"^"-2"*")"),
+      labs(x = expression("SES0 - H (W m"^"-2"*")"),
+           y = expression("SES1 - H (W m"^"-2"*")"),
            title = "Sensible Heat Flux - Ses") +
       # geom_point(shape=1) +
       geom_hex(bins = 50, show.legend=T) +
@@ -701,7 +707,7 @@ ggsave(
       ylim(lims_h) +
       theme_fancy() +
       theme(plot.title = element_text(size = 14, face = "bold")) +
-      theme(legend.position = c(0.85, 0.25)) + # legend position
+      theme(legend.position = c(legend_position_x, legend_position_y))  +
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
       annotate("text", x = 77, y = (lims_h[1] + 0.99 * abs(lims_h[1] - lims_h[2])), label = equation) +
@@ -739,8 +745,8 @@ ggsave(
         
     # create plot
     seg_le <- ggplot(fluxes_LE_SEG_daily, aes(x=SEG0, y=SEG1)) +
-      labs(x = expression("Seg EC0 - LE (W m"^"-2"*")"),
-           y = expression("Seg EC1 - LE (W m"^"-2"*")"),
+      labs(x = expression("SEG0 - LE (W m"^"-2"*")"),
+           y = expression("SEG1 - LE (W m"^"-2"*")"),
            title = "Latent Heat Flux - Seg") +
       # geom_point(shape=1) +
       geom_hex(bins = 50, show.legend=T) +
@@ -749,7 +755,7 @@ ggsave(
       ylim(lims_le) +
       theme_fancy() +
       theme(plot.title = element_text(size = 14, face = "bold")) +
-      theme(legend.position = c(0.85, 0.25)) + # legend position
+      theme(legend.position = c(legend_position_x, legend_position_y))  +
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
       annotate("text", x = 26, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation) +
@@ -777,8 +783,8 @@ ggsave(
     
     # create plot
     ses_le <- ggplot(fluxes_LE_SES_daily, aes(x=SES0, y=SES1)) +
-      labs(x = expression("Ses EC0 - LE (W m"^"-2"*")"),
-           y = expression("Ses EC1 - LE (W m"^"-2"*")"),
+      labs(x = expression("SES0 - LE (W m"^"-2"*")"),
+           y = expression("SES1 - LE (W m"^"-2"*")"),
            title = "Latent Heat Flux - Ses") +
       # geom_point(shape=1) +
       geom_hex(bins = 50, show.legend=T) +
@@ -787,7 +793,7 @@ ggsave(
       ylim(lims_le) +
       theme_fancy() +
       theme(plot.title = element_text(size = 14, face = "bold")) +
-      theme(legend.position = c(0.85, 0.25)) + # legend position
+      theme(legend.position = c(legend_position_x, legend_position_y))  +
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
       annotate("text", x = 26, y = (lims_le[1] + 0.99 * abs(lims_le[1] - lims_le[2])), label = equation) +
@@ -826,9 +832,9 @@ ggsave(
     # create plot
     seg_nee <- ggplot(fluxes_NEE_SEG_daily, aes(x=SEG0, y=SEG1)) +
       labs(
-        x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
-        y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
-        title = "Net Ecosys. Exchange - Ses") +
+        x = expression(paste("SEG0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        y = expression(paste("SEG1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        title = "Net Ecosys. Exchange - Seg") +
       # geom_point(shape=1) +
       geom_hex(bins = 50, show.legend=T) +
       # scale_fill_continuous(type = "viridis") +     # colour palette
@@ -836,7 +842,7 @@ ggsave(
       ylim(lims_nee) +
       theme_fancy() +
       theme(plot.title = element_text(size = 14, face = "bold")) +
-      theme(legend.position = c(0.85, 0.25)) + # legend position
+      theme(legend.position = c(legend_position_x, legend_position_y))  +
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
       annotate("text", x = -0.3, y = (lims_nee[1] + 0.99 * abs(lims_nee[1] - lims_nee[2])), label = equation) +
@@ -865,8 +871,8 @@ ggsave(
     # create plot
     ses_nee <- ggplot(fluxes_NEE_SES_daily, aes(x=SES0, y=SES1)) +
       labs(
-        x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
-        y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        x = expression(paste("SES0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        y = expression(paste("SES1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
         title = "Net Ecosys. Exchange - Ses") +
       # geom_point(shape=1) +
       geom_hex(bins = 50, show.legend=T) +
@@ -875,7 +881,7 @@ ggsave(
       ylim(lims_nee) +
       theme_fancy() +
       theme(plot.title = element_text(size = 14, face = "bold")) +
-      theme(legend.position = c(0.85, 0.25)) + # legend position
+      theme(legend.position = c(legend_position_x, legend_position_y))  +
       geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
       geom_abline(intercept = tls_int, slope = tls_slp) +
       annotate("text", x = -0.35, y = (lims_nee[1] + 0.99 * abs(lims_nee[1] - lims_nee[2])), label = equation) +
@@ -900,7 +906,7 @@ ggsave(
     pall,
     filename = paste0(filename, ".png"),
     width = 17,
-    height = 22,
+    height = 23,
     units = "cm"
   )
   
@@ -908,7 +914,7 @@ ggsave(
     pall,
     filename = paste0(filename, ".pdf"),
     width = 17,
-    height = 22,
+    height = 23,
     units = "cm"
   )
   
@@ -1032,8 +1038,8 @@ ggsave(
     
     # create plot
     seg_h <- ggplot(fluxes_H_SEG_monthly, aes(x=SEG0, y=SEG1)) +
-      labs(x = expression("Seg EC0 - H (W m"^"-2"*")"),
-           y = expression("Seg EC1 - H (W m"^"-2"*")"),
+      labs(x = expression("SEG0 - H (W m"^"-2"*")"),
+           y = expression("SEG1 - H (W m"^"-2"*")"),
            title = "Sensible Heat Flux - Seg") +
       geom_point(shape=1) +
       # geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
@@ -1070,8 +1076,8 @@ ggsave(
     
     # create plot
     ses_h <- ggplot(fluxes_H_SES_monthly, aes(x=SES0, y=SES1)) +
-      labs(x = expression("Ses EC0 - H (W m"^"-2"*")"),
-           y = expression("Ses EC1 - H (W m"^"-2"*")"),
+      labs(x = expression("SES0 - H (W m"^"-2"*")"),
+           y = expression("SES1 - H (W m"^"-2"*")"),
            title = "Sensible Heat Flux - Ses") +
       geom_point(shape=1) +
       # geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
@@ -1108,8 +1114,8 @@ ggsave(
     
     # create plot
     seg_le <- ggplot(fluxes_LE_SEG_monthly, aes(x=SEG0, y=SEG1)) +
-      labs(x = expression("Seg EC0 - LE (W m"^"-2"*")"),
-           y = expression("Seg EC1 - LE (W m"^"-2"*")"),
+      labs(x = expression("SEG0 - LE (W m"^"-2"*")"),
+           y = expression("SEG1 - LE (W m"^"-2"*")"),
            title = "Latent Heat Flux - Seg") +
       geom_point(shape=1) +
       # geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
@@ -1146,8 +1152,8 @@ ggsave(
     
     # create plot
     ses_le <- ggplot(fluxes_LE_SES_monthly, aes(x=SES0, y=SES1)) +
-      labs(x = expression("Ses EC0 - LE (W m"^"-2"*")"),
-           y = expression("Ses EC1 - LE (W m"^"-2"*")"),
+      labs(x = expression("SES0 - LE (W m"^"-2"*")"),
+           y = expression("SES1 - LE (W m"^"-2"*")"),
            title = "Latent Heat Flux - Ses") +
       geom_point(shape=1) +
       # geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
@@ -1184,9 +1190,9 @@ ggsave(
     # create plot
     seg_nee <- ggplot(fluxes_NEE_SEG_monthly, aes(x=SEG0, y=SEG1)) +
       labs(
-        x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
-        y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
-        title = "Net Ecosys. Exchange - Ses") +
+        x = expression(paste("SEG0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        y = expression(paste("SEG1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        title = "Net Ecosys. Exchange - Seg") +
       geom_point(shape=1) +
       # geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
       # scale_fill_continuous(type = "viridis") +     # colour palette
@@ -1223,8 +1229,8 @@ ggsave(
     # create plot
     ses_nee <- ggplot(fluxes_NEE_SES_monthly, aes(x=SES0, y=SES1)) +
       labs(
-        x = expression(paste("Ses EC0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
-        y = expression(paste("Ses EC1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        x = expression(paste("SES0 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
+        y = expression(paste("SES1 - NEE (", mu, "mol CO"[2]*" m"^"-2"*"s"^"-1"*")")),
         title = "Net Ecosys. Exchange - Ses") +
       geom_point(shape=1) +
       # geom_bin2d(bins = 150, show.legend=T) +   # Bin size control
