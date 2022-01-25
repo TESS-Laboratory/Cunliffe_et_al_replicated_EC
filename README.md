@@ -1,11 +1,12 @@
-# Boschetti_et_al_replicated_EC
+# Cunliffe_et_al_replicated_EC
 
 This repository contains R code for processing, analysing and visualizing the 
 data presented in 'Strong correspondence in evapotranspiration and carbon 
 dioxide fluxes between different eddy covariance systems enables quantification 
-of landscape heterogeneity in dryland fluxes' by Fabio Boschetti, Andrew 
-Cunliffe, Robert Clement, Stephen Sitch, Karen Anderson, Tomer Duman, Mikeal 
+of landscape heterogeneity in dryland fluxes' by Andrew Cunliffe, Fabio Boschetti,
+Robert Clement, Stephen Sitch, Karen Anderson, Tomer Duman, Songyan Zhu, Mikeal 
 Schlumpf, Marcy Litvak, Richard Brazier and Timothy Hill.
+
 
 ## The manuscript is in review. DOI TBC
 
