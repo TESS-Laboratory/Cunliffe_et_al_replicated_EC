@@ -1,0 +1,11 @@
+Manifest file for knb-lter-sev.1.14-4c9184f37cff01bcdc32dc486ec36961.zip created on Sat Mar 27 21:50:35 MDT 2021
+Sevilleta_LTER_Hourly_Meteorological_Data_1988_1994.csv (62406283 bytes)
+Sevilleta_LTER_Hourly_Meteorological_Data_1995_1999.csv (58950629 bytes)
+Sevilleta_LTER_Hourly_Meteorological_Data_2000_2004.csv (66212464 bytes)
+Sevilleta_LTER_Hourly_Meteorological_Data_2005_2009.csv (69412065 bytes)
+Sevilleta_LTER_Hourly_Meteorological_Data_2010_2014.csv (69044233 bytes)
+Sevilleta_LTER_Hourly_Meteorological_Data_2015_2019.csv (77381933 bytes)
+Sevilleta_LTER_Hourly_Meteorological_Data_2020.csv (15901585 bytes)
+knb-lter-sev.1.14.xml (225963 bytes)
+knb-lter-sev.1.14.txt (110836 bytes)
+knb-lter-sev.1.14.report.xml (159522 bytes)

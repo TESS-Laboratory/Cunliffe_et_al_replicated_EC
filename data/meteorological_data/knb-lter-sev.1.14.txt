@@ -1,0 +1,5421 @@
+
+  
+    
+      uid=SEV,o=LTER,dc=ecoinformatics,dc=org
+      all
+    
+    
+      public
+      read
+    
+  
+  
+    doi:10.6073/pasta/1cbc37ae4d40b3844b5e4be9f6f18073Meteorology Data from the Sevilleta National Wildlife Refuge, New Mexico
+    
+      Douglas Moore
+      University of New Mexico
+      dmoore@unm.edu
+    
+    2021-01-25
+    
+      
+    These files contain hourly meteorological data that were collected
+    from a network of permanent weather stations on the Sevilleta
+    National Wildlife Refuge as part of the Sevilleta Long Term
+    Ecological Research Program.
+  
+    
+    
+      inorganic nutrients
+      meteorology
+      atmospheric properties
+      humidity
+      wind speed
+      precipitation
+      air temperature
+      soil moisture
+      dataloggers
+      https://vocab.lternet.edu/vocab/vocab/index.php
+    
+    
+      
+    These data were collected from a network of 10 permanent weather
+    stations on the Sevilleta National Wildlife Refuge. Station 40 has
+    been in operation since the middle of 1987; Stations 41-44 were
+    installed in the early part of 1989; Station 45 was put into
+    operation on 26 Jan 1990 (hour 15); Station 46 was put into
+    operation on 31 Aug 1990 (hour 17); and Station 1 was put into test
+    operation on 29 Dec 1991 (hr 12) and official data recording started
+    on 01 Jan 92 (hr 01). A new station (#48) was established during
+    1998 (on Oct 1 1998) at a site designated as Savana (initially
+    called Blue Springs. Station 49 was installed in the Five Points
+    area in 1999 and named Five Points. Another new station was
+    established in 2001 at a new core study site designated as Blue
+    Grama and given a station ID number of 50.
+  
+    
+    
+      This data package is released to the "public domain" under Creative Commons CC0 1.0 "No Rights Reserved" (see: https://creativecommons.org/publicdomain/zero/1.0/). It is considered professional etiquette to provide attribution of the original work if this data package is shared in whole or by individual components. A generic citation is provided for this data package on the website https://portal.edirepository.org (herein "website") in the summary metadata page. Communication (and collaboration) with the creators of this data package is recommended to prevent duplicate research or publication. This data package (and its components) is made available "as is" and with no warranty of accuracy or fitness for use. The creators of this data package and the website shall not be liable for any damages resulting from misinterpretation or misuse of the data package or its components. Periodic updates of this data package may be available from the website. Thank you.
+
+    
+    
+      
+        Five Points Meteorological Station (No. 49) is at the Southern edge of Mckenzie Flats - about 2.5 km west of the actual<ca> Five-Points.<ca> North of the road and just northeast of the intersection where another road takes off going north.<ca> Transition area from creosote to the south into Grasslands to the north. Altitude: 1610 m
+        
+          -106.729
+          -106.729
+          34.335
+          34.335
+        
+      
+      
+        South Gate Meteorological Station (No. 41) is located about 2 km north of the south boundary of the Sevilleta on the east side of the refuge. Altitude: 1538 m
+        
+          -106.795
+          -106.795
+          34.2167
+          34.2167
+        
+      
+      
+        Cerro Montoso Meteorological Station (No. 42) is at the eastern edge of the Sevilleta in a small bowl - Montosa Draw. Cerro Montoso is just to the south and there is a lower set of hills to the north. Altitude: 1971 m
+        
+          -106.535
+          -106.535
+          34.3685
+          34.3685
+        
+      
+      
+        Red Tank Meteorological Station (No. 43) is located on a low ridge which overlooks the confluence of 2 smallwatersheds to the west. The station is located about 100 m to the west of where the road to Red Tank ends at the diversion channel. Altitude: 1766 m
+        
+          -107.037
+          -107.037
+          34.3982
+          34.3982
+        
+      
+      
+        "Rio Salado Meteorological Station (No. 44) is located about 3 km West I-25 just south of the Rio Salado. Site is accessed by taking San Acacia exit, going west and then taking the frontage road back north to the Sevilleta gate. After entering the refuge turn left after about .2 mi and take this road about 1.4 mi to a T in the road at the power lines. An earthen berm stops road travel here and the station is located about 300 m west on the blocked road. Altitude: 1503 m"
+        
+          -106.927
+          -106.927
+          34.296
+          34.296
+        
+      
+      
+        "Bronco Well Meteorological Station (No. 45) is located on the west side of the Sevilleta, near the north boundary of the refuge and about halfway between the Rio Grande and the western boundary of the refuge. Area is generally Colorado Plateau grassland. Altitude: 1547 m"
+        
+          -106.934
+          -106.934
+          34.4056
+          34.4056
+        
+      
+      
+        "Field Station Meteorological Station (No. 1) is located just north of UNM's Sevilleta Field Station. Access is via exit #169 from I-25, taking the road into the refuge leadin to the US Fish and Wildlife Sevilleta headquarters and taking the turn-off to the UNM Field Station. The met station is located about 100 m north of the northern most buildings in the compound. Altitude: 1466 m"
+        
+          -106.885
+          -106.885
+          34.356
+          34.356
+        
+      
+      
+        Savanna (also called Lower Goat Draw) Meteorological Station (No. 48) is at the north-eastern edge of the Sevilleta in lower Goat Draw. In low hills just west of the Goat Draw wash and about 1 km up the wash. Altitude: 1796 m
+        
+          -106.523
+          -106.523
+          34.4147
+          34.4147
+        
+      
+      
+        Blue Grama Meteorological Station (No. 50) is located on the eastern edge of Mckenzie Flats near base of Los Pinos Mountains. About 1 mile south of old ranch headquarters about 200 m west of road. Altitude: 1669 m
+        
+          -106.632
+          -106.632
+          34.335
+          34.335
+        
+      
+      
+        Deep Well Meteorological Station (No. 40) is about half way between Black Butte and FivePoints. It is about 200 m west of the road. Altitude: 1600 m
+        
+          -106.691
+          -106.691
+          34.3592
+          34.3592
+        
+      
+      
+        Langmuir Meteorological Station (No. 46) is located at the top of North Peak atop the Magdalena Mountains in Central New Mexico. The vegetation is mixture of Spruce/fir and Alpine meadows. Altitude: 3243 m
+        
+          -107.181
+          -107.181
+          33.9755
+          33.9755
+        
+      
+      
+        "Bosque Del Apache Meteorological Station (No. 47) is located on the Bosque Del Apache Wildlife Refuge, south of the Sevilleta NWR. Altitude: 1360 m"
+        
+          -106.843
+          -106.843
+          33.8692
+          33.8692
+        
+      
+      
+        
+          
+            1988-01-01
+          
+          
+            2020-12-31
+          
+        
+      
+    
+    
+      ongoing
+    
+    
+      University of New Mexico
+      Information Manager
+      khall001@unm.edu
+    
+    Environmental Data Initiativeinfo@environmentaldatainitiative.orghttps://environmentaldatainitiative.orgEnvironmental Data Initiative
+      
+        
+          
+    Sampling Design Stations were located across the Sevilleta and
+    surrounding areas to cover the entire spatial and elevational extent
+    of the refuge. They were also generally located adjacent to other
+    pertinent study locations such as plant and animal monitoring
+    studies. Measurement Techniques Automated weather stations Each
+    weather station includes a 3 m tripod tower, on which is mounted
+    most of the monitoring equipment. This equipment includes an
+    enclosure housing a datalogger and power supply. On the tripod are
+    mounted an anemometer and wind vane, a pyranometer, and a solar
+    radiation shield that encloses a combination temperature and
+    relative humidity sensor. Other attached sensors include: a
+    precipitation gauge, soil temperature sensors and soil moisture
+    potential sensors.
+  
+          
+    * Manufacturer: Campbell Scientific Inc.* Component: Datalogger -
+    Measurement and Control Module* Model Number CR10* Reference
+    Manuals: CR10 Measurement and Control Module Campbell Scientific
+    Inc.* Manufacturer: Campbell Scientific Inc.Measurement Techniques:
+    Automated weather stations Each weather station includes a 3 m
+    tripod tower, on which is mounted most of the monitoring equipment.
+    This equipment includes an enclosure housing a datalogger and power
+    supply. On the tripod are mounted an anemometer and wind vane, a
+    pyranometer, and a solar radiation shield that encloses a
+    combination temperature and relative humidity sensor. Other attached
+    sensors include: a precipitation gauge, soil temperature sensors and
+    soil moisture potential sensors.* Component: Temperature/Relative
+    Humidity Sensor* Model Number 207* Reference Manuals: *
+    Manufacturer: Campbell Scientific Inc.* Component:
+    Temperature/Relative Humidity Sensor* Model Number HMP45C* Reference
+    Manuals:* Manufacturer: MET-ONE* Component: Cup Anemometer* Model
+    Number 14A* Reference Manuals:* Manufacturer: MET-ONE* Component:
+    Wind Vane* Model Number 24A* Reference Manuals:* Manufacturer:
+    LI-COR* Component: Pyranometer* Model Number 200SZ* Reference
+    Manuals:* Manufacturer: Texas Electronics* Component: Rain Gauge*
+    Model Number TE525 mm* Reference Manuals:* Manufacturer: Campbell
+    Scientific Inc.* Component: Soil Temperature Probe* Model Number
+    108* Reference Manuals: * Manufacturer: Campbell Scientific Inc.*
+    Component: Soil Temperature Probe* Model Number 107* Reference
+    Manuals: * Manufacturer: Campbell Scientific Inc.* Component: Soil
+    Moisture BlockÂ * Model Number 227* Reference Manuals: *
+    Manufacturer: Vaisala* Component: Barometer* Model PTB101B*
+  
+        
+      
+    
+    
+      LTER: Sevilleta (SEV) Site: Climate Variability at Dryland Ecotones
+      
+        Jennifer Rudgers
+        University of New Mexico
+        jrudgers@unm.edu
+        https://orcid.org/0000-0001-7094-4857
+        Principal Investigator
+      
+      National Science Foundation DEB-1655499
+    
+    
+      Sevilleta_LTER_Hourly_Meteorological_Data_1988_1994.csv
+      Sevilleta LTER Hourly Meteorological Data 1988-1994
+      
+        Sevilleta_LTER_Hourly_Meteorological_Data_1988_1994.csv
+        62406283
+        65f97185e8429c3a271975521324a37a
+        
+          
+            1
+            \n
+            column
+            
+              ,
+            
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/knb-lter-sev/1/14/87ff32c8e179e69743c6514cbbc8b31c
+          
+        
+      
+      
+        
+          StationID
+          Station ID Number
+          string
+          
+            
+              
+                
+                  
+                    1
+                    Station 1 - Headquarters
+                  
+                  
+                    40
+                    Station 40 - Deep Well Site
+                  
+                  
+                    41
+                    Station 41 - South Gate Site
+                  
+                  
+                    42
+                    Station 42 - Cerro Montosa Site
+                  
+                  
+                    43
+                    Station 43 - Watersheds Site
+                  
+                  
+                    44
+                    Station 44 - Rio Salado Site
+                  
+                  
+                    45
+                    Station 45 - Bronco Well Site
+                  
+                  
+                    46
+                    Station 46 - Langmuir Site
+                  
+                  
+                    47
+                    Station 47 - Bosque Del Apache
+                  
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Date_Time
+          Date and time - timezone is Mountain Standard Time (MST)
+          string
+          
+            
+              
+                
+                  Date and time - timezone is Mountain Standard Time (MST)
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Date
+          Date
+          date
+          
+            
+              YYYY-MM-DD
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Year
+          Year
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1988
+                  1994
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Month
+          Month
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  12
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Day_of_Month
+          Day of month
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  31
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Julian_Day
+          Day of year
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  366
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Hour
+          Hour of day
+          float
+          
+            
+              
+                hour
+              
+              
+                whole
+                
+                  0
+                  23
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_C
+          "Air temperature. Sensor hgt. at 2.5 m until 14 Feb 1989 (hour 10). Thereafter, sensor hgt. at 2 m."
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -22.34
+                  45.98
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_Temp_C
+          Maximum hourly airt temperature
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -21.87
+                  46.48
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_Temp_C
+          Minimum hourly air temperature
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -22.55
+                  44.89
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Relative_Humidity
+          "Mean Relative Humidity. Sensor height is 2.5 m until 14 Feb 1989 (hour 10). Thereafter, sensor hgt. at 2 m."
+          float
+          
+            
+              
+                percent
+              
+              
+                real
+                
+                  5.01
+                  108
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Mean_WindSpeed
+          Average of windspeed observations over the hour. Sensor height 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0.2
+                  18.48
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Vect_WindSpeed
+          Mean vectored windspeed during the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0.001
+                  17.8
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Wind_Dir
+          Mean wind direction vector for the hour. Sensor height is 3 m.
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  0
+                  360
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Std_dev_dir
+          Standard deviation of wind direction. Sensor height is 3 m.
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  0
+                  80.9
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_WindSpeed
+          Maximum wind speed measured during the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0.2
+                  29.773
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_WindSpeed
+          Minimum wind speed recorded for the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0.2
+                  12.18
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_1_cm
+          Mean Soil Temperature at 1 cm
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -26.97
+                  75.6
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_10_cm
+          Mean soil temperature at 10 cm
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -6.59
+                  45.73
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Vapor_Pressure
+          Vapor pressure as calculated from the relative humidity from the 207 temp/Relative humidity sensor. Computational method for derived data: saturation vapor pressure at measured temperature times measured relative humidity. Started collecting this variable in December 1990.
+          float
+          
+            
+              
+                millibar
+              
+              
+                real
+                
+                  0.491
+                  28.53
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Precipitation
+          Precipitation total during hour. Rain gauge height at 0.5 m.
+          float
+          
+            
+              
+                millimeter
+              
+              
+                real
+                
+                  0
+                  53.4
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Moisture_10_cm
+          "Soil moisture potential at 10 cm as measured with a gypsum block. Note that the the values in this field are shown as positive values, but in reality are negative; thus,greater magnitudes represent drier soils. "
+          float
+          
+            
+              
+                bar
+              
+              
+                real
+                
+                  0.1
+                  9.999
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Moisture_30_cm
+          "Soil moisture potential at 30 cm as measured with a gypsum block. Note that the the values in this field are shown as positive values, but in reality are negative; thus,greater magnitudes represent drier soils."
+          float
+          
+            
+              
+                bar
+              
+              
+                real
+                
+                  0.1
+                  10.04
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Solar_Radiation
+          Hourly Solar Flux. Sensor height at 3 m.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -0.143
+                  418.6
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_Solar_Radiation
+          Maximum Solar radiation reading during hour. Sensor hgt. at 3 m. Note: started collecting this variable in Dec 90.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  0
+                  633.5
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_Solar_Radiation
+          Minimum solar radiation reading during hour. Sensor hgt. at 3 m. Note: started collecting this variable in Dec 90.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -0.163
+                  394.6
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Evaporation
+          Evaporation from pan during hour. Started collecting this variable in May 92 - at Station 1 only.
+          float
+          
+            
+              
+                millimeter
+              
+              
+                real
+                
+                  0
+                  9.79
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Evap_Pan_Temperature
+          Temperature of water in the Evaporation Pan using a 107 sensor. Started collecting in Sep 92.
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -0.379
+                  39.92
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Bar_Pressure
+          Barometric pressure adjusted to sea level. Started collecting in Mar 93 - at Station 1 only.
+          float
+          
+            
+              
+                millibar
+              
+              
+                natural
+                
+                  1003
+                  1030
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+      
+      409224
+    
+    
+      Sevilleta_LTER_Hourly_Meteorological_Data_1995_1999.csv
+      Sevilleta LTER Hourly Meteorological Data 1995-1999
+      
+        Sevilleta_LTER_Hourly_Meteorological_Data_1995_1999.csv
+        58950629
+        faa367b5bbb8240591d6c4a6d9166f12
+        
+          
+            1
+            \n
+            column
+            
+              ,
+            
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/knb-lter-sev/1/14/dbe548a38a8dc4c1c829657cee190c4d
+          
+        
+      
+      
+        
+          StationID
+          Station ID Number
+          string
+          
+            
+              
+                
+                  
+                    1
+                    Station 1 - Headquarters
+                  
+                  
+                    40
+                    Station 40 - Deep Well Site
+                  
+                  
+                    41
+                    Station 41 - South Gate Site
+                  
+                  
+                    42
+                    Station 42 - Cerro Montosa Site
+                  
+                  
+                    43
+                    Station 43 - Watersheds Site
+                  
+                  
+                    44
+                    Station 44 - Rio Salado Site
+                  
+                  
+                    45
+                    Station 45 - Bronco Well Site
+                  
+                  
+                    46
+                    Station 46 - Langmuir Site
+                  
+                  
+                    47
+                    Station 47 - Bosque Del Apache
+                  
+                  
+                    48
+                    Station 48 - Blue Springs Site
+                  
+                  
+                    49
+                    Station 49 - Five Points Site
+                  
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Date_Time
+          Date and time - timezone is Mountain Standard Time (MST)
+          string
+          
+            
+              
+                
+                  Date and time - timezone is Mountain Standard Time (MST)
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Date
+          Date
+          date
+          
+            
+              YYYY-MM-DD
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Year
+          Year
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1995
+                  1999
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Month
+          Month
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  12
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Day_of_Month
+          Day of month
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  31
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Julian_Day
+          Day of year
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  366
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Hour
+          Hour of day
+          float
+          
+            
+              
+                hour
+              
+              
+                whole
+                
+                  0
+                  23
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_C
+          "Air temperature. Sensor hgt. at 2.5 m until 14 Feb 1989 (hour 10). Thereafter, sensor hgt. at 2 m."
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -28.81
+                  43.16
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_Temp_C
+          Maximum hourly airt temperature
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -31.35
+                  44.45
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_Temp_C
+          Minimum hourly air temperature
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -39.29
+                  42.5
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Relative_Humidity
+          "Mean Relative Humidity. Sensor height is 2.5 m until 14 Feb 1989 (hour 10). Thereafter, sensor hgt. at 2 m."
+          float
+          
+            
+              
+                percent
+              
+              
+                real
+                
+                  5.53
+                  109.9
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Mean_WindSpeed
+          Average of windspeed observations over the hour. Sensor height 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  18.04
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Vect_WindSpeed
+          Mean vectored windspeed during the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  17.7
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Wind_Dir
+          Mean wind direction vector for the hour. Sensor height is 3 m.
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  0
+                  360
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Std_dev_dir
+          Standard deviation of wind direction. Sensor height is 3 m.
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  0
+                  81
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_WindSpeed
+          Maximum wind speed measured during the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  27.91
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_WindSpeed
+          Minimum wind speed recorded for the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  12.71
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_1_cm
+          Mean Soil Temperature at 1 cm
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -12.11
+                  72.9
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_10_cm
+          Mean soil temperature at 10 cm
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -5.886
+                  49.61
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Vapor_Pressure
+          Vapor pressure as calculated from the relative humidity from the 207 temp/Relative humidity sensor. Computational method for derived data: saturation vapor pressure at measured temperature times measured relative humidity. Started collecting this variable in December 1990.
+          float
+          
+            
+              
+                millibar
+              
+              
+                real
+                
+                  0.019
+                  29.75
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Precipitation
+          Precipitation total during hour. Rain gauge height at 0.5 m.
+          float
+          
+            
+              
+                millimeter
+              
+              
+                real
+                
+                  0
+                  50.854
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Moisture_10_cm
+          "Soil moisture potential at 10 cm as measured with a gypsum block. Note that the the values in this field are shown as positive values, but in reality are negative; thus,greater magnitudes represent drier soils. "
+          float
+          
+            
+              
+                bar
+              
+              
+                real
+                
+                  0.1
+                  14.97
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Moisture_30_cm
+          "Soil moisture potential at 30 cm as measured with a gypsum block. Note that the the values in this field are shown as positive values, but in reality are negative; thus,greater magnitudes represent drier soils."
+          float
+          
+            
+              
+                bar
+              
+              
+                real
+                
+                  0.1
+                  10.06
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Solar_Radiation
+          Hourly Solar Flux. Sensor height at 3 m.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -0.196
+                  451.7
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_Solar_Radiation
+          Maximum Solar radiation reading during hour. Sensor hgt. at 3 m. Note: started collecting this variable in Dec 90.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  0
+                  692.7
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_Solar_Radiation
+          Minimum solar radiation reading during hour. Sensor hgt. at 3 m. Note: started collecting this variable in Dec 90.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -4.763
+                  400
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Evaporation
+          Evaporation from pan during hour. Started collecting this variable in May 92 - at Station 1 only.
+          float
+          
+            
+              
+                millimeter
+              
+              
+                real
+                
+                  0
+                  12.94
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Evap_Pan_Temperature
+          Temperature of water in the Evaporation Pan using a 107 sensor. Started collecting in Sep 92.
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -9.96
+                  39.99
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Bar_Pressure
+          Barometric pressure adjusted to sea level. Started collecting in Mar 93 - at Station 1 only.
+          float
+          
+            
+              
+                millibar
+              
+              
+                real
+                
+                  0
+                  1030
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+      
+      368571
+    
+    
+      Sevilleta_LTER_Hourly_Meteorological_Data_2000_2004.csv
+      Sevilleta LTER Hourly Meteorological Data 2000-2004
+      
+        Sevilleta_LTER_Hourly_Meteorological_Data_2000_2004.csv
+        66212464
+        52a2ab044d8d9e8dfbc8a9966d75ff23
+        
+          
+            1
+            \n
+            column
+            
+              ,
+            
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/knb-lter-sev/1/14/371109f8068b35cf65edc8ba4237c8bd
+          
+        
+      
+      
+        
+          StationID
+          Station ID Number
+          string
+          
+            
+              
+                
+                  
+                    1
+                    Station 1 - Headquarters
+                  
+                  
+                    40
+                    Station 40 - Deep Well Site
+                  
+                  
+                    41
+                    Station 41 - South Gate Site
+                  
+                  
+                    42
+                    Station 42 - Cerro Montosa Site
+                  
+                  
+                    43
+                    Station 43 - Watersheds Site
+                  
+                  
+                    44
+                    Station 44 - Rio Salado Site
+                  
+                  
+                    45
+                    Station 45 - Bronco Well Site
+                  
+                  
+                    48
+                    Station 48 - Blue Springs Site
+                  
+                  
+                    49
+                    Station 49 - Five Points Site
+                  
+                  
+                    50
+                    Station 50 - Blue Grama Site
+                  
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Date_Time
+          Date and time - timezone is Mountain Standard Time (MST)
+          string
+          
+            
+              
+                
+                  Date and time - timezone is Mountain Standard Time (MST)
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Date
+          Date
+          date
+          
+            
+              YYYY-MM-DD
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Year
+          Year
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  2000
+                  2004
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Month
+          Month
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  12
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Day_of_Month
+          Day of month
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  31
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Julian_Day
+          Day of year
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  366
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Hour
+          Hour of day
+          float
+          
+            
+              
+                hour
+              
+              
+                whole
+                
+                  0
+                  23
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_C
+          "Air temperature. Sensor hgt. at 2.5 m until 14 Feb 1989 (hour 10). Thereafter, sensor hgt. at 2 m."
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -38.11
+                  46.38
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_Temp_C
+          Maximum hourly airt temperature
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -18.92
+                  47.4
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_Temp_C
+          Minimum hourly air temperature
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -39.73
+                  42.74
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Relative_Humidity
+          "Mean Relative Humidity. Sensor height is 2.5 m until 14 Feb 1989 (hour 10). Thereafter, sensor hgt. at 2 m."
+          float
+          
+            
+              
+                percent
+              
+              
+                real
+                
+                  0
+                  109.4
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Mean_WindSpeed
+          Average of windspeed observations over the hour. Sensor height 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  19.12
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Vect_WindSpeed
+          Mean vectored windspeed during the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  18.89
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Wind_Dir
+          Mean wind direction vector for the hour. Sensor height is 3 m.
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  0
+                  360
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Std_dev_dir
+          Standard deviation of wind direction. Sensor height is 3 m.
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  0
+                  99
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_WindSpeed
+          Maximum wind speed measured during the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  30.11
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_WindSpeed
+          Minimum wind speed recorded for the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  12
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_1_cm
+          Mean Soil Temperature at 1 cm
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -26.99
+                  77.9
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_10_cm
+          Mean soil temperature at 10 cm
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -9.03
+                  45.42
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Vapor_Pressure
+          Vapor pressure as calculated from the relative humidity from the 207 temp/Relative humidity sensor. Computational method for derived data: saturation vapor pressure at measured temperature times measured relative humidity. Started collecting this variable in December 1990.
+          float
+          
+            
+              
+                millibar
+              
+              
+                real
+                
+                  0
+                  29.23
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Precipitation
+          Precipitation total during hour. Rain gauge height at 0.5 m.
+          float
+          
+            
+              
+                millimeter
+              
+              
+                real
+                
+                  0
+                  33.156
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Moisture_10_cm
+          "Soil moisture potential at 10 cm as measured with a gypsum block. Note that the the values in this field are shown as positive values, but in reality are negative; thus,greater magnitudes represent drier soils. "
+          float
+          
+            
+              
+                bar
+              
+              
+                real
+                
+                  0.123
+                  15
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Moisture_30_cm
+          "Soil moisture potential at 30 cm as measured with a gypsum block. Note that the the values in this field are shown as positive values, but in reality are negative; thus,greater magnitudes represent drier soils."
+          float
+          
+            
+              
+                bar
+              
+              
+                real
+                
+                  0.1
+                  10.03
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Solar_Radiation
+          Hourly Solar Flux. Sensor height at 3 m.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -3.057
+                  463.164
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_Solar_Radiation
+          Maximum Solar radiation reading during hour. Sensor hgt. at 3 m. Note: started collecting this variable in Dec 90.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -0.728
+                  662
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_Solar_Radiation
+          Minimum solar radiation reading during hour. Sensor hgt. at 3 m. Note: started collecting this variable in Dec 90.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -4.858
+                  400
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Evaporation
+          Evaporation from pan during hour. Started collecting this variable in May 92 - at Station 1 only.
+          float
+          
+            
+              
+                millimeter
+              
+              
+                real
+                
+                  0
+                  1.782
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Evap_Pan_Temperature
+          Temperature of water in the Evaporation Pan using a 107 sensor. Started collecting in Sep 92.
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -9.9
+                  47.86
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Bar_Pressure
+          Barometric pressure adjusted to sea level. Started collecting in Mar 93 - at Station 1 only.
+          float
+          
+            
+              
+                millibar
+              
+              
+                real
+                
+                  0
+                  1030
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+      
+      413455
+    
+    
+      Sevilleta_LTER_Hourly_Meteorological_Data_2005_2009.csv
+      Sevilleta LTER Hourly Meteorological Data 2005-2009
+      
+        Sevilleta_LTER_Hourly_Meteorological_Data_2005_2009.csv
+        69412065
+        8b20a7b2890e6c2985cad624af08cb75
+        
+          
+            1
+            \n
+            column
+            
+              ,
+            
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/knb-lter-sev/1/14/e326dbe48c0cdc5b91496a469a50e36d
+          
+        
+      
+      
+        
+          StationID
+          Station ID Number
+          string
+          
+            
+              
+                
+                  
+                    1
+                    Station 1 - Headquarters
+                  
+                  
+                    40
+                    Station 40 - Deep Well Site
+                  
+                  
+                    41
+                    Station 41 - South Gate Site
+                  
+                  
+                    42
+                    Station 42 - Cerro Montosa Site
+                  
+                  
+                    43
+                    Station 43 - Watersheds Site
+                  
+                  
+                    44
+                    Station 44 - Rio Salado Site
+                  
+                  
+                    45
+                    Station 45 - Bronco Well Site
+                  
+                  
+                    48
+                    Station 48 - Blue Springs Site
+                  
+                  
+                    49
+                    Station 49 - Five Points Site
+                  
+                  
+                    50
+                    Station 50 - Blue Grama Site
+                  
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Date_Time
+          Date and time - timezone is Mountain Standard Time (MST)
+          string
+          
+            
+              
+                
+                  Date and time - timezone is Mountain Standard Time (MST)
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Date
+          Date
+          date
+          
+            
+              YYYY-MM-DD
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Year
+          Year
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  2005
+                  2009
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Month
+          Month
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  12
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Day_of_Month
+          Day of month
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  31
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Julian_Day
+          Day of year
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  366
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Hour
+          Hour of day
+          float
+          
+            
+              
+                hour
+              
+              
+                whole
+                
+                  0
+                  23
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_C
+          "Air temperature. Sensor hgt. at 2.5 m until 14 Feb 1989 (hour 10). Thereafter, sensor hgt. at 2 m."
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -18.92
+                  45.74
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_Temp_C
+          Maximum hourly airt temperature
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -18.51
+                  48.72
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_Temp_C
+          Minimum hourly air temperature
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -19.66
+                  38.46
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Relative_Humidity
+          "Mean Relative Humidity. Sensor height is 2.5 m until 14 Feb 1989 (hour 10). Thereafter, sensor hgt. at 2 m."
+          float
+          
+            
+              
+                percent
+              
+              
+                real
+                
+                  0
+                  109.8
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Mean_WindSpeed
+          Average of windspeed observations over the hour. Sensor height 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  38.65
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Vect_WindSpeed
+          Mean vectored windspeed during the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  46.88
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Wind_Dir
+          Mean wind direction vector for the hour. Sensor height is 3 m.
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  0
+                  360
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Std_dev_dir
+          Standard deviation of wind direction. Sensor height is 3 m.
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  0
+                  152.2
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_WindSpeed
+          Maximum wind speed measured during the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  65.57
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_WindSpeed
+          Minimum wind speed recorded for the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  22.77
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_1_cm
+          Mean Soil Temperature at 1 cm
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -28.23
+                  67.67
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_10_cm
+          Mean soil temperature at 10 cm
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -10
+                  45.82
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Vapor_Pressure
+          Vapor pressure as calculated from the relative humidity from the 207 temp/Relative humidity sensor. Computational method for derived data: saturation vapor pressure at measured temperature times measured relative humidity. Started collecting this variable in December 1990.
+          float
+          
+            
+              
+                millibar
+              
+              
+                real
+                
+                  0
+                  29.93
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Precipitation
+          Precipitation total during hour. Rain gauge height at 0.5 m.
+          float
+          
+            
+              
+                millimeter
+              
+              
+                real
+                
+                  0
+                  75.06
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Moisture_10_cm
+          "Soil moisture potential at 10 cm as measured with a gypsum block. Note that the the values in this field are shown as positive values, but in reality are negative; thus,greater magnitudes represent drier soils. "
+          float
+          
+            
+              
+                bar
+              
+              
+                real
+                
+                  0.102
+                  20
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Moisture_30_cm
+          "Soil moisture potential at 30 cm as measured with a gypsum block. Note that the the values in this field are shown as positive values, but in reality are negative; thus,greater magnitudes represent drier soils."
+          float
+          
+            
+              
+                bar
+              
+              
+                real
+                
+                  0.1
+                  9.98
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Solar_Radiation
+          Hourly Solar Flux. Sensor height at 3 m.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -4.89
+                  490.255
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_Solar_Radiation
+          Maximum Solar radiation reading during hour. Sensor hgt. at 3 m. Note: started collecting this variable in Dec 90.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -5
+                  690.3
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_Solar_Radiation
+          Minimum solar radiation reading during hour. Sensor hgt. at 3 m. Note: started collecting this variable in Dec 90.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -4.955
+                  400
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Evaporation
+          Evaporation from pan during hour. Started collecting this variable in May 92 - at Station 1 only.
+          float
+          
+            
+              
+                millimeter
+              
+              
+                real
+                
+                  0
+                  12.92
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Evap_Pan_Temperature
+          Temperature of water in the Evaporation Pan using a 107 sensor. Started collecting in Sep 92.
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -7.58
+                  30.1
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Bar_Pressure
+          Barometric pressure adjusted to sea level. Started collecting in Mar 93 - at Station 1 only.
+          float
+          
+            
+              
+                millibar
+              
+              
+                real
+                
+                  0
+                  1001
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+      
+      432603
+    
+    
+      Sevilleta_LTER_Hourly_Meteorological_Data_2010_2014.csv
+      Sevilleta LTER Hourly Meteorological Data 2010-2014
+      
+        Sevilleta_LTER_Hourly_Meteorological_Data_2010_2014.csv
+        69044233
+        a307706091c2918dd839efe733e5f382
+        
+          
+            1
+            \n
+            column
+            
+              ,
+            
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/knb-lter-sev/1/14/011fd6eb9726321cace6c72b50cb8056
+          
+        
+      
+      
+        
+          StationID
+          Station ID Number
+          string
+          
+            
+              
+                
+                  
+                    1
+                    Station 1 - Headquarters
+                  
+                  
+                    40
+                    Station 40 - Deep Well Site
+                  
+                  
+                    41
+                    Station 41 - South Gate Site
+                  
+                  
+                    42
+                    Station 42 - Cerro Montosa Site
+                  
+                  
+                    43
+                    Station 43 - Watersheds Site
+                  
+                  
+                    44
+                    Station 44 - Rio Salado Site
+                  
+                  
+                    45
+                    Station 45 - Bronco Well Site
+                  
+                  
+                    48
+                    Station 48 - Blue Springs Site
+                  
+                  
+                    49
+                    Station 49 - Five Points Site
+                  
+                  
+                    50
+                    Station 50 - Blue Grama Site
+                  
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Date_Time
+          Date and time - timezone is Mountain Standard Time (MST)
+          string
+          
+            
+              
+                
+                  Date and time - timezone is Mountain Standard Time (MST)
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Date
+          Date
+          date
+          
+            
+              YYYY-MM-DD
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Year
+          Year
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  2010
+                  2014
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Month
+          Month
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  12
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Day_of_Month
+          Day of month
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  31
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Julian_Day
+          Day of year
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  366
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Hour
+          Hour of day
+          float
+          
+            
+              
+                hour
+              
+              
+                whole
+                
+                  0
+                  23
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_C
+          "Air temperature. Sensor hgt. at 2.5 m until 14 Feb 1989 (hour 10). Thereafter, sensor hgt. at 2 m."
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -40
+                  48.74
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_Temp_C
+          Maximum hourly airt temperature
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -40
+                  49.56
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_Temp_C
+          Minimum hourly air temperature
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -40
+                  49.76
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Relative_Humidity
+          "Mean Relative Humidity. Sensor height is 2.5 m until 14 Feb 1989 (hour 10). Thereafter, sensor hgt. at 2 m."
+          float
+          
+            
+              
+                percent
+              
+              
+                real
+                
+                  0
+                  109.2
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Mean_WindSpeed
+          Average of windspeed observations over the hour. Sensor height 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  20.19
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Vect_WindSpeed
+          Mean vectored windspeed during the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  30.76
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Wind_Dir
+          Mean wind direction vector for the hour. Sensor height is 3 m.
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  0
+                  360
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Std_dev_dir
+          Standard deviation of wind direction. Sensor height is 3 m.
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  0
+                  154.9
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_WindSpeed
+          Maximum wind speed measured during the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  36.26
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_WindSpeed
+          Minimum wind speed recorded for the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  12.8
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_1_cm
+          Mean Soil Temperature at 1 cm
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -29.52
+                  67.86
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_10_cm
+          Mean soil temperature at 10 cm
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -9.99
+                  44.95
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Vapor_Pressure
+          Vapor pressure as calculated from the relative humidity from the 207 temp/Relative humidity sensor. Computational method for derived data: saturation vapor pressure at measured temperature times measured relative humidity. Started collecting this variable in December 1990.
+          float
+          
+            
+              
+                millibar
+              
+              
+                real
+                
+                  0
+                  29.69
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Precipitation
+          Precipitation total during hour. Rain gauge height at 0.5 m.
+          float
+          
+            
+              
+                millimeter
+              
+              
+                real
+                
+                  0
+                  46.202
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Moisture_10_cm
+          "Soil moisture potential at 10 cm as measured with a gypsum block. Note that the the values in this field are shown as positive values, but in reality are negative; thus,greater magnitudes represent drier soils. "
+          float
+          
+            
+              
+                bar
+              
+              
+                real
+                
+                  0.106
+                  19.97
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Moisture_30_cm
+          "Soil moisture potential at 30 cm as measured with a gypsum block. Note that the the values in this field are shown as positive values, but in reality are negative; thus,greater magnitudes represent drier soils."
+          float
+          
+            
+              
+                bar
+              
+              
+                real
+                
+                  0.1
+                  9.98
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Solar_Radiation
+          Hourly Solar Flux. Sensor height at 3 m.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -4.196
+                  497.99
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_Solar_Radiation
+          Maximum Solar radiation reading during hour. Sensor hgt. at 3 m. Note: started collecting this variable in Dec 90.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -3.813
+                  698.8
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_Solar_Radiation
+          Minimum solar radiation reading during hour. Sensor hgt. at 3 m. Note: started collecting this variable in Dec 90.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -4.716
+                  400
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Evaporation
+          Evaporation from pan during hour. Started collecting this variable in May 92 - at Station 1 only.
+          float
+          
+            
+              
+                millimeter
+              
+              
+                real
+                
+                  0
+                  1.166
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Evap_Pan_Temperature
+          Temperature of water in the Evaporation Pan using a 107 sensor. Started collecting in Sep 92.
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -8.08
+                  59.36
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Bar_Pressure
+          Barometric pressure adjusted to sea level. Started collecting in Mar 93 - at Station 1 only.
+          float
+          
+            
+              
+                millibar
+              
+              
+                real
+                
+                  0
+                  804
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+      
+      429401
+    
+    
+      Sevilleta_LTER_Hourly_Meteorological_Data_2015_2019.csv
+      Sevilleta LTER Hourly Meteorological Data 2015-2019
+      
+        Sevilleta_LTER_Hourly_Meteorological_Data_2015_2019.csv
+        77381933
+        a499c3d133feb406290388ee58a829cc
+        
+          
+            1
+            \n
+            column
+            
+              ,
+            
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/knb-lter-sev/1/14/76922a0b041ac5ab05be6132ff7f90d7
+          
+        
+      
+      
+        
+          StationID
+          Station ID Number
+          string
+          
+            
+              
+                
+                  
+                    1
+                    Station 1 - Headquarters
+                  
+                  
+                    40
+                    Station 40 - Deep Well Site
+                  
+                  
+                    41
+                    Station 41 - South Gate Site
+                  
+                  
+                    42
+                    Station 42 - Cerro Montosa Site
+                  
+                  
+                    43
+                    Station 43 - Watersheds Site
+                  
+                  
+                    44
+                    Station 44 - Rio Salado Site
+                  
+                  
+                    45
+                    Station 45 - Bronco Well Site
+                  
+                  
+                    48
+                    Station 48 - Blue Springs Site
+                  
+                  
+                    49
+                    Station 49 - Five Points Site
+                  
+                  
+                    50
+                    Station 50 - Blue Grama Site
+                  
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Date_Time
+          Date and time - timezone is Mountain Standard Time (MST)
+          string
+          
+            
+              
+                
+                  Date and time - timezone is Mountain Standard Time (MST)
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Date
+          Date
+          date
+          
+            
+              YYYY-MM-DD
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Year
+          Year
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  2015
+                  2019
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Month
+          Month
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  12
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Day_of_Month
+          Day of month
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  31
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Julian_Day
+          Day of year
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  366
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Hour
+          Hour of day
+          float
+          
+            
+              
+                hour
+              
+              
+                whole
+                
+                  0
+                  23
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_C
+          "Air temperature. Sensor hgt. at 2.5 m until 14 Feb 1989 (hour 10). Thereafter, sensor hgt. at 2 m."
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -40
+                  48.94
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_Temp_C
+          Maximum hourly airt temperature
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -40
+                  49.66
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_Temp_C
+          Minimum hourly air temperature
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -40
+                  49.46
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Relative_Humidity
+          "Mean Relative Humidity. Sensor height is 2.5 m until 14 Feb 1989 (hour 10). Thereafter, sensor hgt. at 2 m."
+          float
+          
+            
+              
+                percent
+              
+              
+                real
+                
+                  0
+                  108.8
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Mean_WindSpeed
+          Average of windspeed observations over the hour. Sensor height 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  39.88
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Vect_WindSpeed
+          Mean vectored windspeed during the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  41.4
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Wind_Dir
+          Mean wind direction vector for the hour. Sensor height is 3 m.
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  0
+                  360
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Std_dev_dir
+          Standard deviation of wind direction. Sensor height is 3 m.
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  0
+                  81
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_WindSpeed
+          Maximum wind speed measured during the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  30.64
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_WindSpeed
+          Minimum wind speed recorded for the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  38.81
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_1_cm
+          Mean Soil Temperature at 1 cm
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -17.77
+                  70.4
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_10_cm
+          Mean soil temperature at 10 cm
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -10
+                  48.94
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Vapor_Pressure
+          Vapor pressure as calculated from the relative humidity from the 207 temp/Relative humidity sensor. Computational method for derived data: saturation vapor pressure at measured temperature times measured relative humidity. Started collecting this variable in December 1990.
+          float
+          
+            
+              
+                millibar
+              
+              
+                real
+                
+                  0
+                  29.95
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Precipitation
+          Precipitation total during hour. Rain gauge height at 0.5 m.
+          float
+          
+            
+              
+                millimeter
+              
+              
+                real
+                
+                  0
+                  86.6002214839424
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Moisture_10_cm
+          "Soil moisture potential at 10 cm as measured with a gypsum block. Note that the the values in this field are shown as positive values, but in reality are negative; thus,greater magnitudes represent drier soils. "
+          float
+          
+            
+              
+                bar
+              
+              
+                real
+                
+                  0.114
+                  19.98
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Moisture_30_cm
+          "Soil moisture potential at 30 cm as measured with a gypsum block. Note that the the values in this field are shown as positive values, but in reality are negative; thus,greater magnitudes represent drier soils."
+          float
+          
+            
+              
+                bar
+              
+              
+                real
+                
+                  0.1
+                  10.03
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Solar_Radiation
+          Hourly Solar Flux. Sensor height at 3 m.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -4.72336265884653
+                  487.437686939183
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_Solar_Radiation
+          Maximum Solar radiation reading during hour. Sensor hgt. at 3 m. Note: started collecting this variable in Dec 90.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -4.11203534000658
+                  691.226321036889
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_Solar_Radiation
+          Minimum solar radiation reading during hour. Sensor hgt. at 3 m. Note: started collecting this variable in Dec 90.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -4.94330400782014
+                  400
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Evaporation
+          Evaporation from pan during hour. Started collecting this variable in May 92 - at Station 1 only.
+          float
+          
+            
+              
+                millimeter
+              
+              
+                real
+                
+                  0
+                  0.992
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Evap_Pan_Temperature
+          Temperature of water in the Evaporation Pan using a 107 sensor. Started collecting in Sep 92.
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  0
+                  55.2
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Bar_Pressure
+          Barometric pressure adjusted to sea level. Started collecting in Mar 93 - at Station 1 only.
+          float
+          
+            
+              
+                millibar
+              
+              
+                real
+                
+                  0
+                  608.1
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+      
+      430212
+    
+    
+      Sevilleta_LTER_Hourly_Meteorological_Data_2020.csv
+      Sevilleta LTER Hourly Meteorological Data 2020
+      
+        Sevilleta_LTER_Hourly_Meteorological_Data_2020.csv
+        15901585
+        7f441c680c7ddde8d1db78f9e10b55bd
+        
+          
+            1
+            \n
+            column
+            
+              ,
+            
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/knb-lter-sev/1/14/133c1db08c85d222def6d04168905bae
+          
+        
+      
+      
+        
+          StationID
+          Station ID Number
+          string
+          
+            
+              
+                
+                  
+                    1
+                    Station 1 - Headquarters
+                  
+                  
+                    40
+                    Station 40 - Deep Well Site
+                  
+                  
+                    41
+                    Station 41 - South Gate Site
+                  
+                  
+                    42
+                    Station 42 - Cerro Montosa Site
+                  
+                  
+                    43
+                    Station 43 - Watersheds Site
+                  
+                  
+                    44
+                    Station 44 - Rio Salado Site
+                  
+                  
+                    45
+                    Station 45 - Bronco Well Site
+                  
+                  
+                    48
+                    Station 48 - Blue Springs Site
+                  
+                  
+                    49
+                    Station 49 - Five Points Site
+                  
+                  
+                    50
+                    Station 50 - Blue Grama Site
+                  
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Date_Time
+          Date and time - timezone is Mountain Standard Time (MST)
+          string
+          
+            
+              
+                
+                  Date and time - timezone is Mountain Standard Time (MST)
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Date
+          Date
+          date
+          
+            
+              YYYY-MM-DD
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Year
+          Year
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  2020
+                  2020
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Month
+          Month
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  12
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Day_of_Month
+          Day of month
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  31
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Julian_Day
+          Day of year
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  366
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Hour
+          Hour of day
+          float
+          
+            
+              
+                hour
+              
+              
+                whole
+                
+                  0
+                  23
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_C
+          "Air temperature. Sensor hgt. at 2.5 m until 14 Feb 1989 (hour 10). Thereafter, sensor hgt. at 2 m."
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -39.98
+                  49.62
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_Temp_C
+          Maximum hourly airt temperature
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -40
+                  49.65
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_Temp_C
+          Minimum hourly air temperature
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -40
+                  48.24
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Relative_Humidity
+          "Mean Relative Humidity. Sensor height is 2.5 m until 14 Feb 1989 (hour 10). Thereafter, sensor hgt. at 2 m."
+          float
+          
+            
+              
+                percent
+              
+              
+                real
+                
+                  0.015
+                  109.9
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Mean_WindSpeed
+          Average of windspeed observations over the hour. Sensor height 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  21.1
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Vect_WindSpeed
+          Mean vectored windspeed during the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  20.79
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Wind_Dir
+          Mean wind direction vector for the hour. Sensor height is 3 m.
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  0
+                  360
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Std_dev_dir
+          Standard deviation of wind direction. Sensor height is 3 m.
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  0
+                  81
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_WindSpeed
+          Maximum wind speed measured during the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  30.38
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_WindSpeed
+          Minimum wind speed recorded for the hour. Sensor height is 3m.
+          float
+          
+            
+              
+                metersPerSecond
+              
+              
+                real
+                
+                  0
+                  14.4
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_1_cm
+          Mean Soil Temperature at 1 cm
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -13.83
+                  69.82
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Temp_10_cm
+          Mean soil temperature at 10 cm
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  -5.093
+                  45.65
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Vapor_Pressure
+          Vapor pressure as calculated from the relative humidity from the 207 temp/Relative humidity sensor. Computational method for derived data: saturation vapor pressure at measured temperature times measured relative humidity. Started collecting this variable in December 1990.
+          float
+          
+            
+              
+                millibar
+              
+              
+                real
+                
+                  0
+                  29.95
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Precipitation
+          Precipitation total during hour. Rain gauge height at 0.5 m.
+          float
+          
+            
+              
+                millimeter
+              
+              
+                real
+                
+                  0
+                  69.4795127353267
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Moisture_10_cm
+          "Soil moisture potential at 10 cm as measured with a gypsum block. Note that the the values in this field are shown as positive values, but in reality are negative; thus,greater magnitudes represent drier soils. "
+          float
+          
+            
+              
+                bar
+              
+              
+                real
+                
+                  0.124
+                  10.03
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Moisture_30_cm
+          "Soil moisture potential at 30 cm as measured with a gypsum block. Note that the the values in this field are shown as positive values, but in reality are negative; thus,greater magnitudes represent drier soils."
+          float
+          
+            
+              
+                bar
+              
+              
+                real
+                
+                  0.101
+                  10.01
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Solar_Radiation
+          Hourly Solar Flux. Sensor height at 3 m.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -4.36016730109498
+                  470.712560386473
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Max_Solar_Radiation
+          Maximum Solar radiation reading during hour. Sensor hgt. at 3 m. Note: started collecting this variable in Dec 90.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -4.73236524272757
+                  655.495169082126
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Min_Solar_Radiation
+          Minimum solar radiation reading during hour. Sensor hgt. at 3 m. Note: started collecting this variable in Dec 90.
+          float
+          
+            
+              
+                joulePerCentimeterSquared
+              
+              
+                real
+                
+                  -4.93841642228739
+                  399.92480849664
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Evaporation
+          Evaporation from pan during hour. Started collecting this variable in May 92 - at Station 1 only.
+          float
+          
+            
+              
+                millimeter
+              
+              
+                natural
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Evap_Pan_Temperature
+          Temperature of water in the Evaporation Pan using a 107 sensor. Started collecting in Sep 92.
+          float
+          
+            
+              
+                celsius
+              
+              
+                real
+                
+                  0.863
+                  27.8
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+        
+          Bar_Pressure
+          Barometric pressure adjusted to sea level. Started collecting in Mar 93 - at Station 1 only.
+          float
+          
+            
+              
+                millibar
+              
+              
+                real
+                
+                  0.056
+                  0.356
+                
+              
+            
+          
+          
+            NA
+            missing
+          
+        
+      
+      87087
+    
+  
+  
+    
+      
+        
+          joulePerCentimeterSquared
+        
+      
+    
+  
