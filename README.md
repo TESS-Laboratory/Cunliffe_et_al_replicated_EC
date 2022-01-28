@@ -14,7 +14,7 @@ Schlumpf, Marcy Litvak, Richard Brazier and Timothy Hill.
 
 
 ## This repo contains the following scripts
-*analysis_and_visualization.r*
+OUTDATED *analysis_and_visualization.r*
 Main script with analysis and visualization of half-hourly fluxes from the 
 conventional and low-cost systems. NB. Ideally this large script would be 
 separated out into its constituent parts (esp. the time series gap filling in 
@@ -25,6 +25,12 @@ This script contains code for producing the revised analysis of fluxes following
 
 *climate_analysis.R script*
 Main script for analysing the climate data (missing PET calculations).
+
+ALSO EXPLAIN FOOTPRINT ANALYSIS SCRIPT
+
+
+# explain data
+data/land_cover_classifications contains the 2 m spatial resolution land cover classification, where values of 0 = XXXX, 1 = XXXX and 2 XXXX.
 
 
 ## A static version of this repo is archived on Zenodo

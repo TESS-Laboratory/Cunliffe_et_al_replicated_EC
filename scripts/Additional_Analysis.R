@@ -121,7 +121,6 @@ SES_met <- tidy_licor(SES0_all, "SES0"); rm(SES0_all)
 
 
 
-
 #### Read fluxes (gap filled with Random Forest Regression workflow). 
 ## Note that timestamps are the middle of the half hour rather than start and end.
 
@@ -237,6 +236,19 @@ SES_met <- subset_datetime(SES_met)
 
 fluxes <- rbind(SEG_fluxes, SES_fluxes)
 
+
+## Calculate cumulative precipitation
+SEG_met <- SEG_met %>%
+  mutate(
+    Precipitation = replace_na(Precipitation, 0),  # replace two NA values with zeros.
+    Precipitation_cum = cumsum(Precipitation)  # Cumulative precipitation in mm
+  )
+
+SES_met <- SES_met %>% 
+  mutate(
+    Precipitation = replace_na(Precipitation, 0),  # replace two NA values with zeros.
+    Precipitation_cum = cumsum(Precipitation ),  # Cumulative precipitation in mm
+  )
 
 
 # NB. SEG2 instrument failed on 2020-02-19, so LE_filled and NEE_filled are 
@@ -1283,6 +1295,7 @@ fluxes_SEG_cum <- fluxes %>%
     LE_cum = cumsum(LE_filled),
     LE_cum_mj = cumsum(LE_filled * 1800 / 1000000),  # convert to megajoules.
     LE_cum_mm = cumsum(LE_filled) * 1800 / 2461 / 1000,  # Convert W m^2 to mm of cumulative evapotranspiration. Where cumsum(LE_filled) is the cumulative W m-2, 1800 = seconds in 30 mins, 2461 =  specific latent heat = energy required to evaporate 1 g of water in J g-1 based on lamba of our EdiRe output, '/1000' converts from g m-2 to mm.
+    water_flux = LE_cum_mm,
     H_cum = cumsum(H_filled)
   ) %>% 
   select(datetime,
@@ -1292,8 +1305,10 @@ fluxes_SEG_cum <- fluxes %>%
          LE_cum,
          LE_cum_mj,
          LE_cum_mm,
+         water_flux,
          H_cum
   )
+
 
 fluxes_SES_cum <- fluxes %>%
   filter(Station %in% c("SES0", "SES1", "SES2", "SES3", "SES4")) %>%
@@ -1303,34 +1318,79 @@ fluxes_SES_cum <- fluxes %>%
     LE_cum = cumsum(LE_filled),
     LE_cum_mj = cumsum(LE_filled * 1800 / 1000000),  # convert to megajoules.
     LE_cum_mm = cumsum(LE_filled) * 1800 / 2461 / 1000,  # Convert W m^2 to mm of cumulative evapotranspiration. Where cumsum(LE_filled) is the cumulative W m-2, 1800 = seconds in 30 mins, 2461 =  specific latent heat = energy required to evaporate 1 g of water in J g-1 based on lamba of our EdiRe output, '/1000' converts from g m-2 to mm.
+    water_flux = LE_cum_mm,
     H_cum = cumsum(H_filled)
   ) %>%
-select(datetime,
-       Station,
-       NEE_cum,
-       LE_filled,
-       LE_cum,
-       LE_cum_mj,
-       LE_cum_mm,
-       H_cum
-)
+  select(datetime,
+         Station,
+         NEE_cum,
+         LE_filled,
+         LE_cum,
+         LE_cum_mj,
+         LE_cum_mm,
+         water_flux,
+         H_cum
+  )
 
 
+## integrating precip work in progress
+# https://aosmith.rbind.io/2018/07/19/manual-legends-ggplot2/
+# 2. Adding separate layers for subsets of data or based on different datasets*
+# *This second situation is where reformatting your dataset is often most useful
+
+# create function summarizing precip data
+precip_cum <- function(df) {
+  df %>%
+    mutate(
+      datetime = datetime,
+      Station = "Precip.",
+      NEE_cum = NA,
+      LE_filled = NA,
+      LE_cum = NA,
+      LE_cum_mj = NA,
+      LE_cum_mm = NA,
+      cum_water_flux = Precipitation_cum,
+      H_cum = NA
+    ) %>% 
+    select(
+      datetime,
+      Station,
+      NEE_cum,
+      LE_filled,
+      LE_cum,
+      LE_cum_mj,
+      LE_cum_mm,
+      cum_water_flux,
+      H_cum
+    )
+}  #
+
+## extract clean cumulative precipitation
+SEG_met_cum <- precip_cum(SEG_met)
+SES_met_cum <- precip_cum(SES_met)
+
+## extract total precipitation in study period
+head(SEG_met_cum)
+
+## integrate precipitation
+fluxes_SEG_cum2 <- rbind(SEG_met_cum, fluxes_SEG_cum)
+fluxes_SES_cum2 <- rbind(SES_met_cum, fluxes_SES_cum)
 
 ## Determine axis limits
 lims_le <- range(range(fluxes_SEG_cum$LE_cum_mj, na.rm=T),range(fluxes_SES_cum$LE_cum_mj, na.rm=T))
-lims_le_mm <- range(range(fluxes_SEG_cum$LE_cum_mm, na.rm=T),range(fluxes_SES_cum$LE_cum_mm, na.rm=T))
 lims_nee <- range(range(fluxes_SEG_cum$NEE_cum, na.rm=T),range(fluxes_SES_cum$NEE_cum, na.rm=T))
+lims_wf_mm <- range(range(fluxes_SEG_cum2$cum_water_flux, na.rm=T),range(fluxes_SES_cum2$cum_water_flux, na.rm=T))
+
 
 # colour mappings
-selected_colours <- c("orange",
+selected_colours <- c("dodgerblue",
+                      "orange",
                       "purple",
                       "green",
                       "darkgreen",
-                      "brown",
-                      "cyan")
+                      "brown"
+                      )
 
-# labs <- c("EC0", "EC1",    "EC2",    "EC3",  "EC4", "Precipit")
 
 {  # Create Cumulative LE and NEE plots
  # set parameters for legend theme
@@ -1339,56 +1399,57 @@ selected_colours <- c("orange",
   
 ## SEG Cumulative LE
 {
-  (cum_seg_le <- ggplot(fluxes_SEG_cum,
-                        # aes(y=LE_cum_mj, 
-                        aes(y=LE_cum,
-                            x=datetime,
-                            color=Station
-                        )) +
-     labs(x = "",
-          # y = expression("Latent Energy (MJ m"^-2*")", sep=""),
-          y = expression("Latent Energy (W m"^-2*")", sep=""),
-          title = "LE Grassland") +
-     geom_line(na.rm=T) +
-     scale_color_manual(values=selected_colours) +
-     # ylim(lims_le) +
-     theme_fancy() +
-     theme(legend.position = c(leg_pos, 0.8),
-           legend.text = element_text(size=leg_tx))
-  )
+#   (cum_seg_le <- ggplot(fluxes_SEG_cum,
+#                         # aes(y=LE_cum_mj, 
+#                         aes(y=LE_cum,
+#                             x=datetime,
+#                             color=Station
+#                         )) +
+#      labs(x = "",
+#           # y = expression("Latent Energy (MJ m"^-2*")", sep=""),
+#           y = expression("Latent Energy (W m"^-2*")", sep=""),
+#           title = "LE Grassland") +
+#      geom_line(na.rm=T) +
+#      scale_color_manual(values=selected_colours) +
+#      # ylim(lims_le) +
+#      theme_fancy() +
+#      theme(legend.position = c(leg_pos, 0.8),
+#            legend.text = element_text(size=leg_tx))
+#   )
 } # SEG Cumulative LE
 
 
 ## SES Cumulative LE
 {
-  (cum_ses_le <- ggplot(fluxes_SES_cum,
-                        aes(y=LE_cum_mj, 
-                            x=datetime,
-                            color=Station
-                        )) +
-     labs(x = "",
-          y = expression("Latent Energy (MJ m"^-2*")", sep=""),
-          title = "LE Shrubland") +
-     geom_line(na.rm=T) +
-     scale_color_manual(values=selected_colours) +
-     ylim(lims_le) +
-     theme_fancy() +
-     theme(legend.position = c(leg_pos, 0.8),
-           legend.text = element_text(size=leg_tx)) # legend position
-  )
+#   (cum_ses_le <- ggplot(fluxes_SES_cum,
+#                         aes(y=LE_cum_mj, 
+#                             x=datetime,
+#                             color=Station
+#                         )) +
+#      labs(x = "",
+#           y = expression("Latent Energy (MJ m"^-2*")", sep=""),
+#           title = "LE Shrubland") +
+#      geom_line(na.rm=T) +
+#      scale_color_manual(values=selected_colours) +
+#      ylim(lims_le) +
+#      theme_fancy() +
+#      theme(legend.position = c(leg_pos, 0.8),
+#            legend.text = element_text(size=leg_tx)) # legend position
+#   )
 } # SES Cumulative LE  
   
 
 ## SEG Cumulative LE mm
 {
-  (cum_seg_le_mm <- ggplot(fluxes_SEG_cum,
-                        aes(y=LE_cum_mm, 
+  (cum_seg_le_mm <- ggplot(fluxes_SEG_cum2,
+                        aes(y=cum_water_flux, 
                             x=datetime,
                             color=Station
                         )) +
      labs(x = "",
-          y = expression("Cumulative evapotranspiration (mm)", sep=""),
+          y = expression("Cumulative water flux (mm)", sep=""),
           title = "LE Grassland") +
+     # geom_line(data = SEG_met, aes(x = datetime, y = Precipitation_cum), show.legend = TRUE, colour = "dodgerblue") +
      geom_line(na.rm=T) +
      scale_color_manual(values=selected_colours) +
      ylim(lims_le_mm) +
@@ -1401,14 +1462,15 @@ selected_colours <- c("orange",
 
 ## SES Cumulative LE mm
 {
-  (cum_ses_le_mm <- ggplot(fluxes_SES_cum,
-                       aes(y=LE_cum_mm, 
+  (cum_ses_le_mm <- ggplot(fluxes_SES_cum2,
+                       aes(y=cum_water_flux, 
                            x=datetime,
                            color=Station
                        )) +
      labs(x = "",
-          y = expression("Cumulative evapotranspiration (mm)", sep=""),
+          y = expression("Cumulative water flux (mm)", sep=""),
           title = "LE Shrubland") +
+     # geom_line(data = SEG_met, aes(x = datetime, y = Precipitation_cum), show.legend = TRUE, colour = "dodgerblue") +
      geom_line(na.rm=T) +
      scale_color_manual(values=selected_colours) +
      ylim(lims_le_mm) +
