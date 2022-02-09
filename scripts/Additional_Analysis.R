@@ -1552,207 +1552,216 @@ ggsave(
 
 #-------------- 4. Energy balance closure --------------
 
+## Read in soil heat flux data
+SEG_SHF <- read_csv(file="data/soil_energy/soil_heat_flux_SEG.csv",
+                   col_types = cols(datetime = col_datetime("%Y-%m-%d %H:%M:%S")))
 
+SES_SHF <- read_csv(file="data/soil_energy/soil_heat_flux_SES.csv",
+                     col_types = cols(datetime = col_datetime("%Y-%m-%d %H:%M:%S")))
+
+
+## Merge flux data (duplicating SHF for each station)
+SEG_merge <- dplyr::full_join(SEG_fluxes, SEG_SHF, by = 'datetime')
+SES_merge <- dplyr::full_join(SES_fluxes, SES_SHF, by = 'datetime')
+
+## Merge flux data (duplicating NETRAD for each station)
+SEG_merge <- dplyr::full_join(SEG_merge, SEG_met, by = 'datetime')
+SES_merge <- dplyr::full_join(SES_merge, SES_met, by = 'datetime')
+
+
+## Calculate energy balance
+## (assuming negligible change in soil heat storage over two years)
+EB_SEG <- SEG_merge %>% 
+  mutate(
+    H_plus_LE = H_filled + LE_filled,
+    NETRAD_plus_G = NETRAD - SHF_weighted_mean,
+    Station = Station.x
+    ) %>% 
+  select(
+    datetime,
+    H_plus_LE,
+    NETRAD_plus_G,
+    Station
+  )
+
+EB_SES <- SES_merge %>% 
+  mutate(
+    H_plus_LE = H_filled + LE_filled,
+    NETRAD_plus_G = NETRAD - SHF_weighted_mean,
+    Station = Station.x
+  ) %>% 
+  select(
+    datetime,
+    H_plus_LE,
+    NETRAD_plus_G,
+    Station
+  )
+
+EB_SEG0 <- EB_SEG %>% 
+  filter(Station == "SEG0")
+
+EB_SEG1 <- EB_SEG %>% 
+  filter(Station == "SEG1")
+
+EB_SES0 <- EB_SES %>% 
+  filter(Station == "SES0")
+
+EB_SES1 <- EB_SES %>% 
+  filter(Station == "SES1")
+
+
+
+
+### visualize energy balance (EB) closure ###
+{
+## Determine axis range
+lim <- range(EB_SEG0$H_plus_LE, EB_SEG0$NETRAD_plus_G,
+             EB_SEG1$H_plus_LE, EB_SEG1$NETRAD_plus_G,
+             EB_SES0$H_plus_LE, EB_SES0$NETRAD_plus_G,
+             EB_SES1$H_plus_LE, EB_SEG1$NETRAD_plus_G,
+             na.rm=T)
+
+## Determine annotation locations
+position1x <- -250
+position1y <- 750
+position2x <- -400
+position2y <- 620
+
+
+## SEG0
+pca <- prcomp(~H_plus_LE+NETRAD_plus_G, EB_SEG0)
+tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
+tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
+equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
+
+# Compute  Lin's  correlation concordance coefficient
+ccc_result <- DescTools::CCC(EB_SEG0$H_plus_LE, EB_SEG0$NETRAD_plus_G, ci = "z-transform", conf.level = 0.95, na.rm = T)
+ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
+
+EB_SEG0_plot <- ggplot(EB_SEG0, aes(x=H_plus_LE, y=NETRAD_plus_G)) +
+  labs(x = expression("H + LE (W m"^"-2"*")"),
+       y = expression("Rn - G (W m"^"-2"*")"),
+       title = "SEG0") +
+  geom_hex(bins = 100, na.rm=T, show.legend=T) +
+  scale_fill_continuous(type = "viridis") +     # colour palette
+  xlim(lim) +
+  ylim(lim) +
+  theme_fancy() +
+  theme(legend.position = c(0.9, 0.2))  +
+  geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
+  geom_abline(intercept = tls_int, slope = tls_slp) +
+  annotate("text", x = position1x, y = position1y, label = equation) +
+  annotate("text", x = position2x, y = position2y, label = ccc)
+
+
+## SEG1
+pca <- prcomp(~H_plus_LE+NETRAD_plus_G, EB_SEG1)
+tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
+tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
+equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
+
+# Compute  Lin's  correlation concordance coefficient
+ccc_result <- DescTools::CCC(EB_SEG1$H_plus_LE, EB_SEG1$NETRAD_plus_G, ci = "z-transform", conf.level = 0.95, na.rm = T)
+ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
+
+EB_SEG1_plot <- ggplot(EB_SEG1, aes(x=H_plus_LE, y=NETRAD_plus_G)) +
+  labs(x = expression("H + LE (W m"^"-2"*")"),
+       y = expression("Rn - G (W m"^"-2"*")"),
+       title = "SEG1") +
+  geom_hex(bins = 100, na.rm=T, show.legend=T) +
+  scale_fill_continuous(type = "viridis") +     # colour palette
+  xlim(lim) +
+  ylim(lim) +
+  theme_fancy() +
+  theme(legend.position = c(0.9, 0.2))  +
+  geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
+  geom_abline(intercept = tls_int, slope = tls_slp) +
+  annotate("text", x = position1x, y = position1y, label = equation) +
+  annotate("text", x = position2x, y = position2y, label = ccc)
+
+
+
+## SES0
+pca <- prcomp(~H_plus_LE+NETRAD_plus_G, EB_SES0)
+tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
+tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
+equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
+
+# Compute  Lin's  correlation concordance coefficient
+ccc_result <- DescTools::CCC(EB_SES0$H_plus_LE, EB_SES0$NETRAD_plus_G, ci = "z-transform", conf.level = 0.95, na.rm = T)
+ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
+
+EB_SES0_plot <- ggplot(EB_SES0, aes(x=H_plus_LE, y=NETRAD_plus_G)) +
+  labs(x = expression("H + LE (W m"^"-2"*")"),
+       y = expression("Rn - G (W m"^"-2"*")"),
+       title = "SES0") +
+  geom_hex(bins = 100, na.rm=T, show.legend=T) +
+  scale_fill_continuous(type = "viridis") +     # colour palette
+  xlim(lim) +
+  ylim(lim) +
+  theme_fancy() +
+  theme(legend.position = c(0.9, 0.2))  +
+  geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
+  geom_abline(intercept = tls_int, slope = tls_slp) +
+  annotate("text", x = position1x, y = position1y, label = equation) +
+  annotate("text", x = position2x, y = position2y, label = ccc)
+
+
+## SES1
+pca <- prcomp(~H_plus_LE+NETRAD_plus_G, EB_SES1)
+tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
+tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
+equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
+
+# Compute  Lin's  correlation concordance coefficient
+ccc_result <- DescTools::CCC(EB_SES1$H_plus_LE, EB_SES1$NETRAD_plus_G, ci = "z-transform", conf.level = 0.95, na.rm = T)
+ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
+
+EB_SES1_plot <- ggplot(EB_SES1, aes(x=H_plus_LE, y=NETRAD_plus_G)) +
+  labs(x = expression("H + LE (W m"^"-2"*")"),
+       y = expression("Rn - G (W m"^"-2"*")"),
+       title = "SES1") +
+  geom_hex(bins = 100, na.rm=T, show.legend=T) +
+  scale_fill_continuous(type = "viridis") +     # colour palette
+  xlim(lim) +
+  ylim(lim) +
+  theme_fancy() +
+  theme(legend.position = c(0.9, 0.2))  +
+  geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
+  geom_abline(intercept = tls_int, slope = tls_slp) +
+  annotate("text", x = position1x, y = position1y, label = equation) +
+  annotate("text", x = position2x, y = position2y, label = ccc)
+
+
+# Calculate the range of values in both plots for consistent scalars
+count.range = range(lapply(list(EB_SEG0_plot, EB_SEG1_plot, EB_SES0_plot, EB_SES1_plot), function(p){ ggplot_build(p)$data[[1]]$count}))
+EB_SEG0_plot <- EB_SEG0_plot +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
+EB_SEG1_plot <- EB_SEG1_plot +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
+EB_SES0_plot <- EB_SES0_plot +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
+EB_SES1_plot <- EB_SES1_plot +   scale_fill_continuous(type = "viridis", limits=c(count.range))    # colour palette
+
+
+### combine plots using Patchwork
+pall <- (EB_SEG0_plot + EB_SES0_plot) / (EB_SEG1_plot + EB_SES1_plot) +
+    plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97))
+
+
+  ## save raster
+  ggsave(pall,
+         filename = "plots/energy_balance/energy_balance.png",
+         width = 18,
+         height = 18,
+         units = "cm")
+
+  # save vector
+  ggsave(pall,
+         filename = "plots/energy_balance/energy_balance.pdf",
+         width = 18,
+         height = 18,
+         units = "cm")
+
+} ### visualize energy balance (EB) closure ###
   
-
-# 
-# ### 2.2 Merge soil and flux data ###
-# # Use full_join to accommodate different length soil and flux records.
-# ses.data <- dplyr::full_join(ses.flux, ses.soil, by = 'TIMESTAMP_START') 
-# seg.data <- dplyr::full_join(seg.flux, seg.soil, by = 'TIMESTAMP_START')
-# sen.data <- dplyr::full_join(sen.flux, sen.soil, by = 'TIMESTAMP_START')
-
-
-
-
-
-
-
-# NETRAD is in these files SEG_met and SES_met
-
-Energy_Balance <- fluxes %>% 
-  mutate(H_plus_LE = H_filled + LE_filled)
-
-
-Rn_plus_G = 
-  
-
   
     
-### Fabio's code for Energy Balance Closure
-# ###
-# 
-# if(T){
-#   
-#   # Rn + H + LE + G    
-#   # G: soil heat flux + soil heat storage (assumed negligable)
-#   # ideal closure: Y=X
-#   # Burba et al. (2010) found 80% closure H+LE~Rn+G; r2=0.93
-#   
-#   
-#   ## select data
-#   xg <- datdd[,"NETRAD_gm"]-datdd[,"SHF_ALL_AVG_soilg"]
-#   xs <- datdd[,"NETRAD_sm"]-datdd[,"SHF_ALL_AVG_soils"]
-#   ygm <- datdd[,"H_gm"] + datdd[,"cLE_gm"]
-#   ysm <- datdd[,"H_sm"] + datdd[,"cLE_sm"]
-#   yg1 <- datdd[,"Hc_g1"] + datdd[,"cLEc_g1"]
-#   ys1 <- datdd[,"Hc_s1"] + datdd[,"cLEc_s1"]
-#   
-#   
-#   xg[xg==0] <- NA # xg has 500 zeros, but netg has 0, shfg 3 and xgs 5, so they all arise from the sums
-#   # The 500 zeros results in a feature that looks a lot like an artifact, but it really is not
-#   # with or without these 500 zeros, the slope of the plot is the same
-#   
-#   
-#   ##
-#   ## Calculate Energy Balance Ratio
-#   ##
-#   gm_ebr <- (sum(ygm[ygm>0], na.rm=T) + sum(xg[xg<0], na.rm=T)) / 
-#     (sum(ygm[ygm<0], na.rm=T) + sum(xg[xg>0], na.rm=T))    # 0.7820
-#   sm_ebr <- (sum(ysm[ysm>0], na.rm=T) + sum(xs[xs<0], na.rm=T)) / 
-#     (sum(ysm[ysm<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.8446
-#   
-#   g1_ebr <- (sum(yg1[yg1>0], na.rm=T) + sum(xg[xg<0], na.rm=T)) / 
-#     (sum(yg1[yg1<0], na.rm=T) + sum(xg[xg>0], na.rm=T))    # 0.9496
-#   s1_ebr <- (sum(ys1[ys1>0], na.rm=T) + sum(xs[xs<0], na.rm=T)) / 
-#     (sum(ys1[ys1<0], na.rm=T) + sum(xs[xs>0], na.rm=T))    # 0.9525
-#   
-#   
-#   #                       (Intercept)        slope       AmeriFlux 
-#   #l_gm$coefficients          7.4636225   0.8293651           0.81          
-#   #l_sm$coefficients          7.3525987   0.8807114           0.88
-#   
-#   # estimate of bowen ratio beta = H/LE (on x,y axis)
-#   #x <- datdd[,"cLEc_g1"];y <- datdd[,"Hc_g1"];lim <- range(c(x,y), na.rm=T); plot(x, y, pch=16, xlim=lim, ylim=lim)
-#   #x <- datdd[,"cLE_gm"]; y <- datdd[,"H_gm"]; lim <- range(c(x,y), na.rm=T); plot(x, y, pch=16, xlim=lim, ylim=lim)
-#   
-#   
-#   
-#   ### visualize energy balance (EB) closure 
-#   
-#   # Determine axis range
-#   lim <- range(xg, xs, ygm, ysm, yg1, ys1, na.rm=T)
-#   
-#   # create dataframe for ggplot
-#   dtf <- data.frame(xg, xs, ygm, ysm, yg1, ys1)                                 
-#   
-#   # prepare axis labels
-#   ylab <- expression("H + LE (W m"^"-2"*")") 
-#   xlab <- expression("Rn - G (W m"^"-2"*")")
-#   
-#   
-#   # Plot 1
-#   aa <- cbind(xg, ygm)  # Create object with two vectors
-#   bb <- aa[complete.cases(aa),]  # Subset completed data only
-#   cc <- prcomp(bb)$rotation  # Apply Principle Components Analysis
-#   m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2)  # Extract coefficient
-#   y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)  # Extract coefficient
-#   r  <-  round( cor(bb, method="pearson")[1,2], 2)  # Compute pearsons rho
-#   rr <- paste("y = ", y0, "+", m0, "x - r:", r)  # create annotation text
-#   
-#   p1 <-  ggplot(dtf, aes(x=xg, y=ygm) ) +
-#     labs(x = xlab, y = ylab, title = "Seg EC0") +
-#     geom_bin2d(bins = 150) +                       # Bin size control 
-#     scale_fill_continuous(type = "viridis") +     # colour palette
-#     theme_bw() + xlim(lim) + ylim(lim) +
-#     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-#     theme(text = element_text(size=14)) + 
-#     theme(legend.key.size = unit(0.4, "cm")) +   # legend size
-#     theme(legend.position = c(0.85, 0.25)) +       # legend position
-#     theme(plot.title = element_text(size = 14, face = "bold"))  +
-#     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
-#     geom_abline(intercept = y0, slope = m0) +
-#     annotate("text", x = 200, y = 700, label = rr, size=4)  
-#   
-#   
-#   # Plot 2
-#   aa <- cbind(xs, ysm); bb <- aa[complete.cases(aa),]
-#   cc <- prcomp(bb)$rotation
-#   m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2)
-#   y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-#   r  <-  round( cor(bb, method="pearson")[1,2], 2)
-#   rr <- paste("y = ", y0, "+", m0, "x - r:", r)
-#   
-#   p2 <-  ggplot(dtf, aes(x=xs, y=ysm) ) +
-#     labs(x = xlab, y = ylab, title = "Ses EC0") +
-#     geom_bin2d(bins = 150) +                       # Bin size control 
-#     scale_fill_continuous(type = "viridis") +     # colour palette
-#     theme_bw() + xlim(lim) + ylim(lim) +
-#     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-#     theme(text = element_text(size=14)) + 
-#     theme(legend.key.size = unit(0.4, "cm")) +   # legend size
-#     theme(legend.position = c(0.85, 0.25)) +       # legend position
-#     theme(plot.title = element_text(size = 14, face = "bold"))  +
-#     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
-#     geom_abline(intercept = y0, slope = m0) +
-#     annotate("text", x = 200, y = 700, label = rr, size=4)  
-#   
-#   
-#   # Plot 3
-#   aa <- cbind(xg, yg1)
-#   bb <- aa[complete.cases(aa),]
-#   cc <- prcomp(bb)$rotation
-#   m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2)
-#   y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-#   r  <-  round( cor(bb, method="pearson")[1,2], 2)
-#   rr <- paste("y = ", y0, "+", m0, "x - r:", r)
-#   
-#   p3 <-  ggplot(dtf, aes(x=xg, y=yg1) ) +
-#     labs(x = xlab, y = ylab, title = "Seg EC1") +
-#     geom_bin2d(bins = 150) +                       # Bin size control 
-#     scale_fill_continuous(type = "viridis") +     # colour palette
-#     theme_bw() + xlim(lim) + ylim(lim) +
-#     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-#     theme(text = element_text(size=14)) + 
-#     theme(legend.key.size = unit(0.4, "cm")) +   # legend size
-#     theme(legend.position = c(0.85, 0.25)) +       # legend position
-#     theme(plot.title = element_text(size = 14, face = "bold"))  +
-#     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
-#     geom_abline(intercept = y0, slope = m0) +
-#     annotate("text", x = 200, y = 700, label = rr, size=4)  
-#   
-#   
-#   # Plot 4
-#   aa <- cbind(xs, ys1)
-#   bb <- aa[complete.cases(aa),]
-#   cc <- prcomp(bb)$rotation
-#   m0 <-  beta  <-  round( cc[2,1]/cc[1,1], 2)
-#   y0   <-  round( mean(bb[,2])-beta*mean(bb[,1]), 0)
-#   r  <-  round( cor(bb, method="pearson")[1,2], 2)
-#   rr <- paste("y = ", y0, "+", m0, "x - r:", r)
-#   
-#   p4 <-  ggplot(dtf, aes(x=xs, y=ys1) ) +
-#     labs(x = xlab, y = ylab, title = "Ses EC1") +
-#     geom_bin2d(bins = 150) +                       # Bin size control 
-#     scale_fill_continuous(type = "viridis") +     # colour palette
-#     theme_bw() + xlim(lim) + ylim(lim) +
-#     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + # remove grid 
-#     theme(text = element_text(size=14)) + 
-#     theme(legend.key.size = unit(0.4, "cm")) +   # legend size
-#     theme(legend.position = c(0.85, 0.25)) +       # legend position
-#     theme(plot.title = element_text(size = 14, face = "bold"))  +
-#     geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
-#     geom_abline(intercept = y0, slope = m0) +
-#     annotate("text", x = 200, y = 700, label = rr, size=4)  
-#   
-#   
-#   ### combine plots using Patchwork
-#   pall <- (p1 + p2) / (p3 + p4) +
-#     plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97)) 
-#   
-#   
-#   ## save raster
-#   ggsave(pall,
-#          filename = "E:/REC_7_Data/10_Plots/11_energy_balance_closure/Figure 6 - energy_balance_TLS_ggplot.png",
-#          width = 17,
-#          height = 17,
-#          units = "cm")
-#   
-#   # save vector
-#   ggsave(pall,
-#          filename = "E:/REC_7_Data/10_Plots/11_energy_balance_closure/Figure 6 - energy_balance_TLS_ggplot.pdf",
-#          width = 17,
-#          height = 17,
-#          units = "cm")
-#   
-# }
+

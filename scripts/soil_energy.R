@@ -46,7 +46,6 @@ windowsFonts("Helvetica" = windowsFont("Helvetica"))  # Ensure font is mapped co
 ## Define paths
 ## specify input file path
 inpath <- "C:/workspace/JULES/flux_and_soil_input_data"  # Quality Controlled soil met files from UNM
-outpath <- "/data/soil_energy/"  # Directory for soil heat flux files
 
 
 ## Define land cover at each site
