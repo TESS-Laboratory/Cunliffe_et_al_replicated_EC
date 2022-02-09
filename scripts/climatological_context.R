@@ -63,6 +63,18 @@ df_2020 <- read_csv("data/meteorological_data/Sevilleta_LTER_Hourly_Meteorologic
                                      Evaporation = col_double(),
                                      Evap_Pan_Temperature  = col_double()))
 
+# Data from 2021 in different format
+df_2021Met40 <- read_csv("data/meteorological_data/Sev Met Data 20220126/Met40.csv")
+
+str(df_2021Met40)
+
+                    col_types = cols(Moisture_10_cm = col_double(),
+                                     Moisture_30_cm  = col_double(),
+                                     Evaporation = col_double(),
+                                     Evap_Pan_Temperature  = col_double()))
+
+
+
 # Annual summaries extracted from Fluxnet files (as part of JULES prep. script)
 AnnualPrecip_Seg <- read_csv("data/meteorological_data/annual_precip_Seg.csv")
 AnnualPrecip_Sen <- read_csv("data/meteorological_data/annual_precip_Sen.csv")

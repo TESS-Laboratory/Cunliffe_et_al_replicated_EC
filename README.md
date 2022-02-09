@@ -23,6 +23,9 @@ REdddyProc and the footprint analysis).
 *Additional_Analysis.r*
 This script contains code for producing the revised analysis of fluxes following further corrections.
 
+*soil_energy.r*
+Script to tidy soil met data and extract soil energy data.
+
 *climate_analysis.R script*
 Main script for analysing the climate data (missing PET calculations).
 
@@ -30,7 +33,8 @@ ALSO EXPLAIN FOOTPRINT ANALYSIS SCRIPT
 
 
 # explain data
-data/land_cover_classifications contains the 2 m spatial resolution land cover classification, where values of 0 = XXXX, 1 = XXXX and 2 XXXX.
+data/land_cover_classifications contains the 2 m spatial resolution land cover classification, where values of 0 = "barren"", 1 = "shrubland"" and 2 "herbaceous".
+
 
 
 ## A static version of this repo is archived on Zenodo
