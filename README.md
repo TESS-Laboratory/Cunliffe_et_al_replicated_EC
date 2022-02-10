@@ -10,18 +10,11 @@ Schlumpf, Marcy Litvak, Richard Brazier and Timothy Hill.
 
 ## The manuscript is in review. DOI TBC
 
-*The processed half hourly EC flux data is archived with the UK Environmental Information Data Center (DOI: 10.5285/e96466c3-5b67-41b0-9252-8f8f393807d7) and AmeriFlux (https://ameriflux.lbl.gov/).*
 
 
 ## This repo contains the following scripts
-OUTDATED *analysis_and_visualization.r*
-Main script with analysis and visualization of half-hourly fluxes from the 
-conventional and low-cost systems. NB. Ideally this large script would be 
-separated out into its constituent parts (esp. the time series gap filling in 
-REdddyProc and the footprint analysis).
-
 *Additional_Analysis.r*
-This script contains code for producing the revised analysis of fluxes following further corrections.
+This script contains code for producing the main analysis.
 
 *soil_energy.r*
 Script to tidy soil met data and extract soil energy data.
@@ -29,12 +22,29 @@ Script to tidy soil met data and extract soil energy data.
 *climate_analysis.R script*
 Main script for analysing the climate data (missing PET calculations).
 
-ALSO EXPLAIN FOOTPRINT ANALYSIS SCRIPT
+*ALSO EXPLAIN FOOTPRINT ANALYSIS SCRIPT*
+# Work in progress
 
 
-# explain data
-data/land_cover_classifications contains the 2 m spatial resolution land cover classification, where values of 0 = "barren"", 1 = "shrubland"" and 2 "herbaceous".
 
+
+OUTDATED *analysis_and_visualization.r*
+Main script with analysis and visualization of half-hourly fluxes from the 
+conventional and low-cost systems. NB. Ideally this large script would be 
+separated out into its constituent parts (esp. the time series gap filling in 
+REdddyProc and the footprint analysis).
+
+## Data
+*data/land_cover_classifications*
+This directory contains the 2 m spatial resolution land cover classification, where values of 0 = "barren"", 1 = "shrubland"" and 2 "herbaceous".
+
+*The processed half hourly EC flux data is archived with the UK Environmental Information Data Center (DOI: 10.5285/e96466c3-5b67-41b0-9252-8f8f393807d7) and AmeriFlux (https://ameriflux.lbl.gov/).*
+
+Note on flux sign conventions 
+H is the upward surface sensible heat flux
+LE is the upward surface latent heat flux due to evaporation
+SHF is the downward ground heat flux into the subsurface medium.
+NETRAD is the net downward radiative flux (longwave + shortwave).
 
 
 ## A static version of this repo is archived on Zenodo

@@ -41,10 +41,10 @@ theme_fancy <- function() {
         hjust = 0.5,
         color = "black"
       ),
-      legend.text = element_text(size = 10, color = "black"),
-      legend.title = element_text(size = 10, color = "black"),
+      legend.text = element_text(size = 9, color = "black"),
+      legend.title = element_text(size = 9, color = "black"),
       legend.position = c(0.9, 0.9),
-      legend.key.size = unit(0.9, "line"),
+      legend.key.size = unit(0.7, "line"),
       legend.background = element_rect(
         color = "black",
         fill = "transparent",
@@ -283,9 +283,8 @@ shape_wider <- function(df, variable) {
 
 
 
-#-------------- 3. Analyze data --------------
 
-#-------------- 3.1 Co-location comparison --------------
+#-------------- 3. Co-location comparison --------------
 
 
 ### Half-hourly comparison (EC0 versus EC1)----
@@ -1286,7 +1285,8 @@ ggsave(
 } # Generate monthly comparative plots (EC0 versus EC1)
 
 
-#-------------- 3.2 cumulative sum of LE and NEE --------------
+
+#-------------- 4. cumulative sum of LE and NEE --------------
 
 fluxes_SEG_cum <- fluxes %>% 
   filter(Station %in% c("SEG0", "SEG1", "SEG2", "SEG3", "SEG4")) %>% 
@@ -1296,7 +1296,7 @@ fluxes_SEG_cum <- fluxes %>%
     LE_cum = cumsum(LE_filled),
     LE_cum_mj = cumsum(LE_filled * 1800 / 1000000),  # convert to megajoules.
     LE_cum_mm = cumsum(LE_filled) * 1800 / 2461 / 1000,  # Convert W m^2 to mm of cumulative evapotranspiration. Where cumsum(LE_filled) is the cumulative W m-2, 1800 = seconds in 30 mins, 2461 =  specific latent heat = energy required to evaporate 1 g of water in J g-1 based on lamba of our EdiRe output, '/1000' converts from g m-2 to mm.
-    water_flux = LE_cum_mm,
+    cum_water_flux = LE_cum_mm,
     H_cum = cumsum(H_filled)
   ) %>% 
   select(datetime,
@@ -1306,7 +1306,7 @@ fluxes_SEG_cum <- fluxes %>%
          LE_cum,
          LE_cum_mj,
          LE_cum_mm,
-         water_flux,
+         cum_water_flux,
          H_cum
   )
 
@@ -1319,7 +1319,7 @@ fluxes_SES_cum <- fluxes %>%
     LE_cum = cumsum(LE_filled),
     LE_cum_mj = cumsum(LE_filled * 1800 / 1000000),  # convert to megajoules.
     LE_cum_mm = cumsum(LE_filled) * 1800 / 2461 / 1000,  # Convert W m^2 to mm of cumulative evapotranspiration. Where cumsum(LE_filled) is the cumulative W m-2, 1800 = seconds in 30 mins, 2461 =  specific latent heat = energy required to evaporate 1 g of water in J g-1 based on lamba of our EdiRe output, '/1000' converts from g m-2 to mm.
-    water_flux = LE_cum_mm,
+    cum_water_flux = LE_cum_mm,
     H_cum = cumsum(H_filled)
   ) %>%
   select(datetime,
@@ -1329,17 +1329,13 @@ fluxes_SES_cum <- fluxes %>%
          LE_cum,
          LE_cum_mj,
          LE_cum_mm,
-         water_flux,
+         cum_water_flux,
          H_cum
   )
 
 
-## integrating precip work in progress
-# https://aosmith.rbind.io/2018/07/19/manual-legends-ggplot2/
-# 2. Adding separate layers for subsets of data or based on different datasets*
-# *This second situation is where reformatting your dataset is often most useful
 
-# create function summarizing precip data
+# create function summarizing prcipitation data
 precip_cum <- function(df) {
   df %>%
     mutate(
@@ -1377,6 +1373,7 @@ max(SES_met_cum$cum_water_flux)
 ## integrate precipitation
 fluxes_SEG_cum2 <- rbind(SEG_met_cum, fluxes_SEG_cum)
 fluxes_SES_cum2 <- rbind(SES_met_cum, fluxes_SES_cum)
+
 
 ## Determine axis limits
 lims_le <- range(range(fluxes_SEG_cum$LE_cum_mj, na.rm=T),range(fluxes_SES_cum$LE_cum_mj, na.rm=T))
@@ -1454,7 +1451,7 @@ selected_colours <- c("dodgerblue",
      # geom_line(data = SEG_met, aes(x = datetime, y = Precipitation_cum), show.legend = TRUE, colour = "dodgerblue") +
      geom_line(na.rm=T) +
      scale_color_manual(values=selected_colours) +
-     ylim(lims_le_mm) +
+     ylim(lims_wf_mm) +
      theme_fancy() +
      theme(legend.position = c(leg_pos, 0.8),
            legend.text = element_text(size=leg_tx)) # legend position
@@ -1475,13 +1472,21 @@ selected_colours <- c("dodgerblue",
      # geom_line(data = SEG_met, aes(x = datetime, y = Precipitation_cum), show.legend = TRUE, colour = "dodgerblue") +
      geom_line(na.rm=T) +
      scale_color_manual(values=selected_colours) +
-     ylim(lims_le_mm) +
+     ylim(lims_wf_mm) +
      theme_fancy() +
      theme(legend.position = c(leg_pos, 0.8),
            legend.text = element_text(size=leg_tx)) # legend position
   )
 } # SES Cumulative LE mm
 
+# colour mappings
+  selected_colours <- c(#"dodgerblue",
+                        "orange",
+                        "purple",
+                        "green",
+                        "darkgreen",
+                        "brown"
+  )
 
 ## SEG Cumulative NEE
 {
@@ -1550,7 +1555,9 @@ ggsave(
 
 
 
-#-------------- 4. Energy balance closure --------------
+#-------------- 5. Energy balance closure --------------
+
+#-------------- 5.1 Prepare data --------------
 
 ## Read in soil heat flux data
 SEG_SHF <- read_csv(file="data/soil_energy/soil_heat_flux_SEG.csv",
@@ -1574,26 +1581,36 @@ SES_merge <- dplyr::full_join(SES_merge, SES_met, by = 'datetime')
 EB_SEG <- SEG_merge %>% 
   mutate(
     H_plus_LE = H_filled + LE_filled,
-    NETRAD_plus_G = NETRAD - SHF_weighted_mean,
+    NETRAD_minus_G = NETRAD - SHF_weighted_mean,
     Station = Station.x
     ) %>% 
   select(
     datetime,
+    H_filled,
+    LE_filled,
+    NETRAD,
+    SHF_weighted_mean,
+    SHF_ALL_AVG,
     H_plus_LE,
-    NETRAD_plus_G,
+    NETRAD_minus_G,
     Station
   )
 
 EB_SES <- SES_merge %>% 
   mutate(
     H_plus_LE = H_filled + LE_filled,
-    NETRAD_plus_G = NETRAD - SHF_weighted_mean,
+    NETRAD_minus_G = NETRAD - SHF_weighted_mean,
     Station = Station.x
   ) %>% 
   select(
     datetime,
+    H_filled,
+    LE_filled,
+    NETRAD,
+    SHF_weighted_mean,
+    SHF_ALL_AVG,
     H_plus_LE,
-    NETRAD_plus_G,
+    NETRAD_minus_G,
     Station
   )
 
@@ -1611,15 +1628,18 @@ EB_SES1 <- EB_SES %>%
 
 
 
+#-------------- 5.2 visualize energy balance (EB) closure --------------
 
-### visualize energy balance (EB) closure ###
 {
 ## Determine axis range
-lim <- range(EB_SEG0$H_plus_LE, EB_SEG0$NETRAD_plus_G,
-             EB_SEG1$H_plus_LE, EB_SEG1$NETRAD_plus_G,
-             EB_SES0$H_plus_LE, EB_SES0$NETRAD_plus_G,
-             EB_SES1$H_plus_LE, EB_SEG1$NETRAD_plus_G,
+lim <- range(EB_SEG0$H_plus_LE, EB_SEG0$NETRAD_minus_G,
+             EB_SEG1$H_plus_LE, EB_SEG1$NETRAD_minus_G,
+             EB_SES0$H_plus_LE, EB_SES0$NETRAD_minus_G,
+             EB_SES1$H_plus_LE, EB_SEG1$NETRAD_minus_G,
              na.rm=T)
+
+## set parameters for legend theme
+leg_pos <- c(0.9,0.2)
 
 ## Determine annotation locations
 position1x <- -250
@@ -1629,16 +1649,16 @@ position2y <- 620
 
 
 ## SEG0
-pca <- prcomp(~H_plus_LE+NETRAD_plus_G, EB_SEG0)
+pca <- prcomp(~H_plus_LE+NETRAD_minus_G, EB_SEG0)
 tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
 tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
 equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
 
 # Compute  Lin's  correlation concordance coefficient
-ccc_result <- DescTools::CCC(EB_SEG0$H_plus_LE, EB_SEG0$NETRAD_plus_G, ci = "z-transform", conf.level = 0.95, na.rm = T)
+ccc_result <- DescTools::CCC(EB_SEG0$H_plus_LE, EB_SEG0$NETRAD_minus_G, ci = "z-transform", conf.level = 0.95, na.rm = T)
 ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
 
-EB_SEG0_plot <- ggplot(EB_SEG0, aes(x=H_plus_LE, y=NETRAD_plus_G)) +
+EB_SEG0_plot <- ggplot(EB_SEG0, aes(x=H_plus_LE, y=NETRAD_minus_G)) +
   labs(x = expression("H + LE (W m"^"-2"*")"),
        y = expression("Rn - G (W m"^"-2"*")"),
        title = "SEG0") +
@@ -1647,7 +1667,7 @@ EB_SEG0_plot <- ggplot(EB_SEG0, aes(x=H_plus_LE, y=NETRAD_plus_G)) +
   xlim(lim) +
   ylim(lim) +
   theme_fancy() +
-  theme(legend.position = c(0.9, 0.2))  +
+  theme(legend.position = leg_pos)  +
   geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
   geom_abline(intercept = tls_int, slope = tls_slp) +
   annotate("text", x = position1x, y = position1y, label = equation) +
@@ -1655,16 +1675,16 @@ EB_SEG0_plot <- ggplot(EB_SEG0, aes(x=H_plus_LE, y=NETRAD_plus_G)) +
 
 
 ## SEG1
-pca <- prcomp(~H_plus_LE+NETRAD_plus_G, EB_SEG1)
+pca <- prcomp(~H_plus_LE+NETRAD_minus_G, EB_SEG1)
 tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
 tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
 equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
 
 # Compute  Lin's  correlation concordance coefficient
-ccc_result <- DescTools::CCC(EB_SEG1$H_plus_LE, EB_SEG1$NETRAD_plus_G, ci = "z-transform", conf.level = 0.95, na.rm = T)
+ccc_result <- DescTools::CCC(EB_SEG1$H_plus_LE, EB_SEG1$NETRAD_minus_G, ci = "z-transform", conf.level = 0.95, na.rm = T)
 ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
 
-EB_SEG1_plot <- ggplot(EB_SEG1, aes(x=H_plus_LE, y=NETRAD_plus_G)) +
+EB_SEG1_plot <- ggplot(EB_SEG1, aes(x=H_plus_LE, y=NETRAD_minus_G)) +
   labs(x = expression("H + LE (W m"^"-2"*")"),
        y = expression("Rn - G (W m"^"-2"*")"),
        title = "SEG1") +
@@ -1673,7 +1693,7 @@ EB_SEG1_plot <- ggplot(EB_SEG1, aes(x=H_plus_LE, y=NETRAD_plus_G)) +
   xlim(lim) +
   ylim(lim) +
   theme_fancy() +
-  theme(legend.position = c(0.9, 0.2))  +
+  theme(legend.position = leg_pos)  +
   geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
   geom_abline(intercept = tls_int, slope = tls_slp) +
   annotate("text", x = position1x, y = position1y, label = equation) +
@@ -1682,16 +1702,16 @@ EB_SEG1_plot <- ggplot(EB_SEG1, aes(x=H_plus_LE, y=NETRAD_plus_G)) +
 
 
 ## SES0
-pca <- prcomp(~H_plus_LE+NETRAD_plus_G, EB_SES0)
+pca <- prcomp(~H_plus_LE+NETRAD_minus_G, EB_SES0)
 tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
 tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
 equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
 
 # Compute  Lin's  correlation concordance coefficient
-ccc_result <- DescTools::CCC(EB_SES0$H_plus_LE, EB_SES0$NETRAD_plus_G, ci = "z-transform", conf.level = 0.95, na.rm = T)
+ccc_result <- DescTools::CCC(EB_SES0$H_plus_LE, EB_SES0$NETRAD_minus_G, ci = "z-transform", conf.level = 0.95, na.rm = T)
 ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
 
-EB_SES0_plot <- ggplot(EB_SES0, aes(x=H_plus_LE, y=NETRAD_plus_G)) +
+EB_SES0_plot <- ggplot(EB_SES0, aes(x=H_plus_LE, y=NETRAD_minus_G)) +
   labs(x = expression("H + LE (W m"^"-2"*")"),
        y = expression("Rn - G (W m"^"-2"*")"),
        title = "SES0") +
@@ -1700,7 +1720,7 @@ EB_SES0_plot <- ggplot(EB_SES0, aes(x=H_plus_LE, y=NETRAD_plus_G)) +
   xlim(lim) +
   ylim(lim) +
   theme_fancy() +
-  theme(legend.position = c(0.9, 0.2))  +
+  theme(legend.position = leg_pos)  +
   geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
   geom_abline(intercept = tls_int, slope = tls_slp) +
   annotate("text", x = position1x, y = position1y, label = equation) +
@@ -1708,16 +1728,16 @@ EB_SES0_plot <- ggplot(EB_SES0, aes(x=H_plus_LE, y=NETRAD_plus_G)) +
 
 
 ## SES1
-pca <- prcomp(~H_plus_LE+NETRAD_plus_G, EB_SES1)
+pca <- prcomp(~H_plus_LE+NETRAD_minus_G, EB_SES1)
 tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
 tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
 equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
 
 # Compute  Lin's  correlation concordance coefficient
-ccc_result <- DescTools::CCC(EB_SES1$H_plus_LE, EB_SES1$NETRAD_plus_G, ci = "z-transform", conf.level = 0.95, na.rm = T)
+ccc_result <- DescTools::CCC(EB_SES1$H_plus_LE, EB_SES1$NETRAD_minus_G, ci = "z-transform", conf.level = 0.95, na.rm = T)
 ccc <- paste("CCC = ", round(ccc_result$rho.c[1], 2))
 
-EB_SES1_plot <- ggplot(EB_SES1, aes(x=H_plus_LE, y=NETRAD_plus_G)) +
+EB_SES1_plot <- ggplot(EB_SES1, aes(x=H_plus_LE, y=NETRAD_minus_G)) +
   labs(x = expression("H + LE (W m"^"-2"*")"),
        y = expression("Rn - G (W m"^"-2"*")"),
        title = "SES1") +
@@ -1726,7 +1746,7 @@ EB_SES1_plot <- ggplot(EB_SES1, aes(x=H_plus_LE, y=NETRAD_plus_G)) +
   xlim(lim) +
   ylim(lim) +
   theme_fancy() +
-  theme(legend.position = c(0.9, 0.2))  +
+  theme(legend.position = leg_pos)  +
   geom_abline(intercept = 0, slope = 1, colour="grey", linetype="dashed") +
   geom_abline(intercept = tls_int, slope = tls_slp) +
   annotate("text", x = position1x, y = position1y, label = equation) +
@@ -1762,6 +1782,124 @@ pall <- (EB_SEG0_plot + EB_SES0_plot) / (EB_SEG1_plot + EB_SES1_plot) +
 
 } ### visualize energy balance (EB) closure ###
   
-  
-    
+#-------------- 5.3 Energy Balance Ratio (EBR) --------------
 
+(SEG0_EBR <- (sum(EB_SEG0$H_filled, na.rm=T) +
+                sum(EB_SEG0$LE_filled, na.rm=T)) /
+   (sum(EB_SEG0$NETRAD, na.rm=T) +
+      sum(EB_SEG0$SHF_weighted_mean, na.rm=T))
+)
+
+(SEG1_EBR <- (sum(EB_SEG1$H_filled, na.rm=T) +
+                sum(EB_SEG1$LE_filled, na.rm=T)) /
+    (sum(EB_SEG1$NETRAD, na.rm=T) +
+       sum(EB_SEG1$SHF_weighted_mean, na.rm=T))
+)
+
+(SES0_EBR <- (sum(EB_SES0$H_filled, na.rm=T) +
+   sum(EB_SES0$LE_filled, na.rm=T)) /
+   (sum(EB_SES0$NETRAD, na.rm=T) +
+   sum(EB_SES0$SHF_weighted_mean, na.rm=T))
+ )
+
+(SES1_EBR <- (sum(EB_SES1$H_filled, na.rm=T) +
+                sum(EB_SES1$LE_filled, na.rm=T)) /
+    (sum(EB_SES1$NETRAD, na.rm=T) +
+       sum(EB_SES1$SHF_weighted_mean, na.rm=T))
+)
+
+
+
+#-------------- 5.4 Cumulative Energy Balance --------------
+
+SEG0_EBR <- EB_SEG0 %>% 
+  mutate(
+    EB = H_filled + LE_filled - NETRAD - SHF_weighted_mean,
+    cum_EB = (cumsum(coalesce(EB, 0)) + EB*0)/1000  # convert to kW. ignore pesky NA's by replacing them with 0.
+  ) 
+
+SEG1_EBR <- EB_SEG1 %>% 
+  mutate(
+    EB = H_filled + LE_filled - NETRAD - SHF_weighted_mean,
+    cum_EB = (cumsum(coalesce(EB, 0)) + EB*0)/1000  # convert to kW. ignore pesky NA's by replacing them with 0.
+  ) 
+
+SES0_EBR <- EB_SES0 %>% 
+  mutate(
+    EB = H_filled + LE_filled - NETRAD - SHF_weighted_mean,
+    cum_EB = (cumsum(coalesce(EB, 0)) + EB*0)/1000  # convert to kW. ignore pesky NA's by replacing them with 0.
+  ) 
+
+SES1_EBR <- EB_SES1 %>% 
+  mutate(
+    EB = H_filled + LE_filled - NETRAD - SHF_weighted_mean,
+    cum_EB = (cumsum(coalesce(EB, 0)) + EB*0)/1000  # convert to kW. ignore pesky NA's by replacing them with 0.
+  ) 
+
+
+
+### visualize cumulative Energy Balance Ratio ###
+
+## Determine axis range
+lim <- range(SEG0_EBR$cum_EB,
+             SEG1_EBR$cum_EB,
+             SES0_EBR$cum_EB,
+             SES1_EBR$cum_EB,
+             na.rm=T)
+
+
+EB_SEG0_plot <- ggplot(SEG0_EBR, aes(x=datetime , y=cum_EB)) +
+  labs(x = expression("datetime"),
+       y = expression(atop(textstyle("Cumulative Energy Balance"),
+                           atop(textstyle("H + LE + Rn - G (kW m"^"-2"*")")))),
+       title = "SEG0") +
+  geom_line() +
+  ylim(lim) +
+  theme_fancy()
+  
+EB_SEG1_plot <- ggplot(SEG1_EBR, aes(x=datetime , y=cum_EB)) +
+  labs(x = expression("datetime"),
+       y = expression(atop(textstyle("Cumulative Energy Balance"),
+                           atop(textstyle("H + LE + Rn - G (kW m"^"-2"*")")))),
+       title = "SEG1") +
+  geom_line() +
+  ylim(lim) +
+  theme_fancy()
+
+EB_SES0_plot <- ggplot(SES0_EBR, aes(x=datetime , y=cum_EB)) +
+  labs(x = expression("datetime"),
+       y = expression(atop(textstyle("Cumulative Energy Balance"),
+                           atop(textstyle("H + LE + Rn - G (kW m"^"-2"*")")))),
+       title = "SESG0") +
+  geom_line() +
+  ylim(lim) +
+  theme_fancy()
+
+EB_SES1_plot <- ggplot(SES1_EBR, aes(x=datetime , y=cum_EB)) +
+  labs(x = expression("datetime"),
+       y = expression(atop(textstyle("Cumulative Energy Balance"),
+                           atop(textstyle("H + LE + Rn - G (kW m"^"-2"*")")))),
+       title = "SES1") +
+  geom_line() +
+  ylim(lim) +
+  theme_fancy()
+
+
+### combine plots using Patchwork
+pall <- (EB_SEG0_plot + EB_SES0_plot) / (EB_SEG1_plot + EB_SES1_plot) +
+  plot_annotation(tag_levels = 'a') & theme(plot.tag.position = c(0.0, 0.97))
+
+
+## save raster
+ggsave(pall,
+       filename = "plots/energy_balance/cumulative_energy_balance.png",
+       width = 18,
+       height = 18,
+       units = "cm")
+
+# save vector
+ggsave(pall,
+       filename = "plots/energy_balance/cumualtive_energy_balance.pdf",
+       width = 18,
+       height = 18,
+       units = "cm")
