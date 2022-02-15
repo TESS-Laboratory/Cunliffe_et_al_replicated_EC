@@ -1,16 +1,22 @@
 ## This script contains the climate analysis
-## Andrew Cunliffe <andrewmcunliffe@gmail.com>
-## Started 2021-04-15
-
 
 
 # ------ 0 Setup Environment ----------
+# 
+# install.packages("tidyverse") # For dplyr and ggplot2
+# # install.packages("vctrs") # For dplyr and ggplot2
+# install.packages("ellipsis") # For dplyr and ggplot2
+# install.packages("rlang") # For dplyr and ggplot2
+# install.packages("dplyr") # For dplyr and ggplot2
+# install.packages("viridis") # For dplyr and ggplot2
+# install.packages("readr") # For dplyr and ggplot2
+# install.packages("lubridate") # For dplyr and ggplot2
 
 ## Install packages
+library(scales) # for colour review
 library(tidyverse) # For dplyr and ggplot2
 library(viridis) # friendly colour palette
 library(patchwork) # for multi-panel plots
-library(scales) # for colour review
 
 
 #-------------- 1. Extract Data --------------
@@ -63,16 +69,245 @@ df_2020 <- read_csv("data/meteorological_data/Sevilleta_LTER_Hourly_Meteorologic
                                      Evaporation = col_double(),
                                      Evap_Pan_Temperature  = col_double()))
 
-# Data from 2021 in different format
-df_2021Met40 <- read_csv("data/meteorological_data/Sev Met Data 20220126/Met40.csv")
+
+
+
+# Data from 2021 in different (terrible!) format
+## atempting read with read_csv doesn't work, obscure error
+# df_2021Met40 <- read_csv("data/meteorological_data/Sev Met Data 20220126/Met40.csv",
+#                          col_names = FALSE,
+#                          na = c("","NA","-999")
+# )
+# 
+# Error in app$vspace(new_style$`margin-top` %||% 0) :                                                                                               
+#   attempt to apply non-function
+# In addition: Warning message:
+#   One or more parsing issues, see `problems()` for details 
+
+
+
+df_2021Met40 <- read.csv("data/meteorological_data/Sev Met Data 20220126/Met40.csv", header=FALSE)
+
+
+temp1 <- read.csv("data/meteorological_data/Sev Met Data 20220126/Met40.csv", header=FALSE) %>%
+  mutate(across(everything(), ~replace(., . %in%  c("", "NA", -999), NA)))
+
+temp2 <- read.csv("data/meteorological_data/Sev Met Data 20220126/Met40.csv", header=FALSE) %>%
+  mutate(across(everything(), ~replace(., . %in%  c("", "NA", -999), NA))) %>% 
+  rename(
+    Station = V1,
+    Year = V2,
+    DOY = V3,
+    time = V4
+  )
+
+# temp3 <- read.csv("data/meteorological_data/Sev Met Data 20220126/Met40.csv", header=FALSE) %>%
+#   mutate(across(everything(), ~replace(., . %in%  c("", "NA", -999), NA))) %>% 
+#   rename(
+#     Station = V1,
+#     Year = V2,
+#     DOY = V3,
+#     time = V4
+#   ) %>% 
+#   mutate(
+#     hours = time/100,
+#     datetime = lubridate::make_datetime(year = Year, hour = hours) + lubridate::days(DOY-1)
+#   )
+# # Encounter error
+# # Error in app$vspace(new_style$`margin-top` %||% 0) : 
+#  # attempt to apply non-function
+
+
+str(temp2)
+
+names(temp2)
+
+# very strange issues (Hugh couldn't replicate)
+# system specific issue'?
+# update everything in R 
+# use R console with admin
+
+
+# None of my stuff is working!
+
+temp4 <- as_tibble(temp2)
+
+temp5 <- temp4 %>%
+  filter(if_any(all_of(c(6:28), is.na)))
+
+
+temp5 <- temp4 %>% 
+  mutate(
+    hours = time/100,
+    datetime = lubridate::make_datetime(year = Year, hour = hours) + lubridate::days(DOY-1)
+  )
+
+
+
+temp5 <- temp4 %>%
+  filter(!is.na(X6) &
+           !is.na(X7) &
+           !is.na(X8) &
+           !is.na(X9) &
+           !is.na(X10) &
+           !is.na(X11) &
+           !is.na(X12) &
+           !is.na(X13) &
+           !is.na(X14) &
+           !is.na(X15) &
+           !is.na(X16) &
+           !is.na(X17) &
+           !is.na(X18) &
+           !is.na(X19) &
+           !is.na(X20) &
+           !is.na(X21) &
+           !is.na(X22) &
+           !is.na(X23) &
+           !is.na(X24) &
+           !is.na(X25) &
+           !is.na(X26) &
+           !is.na(X27) &
+           !is.na(X28)
+  )
+
+
+
+
+
+
+
+
+
+
+
+df_2021Met40_dev <- df_2021Met40 %>%
+  rename(
+    Station = X1,
+    Year = X2,
+    DOY = X3,
+    time = X4
+  ) %>% 
+  mutate(
+    across(everything(), ~replace(., . %in%  c("", "NA", -999), NA))
+  ) %>% 
+  mutate(
+    hours = time/100,
+    datetime = lubridate::make_datetime(year = Year, hour = hours) + lubridate::days(DOY-1)
+  )
+
+
+
+# str(df_2021Met40)
+# 
+
+# 
+# 
+# 
+# 
+# # Data from 2021 in different (terrible!) format
+# df_2021Met40 <- read_csv2("data/meteorological_data/Sev Met Data 20220126/Met40.csv",
+#                          col_names = FALSE,
+#                          na = c("NA","-999")
+# )
+# 
+# 
+# 
+# # Data from 2021 in different (terrible!) format
+# df_2021Met40 <- read_csv(I("./data/meteorological_data/Sev Met Data 20220126/Met40.csv"),
+#                          col_names = FALSE,
+#                          na = c("NA","-999")
+# )
+
+
+     
+
+df_2021Met40 <- df_2021Met40 %>% 
+  rename(
+    Station = X1,
+    Year = X2,
+    DOY = X3,
+    time = X4
+  ) %>% 
+  mutate(
+    hours = time/100,
+    datetime = lubridate::make_datetime(year = Year, hour = hours) + lubridate::days(DOY-1)
+  )
+
+## Note that there is also 1-minute precip. data imbedded within the hourly; these are the short lines of data.
+## All values are in mm's
+## Skip/exclude row/lines where multiple columns are NA (filter(!is.na...)))
+# temp <- df_2021Met40 %>%
+#   filter(!is.na(column_name))
+# 
+# 
+# temp <- df_2021Met40 %>%
+#   filter(!is.na(X6))
 
 str(df_2021Met40)
 
-                    col_types = cols(Moisture_10_cm = col_double(),
-                                     Moisture_30_cm  = col_double(),
-                                     Evaporation = col_double(),
-                                     Evap_Pan_Temperature  = col_double()))
+temp4 <- df_2021Met40 %>%
+  filter(if_any(all_of(c(6:28), is.na)))
+         
+?if_any
+?tidyverse
+packageVersion('dplyr')
+         
 
+temp3 <- df_2021Met40 %>%
+  filter(!is.na(X6) &
+           !is.na(X7) &
+           !is.na(X8) &
+           !is.na(X9) &
+           !is.na(X10) &
+           !is.na(X11) &
+           !is.na(X12) &
+           !is.na(X13) &
+           !is.na(X14) &
+           !is.na(X15) &
+           !is.na(X16) &
+           !is.na(X17) &
+           !is.na(X18) &
+           !is.na(X19) &
+           !is.na(X20) &
+           !is.na(X21) &
+           !is.na(X22) &
+           !is.na(X23) &
+           !is.na(X24) &
+           !is.na(X25) &
+           !is.na(X26) &
+           !is.na(X27) &
+           !is.na(X28)
+         )
+
+
+
+
+How to write and?
+
+"X6" "X7"  "X8"  "X9"  "X10" "X11" "X12" "X13" "X14" "X15" "X16" "X17" "X18"
+"X19" "X20" "X21" "X22" "X23" "X24" "X25" "X26" "X27" "X28"
+
+
+# Logical operator - test for all conditions
+
+
+
+
+str(df_2021Met40)
+summarise(df_2021Met40$X14)
+plot(df_2021Met40$X14)
+plot(df_2021Met40$X18)
+
+
+
+# Data from 2021 in different format
+df_2021Met49 <- read_csv("data/meteorological_data/Sev Met Data 20220126/Met49.csv",
+                         col_names = "X6" )
+
+
+# TO DO ####
+# Waiting for Doug Moor to confirm precipitation column and units in the raw data files
+                   
 
 
 # Annual summaries extracted from Fluxnet files (as part of JULES prep. script)
