@@ -1815,8 +1815,11 @@ pall <- (EB_SEG0_plot + EB_SES0_plot) / (EB_SEG1_plot + EB_SES1_plot) +
 SEG0_EBR <- EB_SEG0 %>% 
   mutate(
     EB = H_filled + LE_filled - NETRAD - SHF_weighted_mean,
-    cum_EB = (cumsum(coalesce(EB, 0)) + EB*0)/1000  # convert to kW. ignore pesky NA's by replacing them with 0.
+    EB = EB * 3600, # j per half hour
+    cum_EB = (cumsum(coalesce(EB, 0)) + EB*0)/1000000  # convert to mj m2. ignore pesky NA's by replacing them with 0.
   ) 
+
+## TO DO ####
 
 SEG1_EBR <- EB_SEG1 %>% 
   mutate(
