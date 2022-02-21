@@ -16,6 +16,7 @@ library(spatialfil)
 library(viridis)       # color-blind tested (ugly)
 library(raster)
 library(rgdal)
+library(tidyverse)  # for ggplot2
 
 
 #-------------- 0.1 Define paths --------------
