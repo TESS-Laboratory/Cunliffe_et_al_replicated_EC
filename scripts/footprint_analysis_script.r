@@ -14,15 +14,15 @@ library(fields)    # to plot footprint
 library(EBImage)
 library(spatialfil)
 library(viridis)       # color-blind tested (ugly)
-library(raster)
+library(raster)  # for land cover maps
 library(rgdal)
 library(tidyverse)  # for ggplot2
 
 
 #-------------- 0.1 Define paths --------------
-path  <-  "E:/REC_7_Data/8_datasets/Wind_repro_20220211/"
-mpath1<- "E:/REC_7_Data/12_Marcys_data/csv_Marcy_old/"
-mpath2<- "E:/REC_7_Data/12_Marcys_data/hh_Marcy_2020_wind/"
+path   <-  "E:/REC_7_Data/8_datasets/Wind_repro_20220211/"
+mpath1 <- "E:/REC_7_Data/12_Marcys_data/csv_Marcy_old/"
+mpath2 <- "E:/REC_7_Data/12_Marcys_data/hh_Marcy_2020_wind/"
 
 
 #-------------- 0.2 Initialize lists --------------
@@ -145,8 +145,8 @@ ms2019 <- read.csv(file=paste(mpath1, "US-Ses_HH_201901010000_202001010000_xtr_2
 ms2020 <- read.csv(file=paste(mpath2, "US-Ses_HH_202001010000_202101010000_xtr.csv", sep=""), header=TRUE, sep=",")
 
 
-mg0<-rbind(mg2018, mg2019, mg2020)
-ms0<-rbind(ms2018, ms2019, ms2020)
+mg0 <- rbind(mg2018, mg2019, mg2020)
+ms0 <- rbind(ms2018, ms2019, ms2020)
 
 
 ## ================================================ add date_time chron
@@ -174,8 +174,8 @@ ms0$dt <- mthetimes0
 
 # range(mg0$dt - ms0$dt)   # 00:00:00 00:00:00
 
-mg<-mg0[,c("dt", "zoL", "V_SIGMA")]; colnames(mg)<-c("dt", "MO_Stab_gm", "Vstd_gm")
-ms<-ms0[,c("dt", "zoL", "V_SIGMA")]; colnames(ms)<-c("dt", "MO_Stab_sm", "Vstd_sm")
+mg <- mg0[,c("dt", "zoL", "V_SIGMA")]; colnames(mg) <- c("dt", "MO_Stab_gm", "Vstd_gm")
+ms <- ms0[,c("dt", "zoL", "V_SIGMA")]; colnames(ms) <- c("dt", "MO_Stab_sm", "Vstd_sm")
 
 
 
