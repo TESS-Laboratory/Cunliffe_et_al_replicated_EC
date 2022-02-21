@@ -23,8 +23,8 @@ Script to tidy soil met data and extract soil energy data.
 *climate_analysis.R script*
 Main script for analysing the climate data (missing PET calculations).
 
-*ALSO EXPLAIN FOOTPRINT ANALYSIS SCRIPT*
-# Work in progress
+*footprint_analysis_script.r*
+Script for undertaking spatial probability analysis of landcover within 80% footprints.
 
 
 
