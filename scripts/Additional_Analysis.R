@@ -4,6 +4,9 @@
 
 
 # ------------- 0. Setup Environment ----------
+# install.packages("tidyverse")
+
+
 ## Load packages
 library(tidyverse)
 library(patchwork)   
@@ -15,7 +18,6 @@ library(DescTools)
 ## NB. these data are ca. 150 GB
 
 ## Paths Andy's machine
-# path  <-  "C:/workspace/REC_7_Data/8_datasets/"  # Unfilled EdiRe output
 mpath  <-  "C:/workspace/REC_7_Data/12_Marcys_data/"
 npath <- "data/gapfilled_fluxes/"
 
