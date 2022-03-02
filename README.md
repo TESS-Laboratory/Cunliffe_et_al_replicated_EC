@@ -14,7 +14,7 @@ Schlumpf, Marcy Litvak, Richard Brazier and Timothy Hill.
 
 
 ## This repo contains the following scripts
-*Additional_Analysis.r*
+*Main_Analysis.r*
 This script contains code for producing the main analysis.
 
 *soil_energy.r*

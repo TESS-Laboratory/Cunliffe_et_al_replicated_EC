@@ -1,10 +1,11 @@
-## This script sources gap filled data output from ReddyProc and AmeriFlux,
-## merges them into a single file and performs visualization and data analysis
+## This script sources gap filled data output nad soil met data
+## and performs visualization and data analysis
 
 
 
 # ------------- 0. Setup Environment ----------
-# install.packages("tidyverse")
+# install.packages("gt")
+# install.packages("hexbin")  # NB. should load as dependency of tidyverse but sometimes doesn't
 
 
 ## Load packages
@@ -12,13 +13,14 @@ library(tidyverse)
 library(patchwork)   
 library(tls)   
 library(DescTools)
+library(gt)
 
 
 ## Define paths
 ## NB. these data are ca. 150 GB
 
 ## Paths Andy's machine
-mpath  <-  "C:/workspace/REC_7_Data/12_Marcys_data/"
+mpath  <-  "C:/Users/ac365/OneDrive - University of Exeter/03 - DRIVING-C/UNM_flux_data/"
 npath <- "data/gapfilled_fluxes/"
 
 ## Plotting theme
@@ -229,7 +231,7 @@ subset_datetime <- function(df) {
   df %>%
     filter(between(datetime,
                    as.POSIXct("2018-11-01 00:00:00"),
-                   as.POSIXct("2020-10-31 23:30:00")))
+                   as.POSIXct("2020-10-31 23:59:00")))
 }
 
 SEG_fluxes <- subset_datetime(SEG_fluxes_long); rm(SEG_fluxes_long)
@@ -268,9 +270,9 @@ fluxes <- fluxes %>%
 # create function pivoting data from long to wide form for analysis
 shape_wider <- function(df, variable) {
   df %>%
-    select(datetime, variable, Station) %>%
+    select(datetime, all_of(variable), Station) %>%
     pivot_wider(names_from = Station,
-                values_from = variable)
+                values_from = all_of(variable))
 }  #
 
 # pivot data to wide form
@@ -324,7 +326,7 @@ seg_h <- ggplot(fluxes_H, aes(x=SEG0, y=SEG1)) +
   labs(x = expression("SEG0 - H (W m"^"-2"*")"),
        y = expression("SEG1 - H (W m"^"-2"*")"),
        title = "Sensible Heat Flux - Seg") +
-  geom_hex(bins = 100, show.legend=T) +
+  geom_hex(bins = 50, show.legend=T) +
   # scale_fill_continuous(type = "viridis")) +     # colour palette
   xlim(lims_h) +
   ylim(lims_h) +
@@ -361,7 +363,7 @@ seg_h <- ggplot(fluxes_H, aes(x=SEG0, y=SEG1)) +
     labs(x = expression("SES0 - H (W m"^"-2"*")"),
          y = expression("SES1 - H (W m"^"-2"*")"),
          title = "Sensible Heat Flux - Ses") +
-    geom_hex(bins = 100, show.legend=T) +
+    geom_hex(bins = 50, show.legend=T) +
     # scale_fill_continuous(type = "viridis") +     # colour palette
     xlim(lims_h) +
     ylim(lims_h) +
@@ -405,7 +407,7 @@ ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range)
     labs(x = expression("SEG0 - LE (W m"^"-2"*")"),
          y = expression("SEG1 - LE (W m"^"-2"*")"),
          title = "Latent Heat Flux - Seg") +
-    geom_hex(bins = 100, show.legend=T) +
+    geom_hex(bins = 50, show.legend=T) +
     # scale_fill_continuous(type = "viridis") +     # colour palette
     xlim(lims_le) +
     ylim(lims_le) +
@@ -442,7 +444,7 @@ ses_h <- ses_h +   scale_fill_continuous(type = "viridis", limits=c(count.range)
     labs(x = expression("SES0 - LE (W m"^"-2"*")"),
          y = expression("SES1 - LE (W m"^"-2"*")"),
          title = "Latent Heat Flux - Ses") +
-    geom_hex(bins = 100, show.legend=T) +
+    geom_hex(bins = 50, show.legend=T) +
     # scale_fill_continuous(type = "viridis") +     # colour palette
     xlim(lims_le) +
     ylim(lims_le) +
@@ -1288,6 +1290,7 @@ ggsave(
 
 
 
+
 #-------------- 4. cumulative sum of LE and NEE --------------
 
 fluxes_SEG_cum <- fluxes %>% 
@@ -1383,18 +1386,21 @@ lims_nee <- range(range(fluxes_SEG_cum$NEE_cum, na.rm=T),range(fluxes_SES_cum$NE
 lims_wf_mm <- range(range(fluxes_SEG_cum2$cum_water_flux, na.rm=T),range(fluxes_SES_cum2$cum_water_flux, na.rm=T))
 
 
-# colour mappings
-selected_colours <- c("dodgerblue",
-                      "orange",
-                      "purple",
-                      "green",
-                      "darkgreen",
-                      "brown"
-                      )
 
+
+#-------------- 4.1 Cumulative LE and NEE plots --------------
 
 {  # Create Cumulative LE and NEE plots
- # set parameters for legend theme
+  # colour mappings
+  selected_colours <- c("dodgerblue",
+                        "orange",
+                        "purple",
+                        "green",
+                        "darkgreen",
+                        "brown"
+  )
+  
+  # set parameters for legend theme
   leg_pos <- 0.14
   leg_tx <- 8
   
@@ -1556,6 +1562,84 @@ ggsave(
 
 
 
+### 4.2 Extract flux summaries (For Table S5) ####
+
+## Ideally, use the 'gt' package to produce tables ## Not yet implemented
+
+{
+SEG_cum <- fluxes_SEG_cum %>% 
+  group_by(Station) %>% 
+  summarise(finalH = last(H_cum),
+            finalLE = round(last(LE_cum_mm), digits = 2),
+            finalNEE = round(last(NEE_cum), digits = 2)
+            )
+
+temp1 <- data.frame(Station = "SEGmean",
+                   finalH = mean(SEG_cum$finalH), 
+                   finalLE = mean(SEG_cum$finalLE, na.rm=T),
+                   finalNEE = mean(SEG_cum$finalNEE, na.rm=T)
+                   )
+temp2 <- data.frame(Station = "SEGsd",
+                    finalH = sd(SEG_cum$finalH), 
+                    finalLE = sd(SEG_cum$finalLE, na.rm=T),
+                    finalNEE = sd(SEG_cum$finalNEE, na.rm=T)
+)
+  
+SEG_cum <- rbind(SEG_cum, temp1, temp2); rm(temp1, temp2)
+
+SEG_cum$finalLE <- round(SEG_cum$finalLE, digits = 2)
+SEG_cum$finalNEE <- round(SEG_cum$finalNEE, digits = 2)
+
+}
+
+# TO DO ####
+# should H be J not w m2?
+# 
+# w m2 is equal to 
+# 
+# *1800 
+
+
+{
+  SES_cum <- fluxes_SES_cum %>% 
+    group_by(Station) %>% 
+    summarise(finalH = last(H_cum),
+              finalLE = round(last(LE_cum_mm), digits = 2),
+              # finalLE = last(LE_cum_mm),
+              finalNEE = round(last(NEE_cum), digits = 2)
+    )
+  
+  temp1 <- data.frame(Station = "SESmean",
+                      finalH = mean(SES_cum$finalH), 
+                      finalLE = mean(SES_cum$finalLE, na.rm=T),
+                      finalNEE = mean(SES_cum$finalNEE, na.rm=T)
+  )
+  temp2 <- data.frame(Station = "SESsd",
+                      finalH = sd(SES_cum$finalH), 
+                      finalLE = sd(SES_cum$finalLE, na.rm=T),
+                      finalNEE = sd(SES_cum$finalNEE, na.rm=T)
+  )
+  
+  SES_cum <- rbind(SES_cum, temp1, temp2); rm(temp1, temp2)
+  
+  SES_cum$finalLE <- round(SES_cum$finalLE, digits = 3)
+  SES_cum$finalNEE <- round(SES_cum$finalNEE, digits = 2)
+  
+}
+
+
+table_S5 <- rbind(SEG_cum, SES_cum)
+
+
+table_S5
+
+
+
+
+
+
+
+
 
 #-------------- 5. Energy balance closure --------------
 
@@ -1616,6 +1700,7 @@ EB_SES <- SES_merge %>%
     Station
   )
 
+
 EB_SEG0 <- EB_SEG %>% 
   filter(Station == "SEG0")
 
@@ -1627,6 +1712,24 @@ EB_SES0 <- EB_SES %>%
 
 EB_SES1 <- EB_SES %>% 
   filter(Station == "SES1")
+
+
+### TEMP diagnostic plot
+# ggplot(EB_SEG0, aes(x=datetime, y=H_filled)) +
+#   geom_point(alpha=0.1) +
+#   labs(title = "SEG0")
+# 
+# ggplot(EB_SES0, aes(x=datetime, y=H_filled)) +
+#   geom_point(alpha=0.1) +
+#   labs(title = "SES0")
+# 
+# ggplot(EB_SEG0, aes(x=datetime, y=LE_filled)) +
+#   geom_point(alpha=0.1) +
+#   labs(title = "SEG0")
+# 
+# ggplot(EB_SES0, aes(x=datetime, y=LE_filled)) +
+#   geom_point(alpha=0.1) +
+#   labs(title = "SES0")
 
 
 
@@ -1652,8 +1755,8 @@ position2y <- 620
 
 ## SEG0
 pca <- prcomp(~H_plus_LE+NETRAD_minus_G, EB_SEG0)
-tls_slp <- with(pca, rotation[2,1] / rotation[1,1]) # compute slope
-tls_int <- with(pca, center[2] - tls_slp*center[1]) # compute y-intercept
+tls_slp <- with(pca, rotation[2,1] / rotation[1,1])  # compute slope
+tls_int <- with(pca, center[2] - tls_slp*center[1])  # compute y-intercept
 equation <- paste("y = ", round(tls_int, 3), "+", round(tls_slp, 3), "x")
 
 # Compute  Lin's  correlation concordance coefficient
@@ -1784,6 +1887,8 @@ pall <- (EB_SEG0_plot + EB_SES0_plot) / (EB_SEG1_plot + EB_SES1_plot) +
 
 } ### visualize energy balance (EB) closure ###
   
+
+
 #-------------- 5.3 Energy Balance Ratio (EBR) --------------
 
 (SEG0_EBR <- (sum(EB_SEG0$H_filled, na.rm=T) +
@@ -1814,32 +1919,41 @@ pall <- (EB_SEG0_plot + EB_SES0_plot) / (EB_SEG1_plot + EB_SES1_plot) +
 
 #-------------- 5.4 Cumulative Energy Balance --------------
 
-SEG0_EBR <- EB_SEG0 %>% 
+{
+  ## There were gaps in the NETRAD and SHF series, accounting for between 2-7% of
+  ## the timesteps. Timesteps with incomplete observations (NA in any of the four
+  ## inputs) were treated as zero in the cumulative sum.
+
+SEG0_EBR <- EB_SEG0 %>%
   mutate(
     EB = H_filled + LE_filled - NETRAD - SHF_weighted_mean,
-    EB = EB * 3600, # j per half hour
-    cum_EB = (cumsum(coalesce(EB, 0)) + EB*0)/1000000  # convert to mj m2. ignore pesky NA's by replacing them with 0.
-  ) 
+    EB = EB * 1800,  # from w per half hour per m2 to j m2.
+    cum_EB = (cumsum(coalesce(EB, 0)) + EB*0)/1000000  # convert to mj m2. Replace NA timesteps with 0.
+  )
 
-## TO DO ####
 
 SEG1_EBR <- EB_SEG1 %>% 
   mutate(
     EB = H_filled + LE_filled - NETRAD - SHF_weighted_mean,
-    cum_EB = (cumsum(coalesce(EB, 0)) + EB*0)/1000  # convert to kW. ignore pesky NA's by replacing them with 0.
-  ) 
+    EB = EB * 1800,  # from w per half hour per m2 to j m2.
+    cum_EB = (cumsum(coalesce(EB, 0)) + EB*0)/1000000  # convert to mj m2. Replace NA timesteps with 0.
+  )
+
 
 SES0_EBR <- EB_SES0 %>% 
   mutate(
     EB = H_filled + LE_filled - NETRAD - SHF_weighted_mean,
-    cum_EB = (cumsum(coalesce(EB, 0)) + EB*0)/1000  # convert to kW. ignore pesky NA's by replacing them with 0.
-  ) 
+    EB = EB * 1800,  # from w per half hour per m2 to j m2.
+    cum_EB = (cumsum(coalesce(EB, 0)) + EB*0)/1000000  # convert to mj m2. Replace NA timesteps with 0.
+  )
+
 
 SES1_EBR <- EB_SES1 %>% 
   mutate(
     EB = H_filled + LE_filled - NETRAD - SHF_weighted_mean,
-    cum_EB = (cumsum(coalesce(EB, 0)) + EB*0)/1000  # convert to kW. ignore pesky NA's by replacing them with 0.
-  ) 
+    EB = EB * 1800,  # from w per half hour per m2 to j m2.
+    cum_EB = (cumsum(coalesce(EB, 0)) + EB*0)/1000000  # convert to mj m2. Replace NA timesteps with 0.
+  )
 
 
 
@@ -1856,7 +1970,7 @@ lim <- range(SEG0_EBR$cum_EB,
 EB_SEG0_plot <- ggplot(SEG0_EBR, aes(x=datetime , y=cum_EB)) +
   labs(x = expression("datetime"),
        y = expression(atop(textstyle("Cumulative Energy Balance"),
-                           atop(textstyle("H + LE + Rn - G (kW m"^"-2"*")")))),
+                           atop(textstyle("H + LE + Rn - G (MJ m"^"-2"*")")))),
        title = "SEG0") +
   geom_line() +
   ylim(lim) +
@@ -1865,7 +1979,7 @@ EB_SEG0_plot <- ggplot(SEG0_EBR, aes(x=datetime , y=cum_EB)) +
 EB_SEG1_plot <- ggplot(SEG1_EBR, aes(x=datetime , y=cum_EB)) +
   labs(x = expression("datetime"),
        y = expression(atop(textstyle("Cumulative Energy Balance"),
-                           atop(textstyle("H + LE + Rn - G (kW m"^"-2"*")")))),
+                           atop(textstyle("H + LE + Rn - G (MJ m"^"-2"*")")))),
        title = "SEG1") +
   geom_line() +
   ylim(lim) +
@@ -1874,7 +1988,7 @@ EB_SEG1_plot <- ggplot(SEG1_EBR, aes(x=datetime , y=cum_EB)) +
 EB_SES0_plot <- ggplot(SES0_EBR, aes(x=datetime , y=cum_EB)) +
   labs(x = expression("datetime"),
        y = expression(atop(textstyle("Cumulative Energy Balance"),
-                           atop(textstyle("H + LE + Rn - G (kW m"^"-2"*")")))),
+                           atop(textstyle("H + LE + Rn - G (MJ m"^"-2"*")")))),
        title = "SESG0") +
   geom_line() +
   ylim(lim) +
@@ -1883,7 +1997,7 @@ EB_SES0_plot <- ggplot(SES0_EBR, aes(x=datetime , y=cum_EB)) +
 EB_SES1_plot <- ggplot(SES1_EBR, aes(x=datetime , y=cum_EB)) +
   labs(x = expression("datetime"),
        y = expression(atop(textstyle("Cumulative Energy Balance"),
-                           atop(textstyle("H + LE + Rn - G (kW m"^"-2"*")")))),
+                           atop(textstyle("H + LE + Rn - G (MJ m"^"-2"*")")))),
        title = "SES1") +
   geom_line() +
   ylim(lim) +
@@ -1908,3 +2022,4 @@ ggsave(pall,
        width = 18,
        height = 18,
        units = "cm")
+}
