@@ -1562,6 +1562,7 @@ ggsave(
 
 
 
+
 ### 4.2 Extract flux summaries (For Table S5) ####
 
 ## Ideally, use the 'gt' package to produce tables ## Not yet implemented
@@ -1569,7 +1570,7 @@ ggsave(
 {
 SEG_cum <- fluxes_SEG_cum %>% 
   group_by(Station) %>% 
-  summarise(finalH = last(H_cum),
+  summarise(finalH = last(H_cum)*1800/1000000,
             finalLE = round(last(LE_cum_mm), digits = 2),
             finalNEE = round(last(NEE_cum), digits = 2)
             )
@@ -1592,20 +1593,14 @@ SEG_cum$finalNEE <- round(SEG_cum$finalNEE, digits = 2)
 
 }
 
-# TO DO ####
-# should H be J not w m2?
-# 
-# w m2 is equal to 
-# 
-# *1800 
+
 
 
 {
   SES_cum <- fluxes_SES_cum %>% 
     group_by(Station) %>% 
-    summarise(finalH = last(H_cum),
+    summarise(finalH = last(H_cum)*1800/1000000,
               finalLE = round(last(LE_cum_mm), digits = 2),
-              # finalLE = last(LE_cum_mm),
               finalNEE = round(last(NEE_cum), digits = 2)
     )
   

@@ -18,11 +18,47 @@ library(raster)  # for land cover maps
 library(rgdal)
 library(tidyverse)  # for ggplot2
 
+## Plotting theme
+theme_fancy <- function() {
+  theme_bw() +
+    theme(
+      text = element_text(family = "Helvetica"),
+      axis.text = element_text(size = 8, color = "black"),
+      axis.title = element_text(size = 10, color = "black"),
+      axis.line.x = element_line(size = 0.3, color = "black"),
+      axis.line.y = element_line(size = 0.3, color = "black"),
+      axis.ticks = element_line(size = 0.3, color = "black"),
+      panel.border = element_blank(),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      panel.grid.minor.y = element_blank(),
+      panel.grid.major.y = element_blank(),
+      plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), units = , "cm"),
+      plot.title = element_text(
+        size = 10,
+        vjust = 1,
+        hjust = 0.5,
+        color = "black"
+      ),
+      legend.text = element_text(size = 9, color = "black"),
+      legend.title = element_text(size = 9, color = "black"),
+      legend.position = c(0.9, 0.9),
+      legend.key.size = unit(0.7, "line"),
+      legend.background = element_rect(
+        color = "black",
+        fill = "transparent",
+        size = 2,
+        linetype = "blank"
+      )
+    )
+}
+windowsFonts("Helvetica" = windowsFont("Helvetica"))  # Ensure font is mapped correctly
 
 #-------------- 0.1 Define paths --------------
 path   <-  "E:/REC_7_Data/8_datasets/Wind_repro_20220211/"
 mpath1 <- "E:/REC_7_Data/12_Marcys_data/csv_Marcy_old/"
 mpath2 <- "E:/REC_7_Data/12_Marcys_data/hh_Marcy_2020_wind/"
+footprintpath <- "data/footprint_probability_datasets/Footprint_Landcover_Results.csv"
 
 
 #-------------- 0.2 Initialize lists --------------
@@ -64,6 +100,10 @@ sum_na <- function(x){sum(is.na(x))}
 
 datg  <- read.csv(file=paste(path, "SEG_fluxes_WIND.csv", sep=""), header=TRUE, sep=",")  
 dats  <- read.csv(file=paste(path, "SES_fluxes_WIND.csv", sep=""), header=TRUE, sep=",")  
+
+footprint_df  <- read_csv(file=footprintpath)  
+
+
 
 # range(datg[,"WS"]-datg[,"Licor.SEG.WS"], na.rm=T)        # 0 0
 # range(datg[,"WD"]-datg[,"Licor.SEG.WD"], na.rm=T)        # 0 0
@@ -354,7 +394,7 @@ if(T){
   
   
   # ===================================================================================== #
-  ###### 6.3 hourly footprint for clusters / probability sum for clusters and towers ######
+  ###### hourly footprint for clusters / probability sum for clusters and towers ######
   # ===================================================================================== #
   
   
@@ -655,66 +695,96 @@ if(T){
 
 
 ###
-### Land cover maps ####
+### 2.0 Land cover maps ####
 ###
 
-if(T){
-  
-  # land cover prob barplot
-  
-  mon_ys <- unique(dat[,c("yyyy", "mon")])
-  rpath <- "E:/REC_7_Data/9_R/Rdata/foot_data_20220211/"
-  pmat <- NULL
-  
-  for(i in 1:nrow(mon_ys)){
-    load(paste(rpath, "pmat_80_", mon_ys[i, "yyyy"], "_", mon_ys[i, "mon"], ".RData", sep="")) # load "pmat_80
-    pmat <- rbind(pmat, pmat_80)
-  }
-  
-  pcols <- paste( rep(c("p1", "p2", "p3"), 10), rep(adatasets[1:10], each=3), sep="_" )
-  
-  pv <- apply(pmat[,pcols], 2, mean, na.r=T)
-  pb <- matrix(pv, nrow=3)
-  colnames(pb) <- adatasets[1:10]
-  rownames(pb) <- c("p1", "p2", "p3")
-  pb <- pb[,c(9, 1:4, 10, 5:8)]
-  
-  ps <- apply(pmat[,pcols], 2, sd, na.r=T)
-  pa <- matrix(ps, nrow=3)
-  colnames(pa) <- adatasets[1:10]
-  rownames(pa) <- c("p1", "p2", "p3")
-  pa <- pa[,c(9, 1:4, 10, 5:8)]
-  
-  
-  cols <- c("darkgreen", "olivedrab3", "moccasin")
-  
-  
-  
-  #### reshape data
-  pbi <- pb[c(2, 3, 1), 10:1]
-  pai <- pa[c(2, 3, 1), 10:1]
-  
-  bplot <- "E:/REC_7_Data/10_Plots/9_footprints/"
-  filenm <- paste(bplot, "land_cover_probabilities_all_year_h_EC0_wind_repro.png", sep="")
-  
-  png(filenm, width=900, height=900)
-  par(mar = c(8, 13, 2, 2), mgp=c(2, 2, 0), tck=-0.01)
-  
-  pbi_h <- barplot(pbi, las=1, beside=T, xlim=c(0, 1), cex.names=3, cex.axis=3, col=cols, horiz=T,
-                   names.arg = c("Ses EC4", "Ses EC3", "Ses EC2", "Ses EC1", "Ses EC0", 
-                                 "Seg EC4", "Seg EC3", "Seg EC2", "Seg EC1", "Seg EC0"))
-  arrows(x0=pbi+pai, y0=pbi_h, x1=pbi-pai, y1=pbi_h, length=0, code=3, lwd=3)
-  mtext("Probability", 1, line=5, cex=3)
-  abline(v=0.8, col="grey", lty=3)
-  box()
-  legend("bottomright", legend=c("Bare Ground", "Herbaceous", "Shrubs"), col=rev(cols), pch=16, cex=2.5)
-  
-  dev.off()
-  
-  
-  
-  
-  
-}  # land cover prob barplot
+# if(T){
+#   
+#   # land cover prob barplot
+#   
+#   mon_ys <- unique(dat[,c("yyyy", "mon")])
+#   rpath <- "E:/REC_7_Data/9_R/Rdata/foot_data_20220211/"
+#   pmat <- NULL
+#   
+#   for(i in 1:nrow(mon_ys)){
+#     load(paste(rpath, "pmat_80_", mon_ys[i, "yyyy"], "_", mon_ys[i, "mon"], ".RData", sep="")) # load "pmat_80
+#     pmat <- rbind(pmat, pmat_80)
+#   }
+#   
+#   pcols <- paste( rep(c("p1", "p2", "p3"), 10), rep(adatasets[1:10], each=3), sep="_" )
+#   
+#   pv <- apply(pmat[,pcols], 2, mean, na.r=T)
+#   pb <- matrix(pv, nrow=3)
+#   colnames(pb) <- adatasets[1:10]
+#   rownames(pb) <- c("p1", "p2", "p3")
+#   pb <- pb[,c(9, 1:4, 10, 5:8)]
+#   
+#   ps <- apply(pmat[,pcols], 2, sd, na.r=T)
+#   pa <- matrix(ps, nrow=3)
+#   colnames(pa) <- adatasets[1:10]
+#   rownames(pa) <- c("p1", "p2", "p3")
+#   pa <- pa[,c(9, 1:4, 10, 5:8)]
+#   
+#   
+#   cols <- c("darkgreen", "olivedrab3", "moccasin")
+#   
+#   
+#   
+#   #### reshape data
+#   pbi <- pb[c(2, 3, 1), 10:1]
+#   pai <- pa[c(2, 3, 1), 10:1]
+#   
+#   bplot <- "E:/REC_7_Data/10_Plots/9_footprints/"
+#   filenm <- paste(bplot, "land_cover_probabilities_all_year_h_EC0_wind_repro.png", sep="")
+#   
+#   png(filenm, width=900, height=900)
+#   par(mar = c(8, 13, 2, 2), mgp=c(2, 2, 0), tck=-0.01)
+#   
+#   pbi_h <- barplot(pbi, las=1, beside=T, xlim=c(0, 1), cex.names=3, cex.axis=3, col=cols, horiz=T,
+#                    names.arg = c("Ses EC4", "Ses EC3", "Ses EC2", "Ses EC1", "Ses EC0", 
+#                                  "Seg EC4", "Seg EC3", "Seg EC2", "Seg EC1", "Seg EC0"))
+#   arrows(x0=pbi+pai, y0=pbi_h, x1=pbi-pai, y1=pbi_h, length=0, code=3, lwd=3)
+#   mtext("Probability", 1, line=5, cex=3)
+#   abline(v=0.8, col="grey", lty=3)
+#   box()
+#   legend("bottomright", legend=c("Bare Ground", "Herbaceous", "Shrubs"), col=rev(cols), pch=16, cex=2.5)
+#   
+#   dev.off()
+#   
+#   
+#   
+#   
+#   
+# }  # land cover prob barplot
 
-
+   
+footprint_plot <- ggplot(data=footprint_df, 
+                         aes(fill=Landcover, 
+                             y=Proportion, 
+                             x=reorder(Station, desc(Station)))) + 
+     geom_col(position="fill") +
+     scale_fill_manual(values=c("moccasin",  "olivedrab3", "darkgreen")) +
+     coord_flip() +
+     labs(y = expression("Landcover Proportion"),
+          x = expression("EC System (80% footprint)")
+          ) +
+     theme_fancy() + 
+     theme(legend.position="top",
+          legend.title = element_blank()) 
+    
+   ## save raster
+   ggsave(footprint_plot,
+          filename = "plots/footprint.png",
+          width = 15,
+          height = 15,
+          units = "cm")
+   
+   # save vector
+   ggsave(footprint_plot,
+          filename = "plots/footprint.pdf",
+          width = 15,
+          height = 15,
+          units = "cm")
+   
+      
+   

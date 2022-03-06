@@ -73,7 +73,7 @@ df_2020 <- read_csv("data/meteorological_data/Sevilleta_LTER_Hourly_Meteorologic
 
 
 # Data from 2021 in different (terrible!) format
-## atempting read with read_csv doesn't work, obscure error
+## attempting read with read_csv doesn't work, obscure error
 # df_2021Met40 <- read_csv("data/meteorological_data/Sev Met Data 20220126/Met40.csv",
 #                          col_names = FALSE,
 #                          na = c("","NA","-999")
