@@ -6,7 +6,7 @@
 # ------------- 0. Setup Environment ----------
 # install.packages("gt")
 # install.packages("hexbin")  # NB. should load as dependency of tidyverse but sometimes doesn't
-
+# install.packages("mvtnorm") 
 
 ## Load packages
 library(tidyverse)

@@ -3,7 +3,7 @@
 ## Tested with R v3.6.2
 
 # Note that this script currently includes many static file paths for outputs 
-# preventing execution on different machines.
+# hindering execution on different machines.
 
 
 
@@ -101,7 +101,8 @@ sum_na <- function(x){sum(is.na(x))}
 datg  <- read.csv(file=paste(path, "SEG_fluxes_WIND.csv", sep=""), header=TRUE, sep=",")  
 dats  <- read.csv(file=paste(path, "SES_fluxes_WIND.csv", sep=""), header=TRUE, sep=",")  
 
-footprint_df  <- read_csv(file=footprintpath)  
+
+
 
 
 
@@ -152,7 +153,8 @@ colnames(ds)<-c("datetime",     "FC_sm",      "FC_s1",      "FC_s2",        "FC_
 
 ## ================================================ add date_time chron
 
-#dat<-merge(dg, ds, by="datetime")  ##### aaaalllll rearranged !!!!
+#dat <- merge(dg, ds, by="datetime")
+
 # range(as.numeric(dg[,1])-as.numeric(ds[,1]))    # 0 0 
 
 dtimes <- as.character(dg[,1])
@@ -698,79 +700,28 @@ if(T){
 ### 2.0 Land cover maps ####
 ###
 
-# if(T){
-#   
-#   # land cover prob barplot
-#   
-#   mon_ys <- unique(dat[,c("yyyy", "mon")])
-#   rpath <- "E:/REC_7_Data/9_R/Rdata/foot_data_20220211/"
-#   pmat <- NULL
-#   
-#   for(i in 1:nrow(mon_ys)){
-#     load(paste(rpath, "pmat_80_", mon_ys[i, "yyyy"], "_", mon_ys[i, "mon"], ".RData", sep="")) # load "pmat_80
-#     pmat <- rbind(pmat, pmat_80)
-#   }
-#   
-#   pcols <- paste( rep(c("p1", "p2", "p3"), 10), rep(adatasets[1:10], each=3), sep="_" )
-#   
-#   pv <- apply(pmat[,pcols], 2, mean, na.r=T)
-#   pb <- matrix(pv, nrow=3)
-#   colnames(pb) <- adatasets[1:10]
-#   rownames(pb) <- c("p1", "p2", "p3")
-#   pb <- pb[,c(9, 1:4, 10, 5:8)]
-#   
-#   ps <- apply(pmat[,pcols], 2, sd, na.r=T)
-#   pa <- matrix(ps, nrow=3)
-#   colnames(pa) <- adatasets[1:10]
-#   rownames(pa) <- c("p1", "p2", "p3")
-#   pa <- pa[,c(9, 1:4, 10, 5:8)]
-#   
-#   
-#   cols <- c("darkgreen", "olivedrab3", "moccasin")
-#   
-#   
-#   
-#   #### reshape data
-#   pbi <- pb[c(2, 3, 1), 10:1]
-#   pai <- pa[c(2, 3, 1), 10:1]
-#   
-#   bplot <- "E:/REC_7_Data/10_Plots/9_footprints/"
-#   filenm <- paste(bplot, "land_cover_probabilities_all_year_h_EC0_wind_repro.png", sep="")
-#   
-#   png(filenm, width=900, height=900)
-#   par(mar = c(8, 13, 2, 2), mgp=c(2, 2, 0), tck=-0.01)
-#   
-#   pbi_h <- barplot(pbi, las=1, beside=T, xlim=c(0, 1), cex.names=3, cex.axis=3, col=cols, horiz=T,
-#                    names.arg = c("Ses EC4", "Ses EC3", "Ses EC2", "Ses EC1", "Ses EC0", 
-#                                  "Seg EC4", "Seg EC3", "Seg EC2", "Seg EC1", "Seg EC0"))
-#   arrows(x0=pbi+pai, y0=pbi_h, x1=pbi-pai, y1=pbi_h, length=0, code=3, lwd=3)
-#   mtext("Probability", 1, line=5, cex=3)
-#   abline(v=0.8, col="grey", lty=3)
-#   box()
-#   legend("bottomright", legend=c("Bare Ground", "Herbaceous", "Shrubs"), col=rev(cols), pch=16, cex=2.5)
-#   
-#   dev.off()
-#   
-#   
-#   
-#   
-#   
-# }  # land cover prob barplot
-
+### 3.0 land cover prob barplot ####
    
-footprint_plot <- ggplot(data=footprint_df, 
+   
+### read in putput csv
+footprint_df  <- read_csv(file=footprintpath, col_types = cols(Station=col_factor(NULL),
+                                                                  Landcover =col_factor(NULL)))  
+   
+
+(footprint_plot <- ggplot(data=footprint_df, 
                          aes(fill=Landcover, 
                              y=Proportion, 
                              x=reorder(Station, desc(Station)))) + 
      geom_col(position="fill") +
-     scale_fill_manual(values=c("moccasin",  "olivedrab3", "darkgreen")) +
+     scale_fill_manual(values=c("grey", "moccasin", "darkgreen", "olivedrab3")) +
      coord_flip() +
-     labs(y = expression("Landcover Proportion"),
-          x = expression("EC System (80% footprint)")
+     labs(y = expression("Landcover in Sampled Footprint"),
+          x = expression("EC System")
           ) +
      theme_fancy() + 
      theme(legend.position="top",
           legend.title = element_blank()) 
+  )
     
    ## save raster
    ggsave(footprint_plot,
