@@ -726,15 +726,15 @@ footprint_df  <- read_csv(file=footprintpath, col_types = cols(Station=col_facto
    ## save raster
    ggsave(footprint_plot,
           filename = "plots/footprint.png",
-          width = 15,
-          height = 15,
+          width = 11,
+          height = 8,
           units = "cm")
    
    # save vector
    ggsave(footprint_plot,
           filename = "plots/footprint.pdf",
-          width = 15,
-          height = 15,
+          width = 11,
+          height = 8,
           units = "cm")
    
       
