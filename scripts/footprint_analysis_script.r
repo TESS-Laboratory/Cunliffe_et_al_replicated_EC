@@ -715,7 +715,7 @@ footprint_df  <- read_csv(file=footprintpath, col_types = cols(Station=col_facto
      geom_col(position="fill") +
      scale_fill_manual(values=c("grey", "moccasin", "darkgreen", "olivedrab3")) +
      coord_flip() +
-     labs(y = expression("Landcover in Sampled Footprint"),
+     labs(y = expression("Proportion of land cover in sampled footprint"),
           x = expression("EC System")
           ) +
      theme_fancy() + 
