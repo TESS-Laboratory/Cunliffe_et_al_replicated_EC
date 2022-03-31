@@ -2018,3 +2018,35 @@ ggsave(pall,
        height = 18,
        units = "cm")
 }
+
+
+
+#-------------- 6. Climate context: calculate observed monthly precipitation from the EC towers --------------
+
+SEG_met_study <- subset_datetime(SEG_met)
+SES_met_study <- subset_datetime(SES_met)
+
+
+names(SEG_met_study)
+
+# Function to calculate monthly precipitation in study period
+monthly_precip <- function(df) {
+  df %>%
+    mutate(
+      month = lubridate::month(datetime),
+      year = lubridate::year(datetime)
+    ) %>% 
+    group_by(year, month) %>%
+    summarise(Precipitation = sum(Precipitation, na.rm = TRUE))  # Return total precipitation for every month
+}
+
+
+MonthlyPrecip_SEG_study <- monthly_precip(SEG_met_study)
+MonthlyPrecip_SES_study <- monthly_precip(SES_met_study)
+
+
+
+
+
+
+
