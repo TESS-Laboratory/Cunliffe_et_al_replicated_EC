@@ -1916,7 +1916,7 @@ pall <- (EB_SEG0_plot + EB_SES0_plot) / (EB_SEG1_plot + EB_SES1_plot) +
 
 {
   ## There were gaps in the NETRAD and SHF series, accounting for between 2-7% of
-  ## the timesteps. Timesteps with incomplete observations (NA in any of the four
+  ## the time steps. Time steps with incomplete observations (NA in any of the four
   ## inputs) were treated as zero in the cumulative sum.
 
 SEG0_EBR <- EB_SEG0 %>%
@@ -1950,7 +1950,10 @@ SES1_EBR <- EB_SES1 %>%
     cum_EB = (cumsum(coalesce(EB, 0)) + EB*0)/1000000  # convert to mj m2. Replace NA timesteps with 0.
   )
 
-
+## Calculate cumulative energy emissions to contextualize the relative magnitude
+# of the imbalance
+# names(EB_SEG0)
+# sum()
 
 ### visualize cumulative Energy Balance Ratio ###
 
