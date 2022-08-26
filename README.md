@@ -7,10 +7,9 @@ of landscape heterogeneity in dryland fluxes' by Andrew Cunliffe, Fabio Boschett
 Robert Clement, Stephen Sitch, Karen Anderson, Tomer Duman, Songyan Zhu, Mikeal 
 Schlumpf, Marcy Litvak, Richard Brazier and Timothy Hill.
 
+This is publsihed in: Journal of Geophysical Research: Biogeosciences 127(8):e2021JG006240. DOI: 10.1029/2021JG006240.
+
 ## Contact: a.cunliffe@Exeter.ac.uk
-
-## The manuscript is in review. DOI TBC
-
 
 
 ## This repo contains the following scripts
